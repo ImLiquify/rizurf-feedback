@@ -91,7 +91,7 @@ export async function fetchInterns({ limit = 100, offset = 0, correlationId } = 
     role: intern.position || intern.role || 'Intern',
     department: intern.department || 'Internship',
     email: intern.email_address || intern.email || null,
-    avatar: intern.avatar || intern.profile_photo || null,
+    avatar: intern.photo_url || intern.avatar || intern.profile_photo || null,
     skills: Array.isArray(intern.skills) ? intern.skills : []
   })).filter(intern => intern.externalId !== 'undefined');
 }
