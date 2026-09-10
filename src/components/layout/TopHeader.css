@@ -1,0 +1,154 @@
+/* Top Header Styles */
+
+.top-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.top-header-left {
+  flex: 1;
+}
+
+.search-placeholder {
+  width: 300px;
+  height: 40px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+}
+
+.top-header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.role-switcher-wrapper {
+  position: relative;
+}
+
+.role-switcher-btn {
+  padding: var(--space-xs) var(--space-md);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.role-switcher-btn:hover {
+  background: var(--bg-hover);
+}
+
+.role-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 120px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--border-light);
+  display: none;
+  flex-direction: column;
+  padding: var(--space-xs);
+}
+
+.role-menu.open {
+  display: flex;
+}
+
+.role-option {
+  text-align: left;
+  padding: var(--space-sm) var(--space-md);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.role-option:hover {
+  background: var(--bg-hover);
+}
+
+.role-option.active {
+  background: #e3f2fd;
+  color: var(--accent-blue);
+}
+
+.notification-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.notification-btn:hover {
+  background: var(--bg-hover);
+}
+
+.theme-toggle-btn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--border-light);
+  border-radius: 50%;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 1.2rem;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--bg-hover);
+}
+
+.notification-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: var(--reaction-heart);
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+  background: var(--bg-card);
+}
+
+.profile-name {
+  font-size: 0.875rem;
+  margin-left: var(--space-xs);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.profile-btn:hover {
+  border-color: var(--accent-blue);
+}
+
+.profile-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

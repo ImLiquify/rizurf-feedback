@@ -1,0 +1,243 @@
+/* Me Tab Styles */
+
+.me-tab {
+  background: var(--bg-card);
+}
+
+.me-tab-header {
+  background: linear-gradient(135deg, var(--accent-blue), #64b5f6);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-md);
+}
+
+.me-tab-header h2 {
+  color: white;
+  margin-bottom: var(--space-md);
+}
+
+.me-tab-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.15);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.stat-icon {
+  font-size: 1.5rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.me-tab-stats-section {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-md);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.me-tab-stats-section h3 {
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+}
+
+.global-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+}
+
+.global-stat-card {
+  padding: var(--space-lg);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.stat-received {
+  background: #e8f5e9;
+  border: 1px solid #c8e6c9;
+}
+
+.stat-given {
+  background: #fff3e0;
+  border: 1px solid #ffe0b2;
+}
+
+.global-stat-icon {
+  font-size: 2rem;
+}
+
+.global-stat-label {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.global-stat-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.me-tab-timeline,
+.me-tab-performers {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.me-tab-timeline h3,
+.me-tab-performers h3 {
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+  font-size: 1rem;
+}
+
+/* Mini Feedback Card */
+.mini-feedback-card {
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.mini-fc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mini-fc-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.mini-fc-time {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.mini-fc-content {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.mini-fc-reactions {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.mini-fc-reaction {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  padding: 2px 6px;
+  background: var(--bg-hover);
+  border-radius: var(--radius-sm);
+}
+
+/* Activity Item */
+.activity-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--space-md);
+  align-items: center;
+  padding: var(--space-md);
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-sm);
+}
+
+.activity-icon {
+  font-size: 1.5rem;
+}
+
+.activity-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.activity-time {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.activity-reaction-count {
+  font-size: 0.75rem;
+  color: var(--accent-blue);
+}
+
+/* Top Performers */
+.performer-card {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-sm);
+}
+
+.performer-rank {
+  font-size: 1.25rem;
+  font-weight: 700;
+  width: 40px;
+  text-align: center;
+}
+
+.rank-1 { color: #ffd700; }
+.rank-2 { color: #c0c0c0; }
+.rank-3 { color: #cd7f32; }
+
+.performer-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.performer-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.performer-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.performer-role {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.performer-stats {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  text-align: right;
+}

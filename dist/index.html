@@ -1,0 +1,4680 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PulseFeedback — Enterprise Feedback & Workplace Improvement Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       1. CSS VARIABLES & DESIGN TOKENS
+       ========================================================================== */
+    :root {
+      --brand-dark: #021732;
+      --brand-navy: #0A2A4E;
+      --brand-teal-dark: #027E8F;
+      --brand-teal: #039DB1;
+      --brand-teal-light: #0A2A4E;
+      --brand-ice: #E7F6F8;
+
+      --neutral-dark: #0E1B2C;
+      --neutral-gray: #5A6B80;
+      --neutral-border: #E3E8EF;
+      --neutral-white: #FFFFFF;
+      --neutral-bg: #F6F8FB;
+
+      --status-success: #12A150;
+      --status-warning: #E8A317;
+      --status-danger: #E0533D;
+
+      --primary: var(--brand-teal);
+      --primary-hover: var(--brand-teal-dark);
+      --primary-light: var(--brand-ice);
+      --bg-main: var(--neutral-white);
+      --bg-surface: var(--neutral-white);
+      --bg-muted: var(--neutral-bg);
+      --text-main: var(--neutral-dark);
+      --text-muted: var(--neutral-gray);
+      --text-inverse: var(--neutral-white);
+      --badge-rent: var(--status-danger);
+      --badge-sale: var(--status-success);
+      --border-light: var(--neutral-border);
+
+      --bg-canvas: var(--neutral-bg);
+      --bg-subtle: var(--bg-muted);
+      --bg-hover: var(--border-light);
+      --text-subtle: #8291A3;
+
+      --accent-cyan: var(--primary);
+      --accent-cyan-hover: var(--primary-hover);
+      --accent-cyan-light: var(--primary-light);
+      --accent-cyan-glow: rgba(3, 157, 177, 0.22);
+
+      --danger-color: var(--status-danger);
+      --danger-hover: #C84431;
+      --danger-light: #FCE9E5;
+
+      --border-color: var(--border-light);
+      --border-focus: var(--brand-teal);
+
+      --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+      --shadow-lg: 0 12px 28px -6px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.03);
+      --shadow-xl: 0 20px 35px -8px rgba(15, 23, 42, 0.12);
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+      --radius-full: 9999px;
+
+      --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-heading: var(--font-body);
+
+      --font-size-h1: 28px;
+      --font-size-h2: 16px;
+      --font-size-h3: 14px;
+      --font-size-p: 13.5px;
+      --font-size-secondary: 12.5px;
+      --font-size-btn: 14px;
+      --radius-pill: 9999px;
+
+      --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-smooth: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ==========================================================================
+       2. RESET & BASE STYLES
+       ========================================================================== */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1 {
+      font-size: var(--font-size-h1);
+      font-weight: 700;
+      color: var(--neutral-dark);
+    }
+
+    h2 {
+      font-size: var(--font-size-h2);
+      font-weight: 700;
+      color: var(--neutral-dark);
+    }
+
+    h3 {
+      font-size: var(--font-size-h3);
+      font-weight: 700;
+      color: var(--neutral-dark);
+    }
+
+    p {
+      font-size: var(--font-size-p);
+      font-weight: 500;
+      color: var(--neutral-dark);
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font-family: inherit;
+      color: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      background: none;
+      outline: none;
+    }
+
+    .btn-give-kudos,
+    .btn-submit-feedback,
+    .btn-submit-comment,
+    .btn-save-inline,
+    .btn-submit-reply {
+      background: var(--neutral-dark);
+      color: var(--neutral-white);
+      font-size: var(--font-size-btn);
+      font-weight: 650;
+      border-radius: var(--radius-pill);
+    }
+
+    .btn-give-kudos:hover,
+    .btn-submit-feedback:hover,
+    .btn-submit-comment:hover,
+    .btn-save-inline:hover,
+    .btn-submit-reply:hover {
+      background: var(--brand-navy);
+    }
+
+    /* ==========================================================================
+       3. TOP NAVIGATION BAR
+       ========================================================================== */
+    .navbar-wrapper {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .navbar-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px var(--accent-cyan-glow);
+    }
+
+    .brand-title-group h1 {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-badge {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+      background: var(--accent-cyan-light);
+      color: var(--accent-cyan);
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(37, 99, 235, 0.2);
+    }
+
+    .brand-title-group p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Nav Center Tabs */
+    .nav-tabs-wrapper {
+      display: flex;
+      background: var(--bg-subtle);
+      padding: 4px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-color);
+    }
+
+    .nav-tab-btn {
+      padding: 8px 24px;
+      border-radius: var(--radius-full);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all var(--transition-fast);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-tab-btn:hover {
+      color: var(--text-main);
+    }
+
+    .nav-tab-btn.active {
+      background: var(--bg-surface);
+      color: var(--accent-cyan);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .nav-tab-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      padding: 1px 7px;
+      border-radius: 999px;
+    }
+
+    .nav-tab-btn.active .nav-tab-badge {
+      background: var(--accent-cyan-light);
+      color: var(--accent-cyan);
+    }
+
+    /* Nav Right Actions */
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .role-switcher-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 5px 10px;
+      transition: border-color var(--transition-fast);
+    }
+
+    .role-switcher-box:hover,
+    .role-switcher-box:focus-within {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 2px var(--accent-cyan-glow);
+    }
+
+    .role-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .role-select {
+      background: transparent;
+      border: none;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-main);
+      cursor: pointer;
+      outline: none;
+      padding-right: 4px;
+    }
+
+    .role-indicator-badge {
+      font-size: 0.68rem;
+      padding: 2px 6px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+    }
+
+    .role-employee {
+      background: #F1F5F9;
+      color: #475569;
+    }
+
+    .role-manager {
+      background: #FEF3C7;
+      color: #D97706;
+    }
+
+    .role-admin {
+      background: #EDE9FE;
+      color: #7C3AED;
+    }
+
+    .user-avatar-mini {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-full);
+      border: 2px solid var(--bg-surface);
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+
+    .user-avatar-mini img {
+      width: 100%;
+      height: 100%;
+      border-radius: var(--radius-full);
+      object-fit: cover;
+    }
+
+    .status-dot {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #10B981;
+      border: 2px solid #FFFFFF;
+    }
+
+    /* ==========================================================================
+       4. MAIN APP CONTAINER & LAYOUT
+       ========================================================================== */
+    .app-main-content {
+      max-width: 1240px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px 24px 80px 24px;
+      flex: 1;
+    }
+
+    .view-pane {
+      display: none;
+      animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .view-pane.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ==========================================================================
+       5. TAB 1: "ME" VIEW (WITH SUB-NAVIGATION TOGGLE TABS)
+       ========================================================================== */
+    .me-hero-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .me-hero-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 240px;
+      height: 100%;
+      background: radial-gradient(circle at top right, var(--accent-cyan-light) 0%, transparent 70%);
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    .me-profile-left {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      z-index: 1;
+    }
+
+    .me-avatar-lg {
+      width: 84px;
+      height: 84px;
+      border-radius: var(--radius-xl);
+      background: #E2E8F0;
+      border: 3px solid #FFFFFF;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .me-avatar-lg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .me-details h2 {
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .me-details .verified-icon {
+      color: var(--accent-cyan);
+      display: inline-flex;
+    }
+
+    .me-role-title {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    .me-tags {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .badge-pill {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .badge-pill.highlight {
+      background: var(--accent-cyan-light);
+      color: var(--accent-cyan);
+      border-color: rgba(37, 99, 235, 0.2);
+    }
+
+    .me-stats-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      z-index: 1;
+    }
+
+    .stat-card-box {
+      text-align: center;
+      background: var(--bg-subtle);
+      padding: 14px 22px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+      min-width: 120px;
+      transition: transform var(--transition-fast);
+    }
+
+    .stat-card-box:hover {
+      transform: translateY(-2px);
+    }
+
+    .stat-number {
+      font-family: var(--font-heading);
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.1;
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-top: 4px;
+    }
+
+    .btn-give-kudos {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent-cyan);
+      color: #FFFFFF;
+      font-weight: 700;
+      font-size: 0.88rem;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      box-shadow: 0 4px 14px var(--accent-cyan-glow);
+      transition: all var(--transition-fast);
+    }
+
+    .btn-give-kudos:hover {
+      background: var(--accent-cyan-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px var(--accent-cyan-glow);
+    }
+
+    /* ME Sub-Navigation Toggle Tabs */
+    .me-subtabs-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 8px 12px;
+      box-shadow: var(--shadow-sm);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .me-subtabs-nav {
+      display: flex;
+      gap: 8px;
+    }
+
+    .me-subtab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: transparent;
+      transition: all var(--transition-fast);
+      border: 1px solid transparent;
+    }
+
+    .me-subtab-btn:hover {
+      color: var(--text-main);
+      background: var(--bg-subtle);
+    }
+
+    .me-subtab-btn.active {
+      background: var(--accent-cyan-light);
+      color: var(--accent-cyan);
+      border-color: rgba(37, 99, 235, 0.25);
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.12);
+    }
+
+    .me-subtab-badge {
+      font-size: 0.75rem;
+      font-weight: 800;
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+    }
+
+    .me-subtab-btn.active .me-subtab-badge {
+      background: #FFFFFF;
+      color: var(--accent-cyan);
+      border: 1px solid rgba(37, 99, 235, 0.2);
+    }
+
+    .me-subtab-hint {
+      font-size: 0.8rem;
+      color: var(--text-subtle);
+      padding-right: 8px;
+    }
+
+    /* Sub-pane toggle visibility */
+    .me-subpane {
+      display: none;
+      animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .me-subpane.active {
+      display: block;
+    }
+
+    .feed-cards-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* ==========================================================================
+       6. FEEDBACK CARD DESIGN SYSTEM (WITH EDITING & DELETION)
+       ========================================================================== */
+    .feedback-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-smooth);
+      position: relative;
+    }
+
+    .feedback-card:hover {
+      border-color: #CBD5E1;
+      box-shadow: var(--shadow-md);
+    }
+
+    .feedback-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .author-info-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .author-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .author-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .author-avatar.anon-avatar {
+      background: var(--neutral-bg);
+      color: var(--neutral-gray);
+    }
+
+    .author-meta {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .author-name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .author-name {
+      font-weight: 700;
+      font-size: 0.94rem;
+      color: var(--text-main);
+    }
+
+    .target-direction {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .target-name-link {
+      font-weight: 600;
+      color: var(--accent-cyan);
+      text-decoration: none;
+    }
+
+    .post-timestamp-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 1px;
+    }
+
+    .post-timestamp {
+      font-size: 0.75rem;
+      color: var(--text-subtle);
+    }
+
+    .edited-badge {
+      font-size: 0.72rem;
+      color: var(--text-subtle);
+      font-style: italic;
+      font-weight: 500;
+    }
+
+    /* Manager / Admin Anonymous Identity Badge: [Anon] */
+    .anon-manager-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: #FEF3C7;
+      color: #B45309;
+      border: 1px solid #FCD34D;
+      letter-spacing: 0.02em;
+    }
+
+    /* Action Buttons (Edit & Delete) */
+    .card-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-action-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      color: var(--text-subtle);
+      background: transparent;
+      transition: all var(--transition-fast);
+      flex-shrink: 0;
+    }
+
+    .btn-action-icon:hover {
+      background: var(--bg-subtle);
+      color: var(--text-main);
+      transform: scale(1.05);
+    }
+
+    .btn-action-icon.danger:hover {
+      background: var(--danger-light);
+      color: var(--danger-color);
+    }
+
+    .feedback-body-text {
+      font-size: 0.94rem;
+      line-height: 1.65;
+      color: #1E293B;
+      margin-bottom: 18px;
+      white-space: pre-line;
+    }
+
+    /* Inline Editing Form */
+    .inline-edit-box {
+      margin-bottom: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .inline-edit-textarea {
+      width: 100%;
+      min-height: 80px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--accent-cyan);
+      box-shadow: 0 0 0 2px var(--accent-cyan-glow);
+      font-size: 0.9rem;
+      outline: none;
+      resize: vertical;
+      background: #FFFFFF;
+    }
+
+    .inline-edit-controls {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .btn-save-inline {
+      background: var(--accent-cyan);
+      color: #FFFFFF;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: var(--radius-sm);
+      transition: background var(--transition-fast);
+    }
+
+    .btn-save-inline:hover {
+      background: var(--accent-cyan-hover);
+    }
+
+    .btn-cancel-inline {
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: var(--radius-sm);
+      transition: all var(--transition-fast);
+    }
+
+    .btn-cancel-inline:hover {
+      background: #E2E8F0;
+      color: var(--text-main);
+    }
+
+    /* Emoji Reaction Bar & Comment Toggle Button */
+    .card-footer-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-light);
+      flex-wrap: wrap;
+    }
+
+    .emoji-reactions-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .reaction-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 11px;
+      border-radius: var(--radius-full);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all var(--transition-fast);
+      user-select: none;
+    }
+
+    .reaction-chip:hover {
+      background: #E2E8F0;
+      transform: scale(1.05);
+    }
+
+    .reaction-chip.active {
+      background: var(--accent-cyan-light);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15);
+    }
+
+    .reaction-chip .emoji-icon {
+      font-size: 0.95rem;
+      line-height: 1;
+    }
+
+    /* Enhanced Comment Action Button */
+    .btn-comment-toggle {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: var(--radius-md);
+      transition: all var(--transition-fast);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-comment-toggle:hover,
+    .btn-comment-toggle.active {
+      background: var(--accent-cyan-light);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    /* ==========================================================================
+       7. THREADED COMMENTS & VISIBILITY
+       ========================================================================== */
+    .comments-thread {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--border-color);
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .comments-thread.open {
+      display: flex;
+    }
+
+    .comments-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .empty-comments-message {
+      background: var(--bg-subtle);
+      border: 1px dashed var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .single-comment {
+      display: flex;
+      gap: 12px;
+      background: var(--bg-subtle);
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      border: 1px solid var(--border-light);
+      position: relative;
+    }
+
+    .comment-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .comment-avatar.anon-avatar {
+      background: #E2E8F0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+    }
+
+    .comment-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .comment-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .comment-author-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .comment-author {
+      font-weight: 700;
+      font-size: 0.84rem;
+      color: var(--text-main);
+    }
+
+    .reply-destination {
+      font-size: 0.78rem;
+      color: var(--text-subtle);
+      font-weight: 600;
+    }
+
+    .comment-time {
+      font-size: 0.72rem;
+      color: var(--text-subtle);
+    }
+
+    .comment-text {
+      color: #1E293B;
+      line-height: 1.5;
+    }
+
+    /* Comment Reaction Chips & Actions */
+    .comment-footer-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .comment-reactions-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .comment-reaction-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all var(--transition-fast);
+    }
+
+    .comment-reaction-btn:hover {
+      background: #F1F5F9;
+      transform: scale(1.05);
+    }
+
+    .comment-reaction-btn.active {
+      background: var(--accent-cyan-light);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    .comment-action-icons {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .btn-action-icon-mini {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      padding-right: 10px;
+      border-radius: 4px;
+      color: var(--text-subtle);
+      background: transparent;
+      transition: all var(--transition-fast);
+    }
+
+    .btn-action-icon-mini:hover {
+      background: #E2E8F0;
+      color: var(--text-main);
+    }
+
+    .btn-action-icon-mini.danger:hover {
+      background: var(--danger-light);
+      color: var(--danger-color);
+    }
+
+    /* Comment Input Box */
+    .comment-input-box {
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .comment-input-field {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 0.85rem;
+      background: transparent;
+    }
+
+    .comment-action-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border-light);
+      padding-top: 8px;
+      gap: 10px;
+    }
+
+    .mini-anon-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      user-select: none;
+    }
+
+    .mini-anon-toggle input {
+      accent-color: var(--accent-cyan);
+      cursor: pointer;
+    }
+
+    .btn-submit-comment {
+      background: var(--accent-cyan);
+      color: #FFFFFF;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+      transition: background var(--transition-fast);
+    }
+
+    .btn-submit-comment:hover {
+      background: var(--accent-cyan-hover);
+    }
+
+    .comment-reply-btn {
+      color: var(--accent-cyan);
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .reply-input-box {
+      display: flex;
+      align-items: center;
+      gap: 8px; /* space between checkbox and text */
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .reply-anon-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      width: auto;
+      flex: 0 0 auto;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      cursor: pointer;
+    }
+
+    .reply-anon-toggle input[type="checkbox"] {
+      accent-color: var(--primary);
+      width: 13px;
+      height: 13px;
+      margin: 0;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .reply-input-box input[type="text"] {
+      flex: 1;
+      min-width: 0;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 7px 9px;
+      font-size: 0.8rem;
+      outline: none;
+    }
+
+    .reply-input-box input[type="text"]:focus {
+      border-color: var(--accent-cyan);
+    }
+
+    .reply-input-box button {
+      background: var(--accent-cyan);
+      color: #FFFFFF;
+      border-radius: var(--radius-sm);
+      padding: 6px 10px;
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+
+    .comment-replies {
+      margin: 10px 0 0 18px;
+      padding-left: 12px;
+      border-left: 2px solid var(--border-light);
+    }
+
+    /* Empty state */
+    .empty-feed-card {
+      background: var(--bg-surface);
+      border: 2px dashed var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 42px 20px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    .empty-feed-card svg {
+      margin-bottom: 8px;
+      color: var(--text-subtle);
+    }
+
+    /* ==========================================================================
+       8. TAB 2: "EMPLOYEE WALL" VIEW (CLEAN TILES)
+       ========================================================================== */
+    .wall-controls-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .search-filter-row {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search-input-wrapper {
+      flex: 1;
+      min-width: 280px;
+      position: relative;
+    }
+
+    .search-input-wrapper svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-subtle);
+      pointer-events: none;
+    }
+
+    .search-input-field {
+      width: 100%;
+      padding: 12px 14px 12px 42px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      font-size: 0.92rem;
+      box-shadow: var(--shadow-sm);
+      outline: none;
+      transition: all var(--transition-fast);
+    }
+
+    .search-input-field:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 3px var(--accent-cyan-glow);
+    }
+
+    .department-chips-group {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .dept-chip-btn {
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      white-space: nowrap;
+      transition: all var(--transition-fast);
+    }
+
+    .dept-chip-btn:hover {
+      background: var(--bg-subtle);
+      color: var(--text-main);
+    }
+
+    .dept-chip-btn.active {
+      background: var(--text-main);
+      color: #FFFFFF;
+      border-color: var(--text-main);
+    }
+
+    /* Grid Layout */
+    .employee-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 22px;
+    }
+
+    /* Workplace Suggestions Wall Card */
+    .company-wall-card {
+      background: linear-gradient(145deg, var(--brand-dark) 0%, var(--brand-navy) 100%);
+      color: var(--neutral-white);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all var(--transition-smooth);
+      border: 1px solid #334155;
+    }
+
+    .company-wall-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 32px rgba(15, 23, 42, 0.25);
+      border-color: var(--accent-cyan);
+    }
+
+    .company-wall-card::after {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -30%;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(37, 99, 235, 0.35) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .company-badge-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .company-pill {
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: rgba(37, 99, 235, 0.2);
+      color: #38BDF8;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .company-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-cyan);
+      margin-bottom: 14px;
+    }
+
+    .company-wall-title {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: #FFFFFF;
+    }
+
+    .company-wall-desc {
+      font-size: 0.82rem;
+      color: #94A3B8;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .company-action-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 14px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: #38BDF8;
+    }
+
+    /* Cleaned Up Employee Tile */
+    .employee-tile-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      transition: all var(--transition-smooth);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .employee-tile-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent-cyan);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .employee-avatar-box {
+      width: 72px;
+      height: 72px;
+      border-radius: var(--radius-xl);
+      border: 2px solid var(--bg-surface);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .employee-avatar-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .employee-name {
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 3px;
+    }
+
+    .employee-role-tag {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .employee-dept-badge {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+
+    .tile-stats-row {
+      display: flex;
+      width: 100%;
+      justify-content: space-around;
+      padding: 12px 0 4px 0;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .tile-stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .tile-stat-val {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--text-main);
+    }
+
+    .tile-stat-lbl {
+      font-size: 0.7rem;
+      color: var(--text-subtle);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    /* ==========================================================================
+       9. WALL MODAL / DRAWER
+       ========================================================================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-content-card {
+      background: var(--bg-surface);
+      width: 100%;
+      max-width: 820px;
+      max-height: 90vh;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      overscroll-behavior: contain;
+      border: 1px solid var(--border-color);
+      position: relative;
+      animation: zoomIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes zoomIn {
+      from {
+        opacity: 0;
+        transform: scale(0.96);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-target-profile {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .modal-target-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-target-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .modal-target-info h3 {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .modal-target-info p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .btn-modal-close {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      background: var(--bg-subtle);
+      transition: all var(--transition-fast);
+    }
+
+    .btn-modal-close:hover {
+      background: #E2E8F0;
+      color: var(--text-main);
+    }
+
+    .modal-scrollable-body {
+      padding: 24px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      background: var(--bg-canvas);
+    }
+
+    /* Write Feedback Box */
+    .write-feedback-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .write-panel-title {
+      font-family: var(--font-heading);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .feedback-textarea {
+      width: 100%;
+      height: 100px;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      font-size: 0.9rem;
+      resize: vertical;
+      outline: none;
+      transition: border-color var(--transition-fast);
+      margin-bottom: 12px;
+      background: #FFFFFF;
+    }
+
+    .feedback-textarea:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 2px var(--accent-cyan-glow);
+    }
+
+    /* Form Bottom Bar: Anonymous Toggle & Submit Button */
+    .form-bottom-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .anon-toggle-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .toggle-switch-wrapper {
+      position: relative;
+      width: 44px;
+      height: 24px;
+    }
+
+    .toggle-checkbox {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background-color: #CBD5E1;
+      border-radius: 24px;
+      transition: background-color var(--transition-fast);
+    }
+
+    .toggle-slider::before {
+      content: "";
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      border-radius: 50%;
+      transition: transform var(--transition-fast);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    .toggle-checkbox:checked+.toggle-slider {
+      background-color: var(--accent-cyan);
+    }
+
+    .toggle-checkbox:checked+.toggle-slider::before {
+      transform: translateX(20px);
+    }
+
+    .anon-label-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .anon-label-title {
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .anon-label-subtext {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .btn-submit-feedback {
+      background: var(--accent-cyan);
+      color: #FFFFFF;
+      font-size: 0.88rem;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: var(--radius-md);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 8px var(--accent-cyan-glow);
+      transition: all var(--transition-fast);
+    }
+
+    .btn-submit-feedback:hover {
+      background: var(--accent-cyan-hover);
+      transform: translateY(-1px);
+    }
+
+    /* Private remarks are visible only to the current user. */
+    .private-remark-panel {
+      position: absolute;
+      top: 82px;
+      right: 24px;
+      z-index: 2;
+      width: min(380px, calc(100% - 48px));
+      max-height: calc(90vh - 120px);
+      overflow-y: auto;
+      background: #FFFDF5;
+      border: 1px solid #E7C66A;
+      border-radius: 4px 12px 12px 4px;
+      padding: 18px 20px 20px 26px;
+      box-shadow: 10px 12px 24px rgba(15, 23, 42, 0.18);
+      animation: notebookPopIn 0.18s ease-out;
+    }
+
+    .private-remark-panel::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 13px;
+      width: 1px;
+      background: #E6A7A7;
+    }
+
+    @keyframes notebookPopIn {
+      from {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.98);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .private-remark-panel[hidden] {
+      display: none;
+    }
+
+    .private-remark-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-heading);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .private-remark-close {
+      margin-left: auto;
+      padding: 2px 4px;
+      border: 0;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.75rem;
+    }
+
+    .private-remark-close:hover {
+      color: var(--text-main);
+    }
+
+    .personal-remark-link {
+      margin-left: 8px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--accent-cyan-hover);
+      font: inherit;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      cursor: pointer;
+      vertical-align: middle;
+    }
+
+    .personal-remark-link:hover {
+      color: var(--accent-cyan);
+    }
+
+    .personal-remark-link:focus-visible {
+      outline: 2px solid var(--accent-cyan);
+      outline-offset: 3px;
+      border-radius: 2px;
+    }
+
+    .private-remark-subtitle {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-bottom: 12px;
+    }
+
+    .private-remark-input {
+      width: 100%;
+      min-height: 150px;
+      padding: 10px 12px;
+      border: 1px solid #E7C66A;
+      border-radius: 2px;
+      resize: vertical;
+      font: inherit;
+      outline: none;
+      line-height: 1.7;
+      background-color: #FFFFFF;
+      background-image: linear-gradient(to bottom, transparent 31px, #F2E5BE 32px);
+      background-size: 100% 32px;
+    }
+
+    .private-remark-input:focus {
+      border-color: #C58A00;
+      box-shadow: 0 0 0 2px rgba(197, 138, 0, 0.12);
+    }
+
+    .private-remark-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .private-remark-display {
+      margin-top: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .private-remark-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border-left: 3px solid #C58A00;
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .private-remark-item-text {
+      flex: 1;
+      min-width: 0;
+      color: var(--text-main);
+      font-size: 0.84rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .private-remark-delete {
+      flex: 0 0 auto;
+      padding: 2px 4px;
+      border: 0;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.75rem;
+    }
+
+    .private-remark-delete:hover {
+      color: #B42318;
+    }
+
+    @media (max-width: 600px) {
+      .private-remark-panel {
+        top: 72px;
+        right: 12px;
+        width: calc(100% - 24px);
+      }
+    }
+
+    .private-remark-display:empty {
+      display: none;
+    }
+
+    /* Modal Wall Feed */
+    .modal-feed-title {
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .feedback-feed-tools {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .feedback-feed-search {
+      flex: 1;
+      min-width: 0;
+      padding: 9px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      color: var(--text-main);
+      background: var(--bg-surface);
+      font: inherit;
+      font-size: 0.82rem;
+    }
+
+    .feedback-feed-search:focus,
+    .feedback-feed-sort:focus {
+      outline: 2px solid var(--accent-cyan-glow);
+      outline-offset: 1px;
+      border-color: var(--accent-cyan);
+    }
+
+    .feedback-feed-sort {
+      padding: 9px 30px 9px 10px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      color: var(--text-main);
+      background: var(--bg-surface);
+      font: inherit;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+
+    .feedback-feed-empty {
+      padding: 24px 12px;
+      color: var(--text-muted);
+      text-align: center;
+      font-size: 0.86rem;
+    }
+
+    @media (max-width: 600px) {
+      .feedback-feed-tools {
+        align-items: stretch;
+        flex-direction: column;
+      }
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast-card {
+      pointer-events: auto;
+      background: var(--text-main);
+      color: #FFFFFF;
+      padding: 14px 20px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-xl);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      border-left: 4px solid var(--accent-cyan);
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ==========================================================================
+       SIDEBAR DASHBOARD LAYOUT
+       ========================================================================== */
+
+    /* Override body to be a plain flex row for the dashboard */
+    body {
+      display: flex;
+      flex-direction: row !important;
+      background: #F4F6F9 !important;
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    /* ---- Sidebar ---- */
+    .sidebar {
+      width: 260px;
+      min-width: 260px;
+      height: 100vh;
+      background: #0B1727;
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      overflow: hidden;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 100;
+      box-shadow: 4px 0 20px rgba(0,0,0,0.18);
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 24px 20px 20px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .sidebar-brand .brand-logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0,163,166,0.35);
+    }
+
+    .sidebar-brand .brand-title-group h1 {
+      font-family: var(--font-heading);
+      font-size: 1rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: nowrap;
+    }
+
+    .sidebar-brand .brand-badge {
+      font-size: 0.6rem;
+      background: rgba(0,163,166,0.2);
+      color: #00C8CC;
+      border: 1px solid rgba(0,163,166,0.3);
+      padding: 2px 6px;
+      border-radius: var(--radius-full);
+      letter-spacing: 0.06em;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .sidebar-brand .brand-title-group p {
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.4);
+      font-weight: 400;
+      margin-top: 1px;
+    }
+
+    /* ---- Sidebar Nav ---- */
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow-y: auto;
+    }
+
+    .sidebar-nav-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.28);
+      padding: 10px 8px 4px 8px;
+    }
+
+    .sidebar-nav-link {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      color: rgba(255,255,255,0.65);
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      border: 1px solid transparent;
+    }
+
+    .sidebar-nav-link:hover {
+      background: rgba(255,255,255,0.07);
+      color: #FFFFFF;
+    }
+
+    .sidebar-nav-link.active {
+      background: #00A3A6;
+      color: #FFFFFF;
+      border-color: rgba(255,255,255,0.12);
+      box-shadow: 0 4px 14px rgba(0,163,166,0.35);
+    }
+
+    .sidebar-nav-link .nav-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      flex-shrink: 0;
+      opacity: 0.85;
+    }
+
+    .sidebar-nav-link.active .nav-icon {
+      opacity: 1;
+    }
+
+    .sidebar-nav-link .nav-badge {
+      margin-left: auto;
+      background: rgba(255,255,255,0.15);
+      color: #FFFFFF;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 999px;
+    }
+
+    .sidebar-nav-link.active .nav-badge {
+      background: rgba(255,255,255,0.25);
+    }
+
+    /* ---- Sidebar User Badge ---- */
+    .sidebar-user-badge {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 14px 16px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      margin: 0;
+      background: rgba(0,0,0,0.12);
+    }
+
+    .sidebar-user-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-full);
+      border: 2px solid rgba(0,163,166,0.6);
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .sidebar-user-avatar img {
+      width: 100%;
+      height: 100%;
+      border-radius: var(--radius-full);
+      object-fit: cover;
+    }
+
+    .sidebar-user-avatar .status-dot {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #10B981;
+      border: 2px solid #0B1727;
+    }
+
+    .sidebar-user-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .sidebar-user-name {
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sidebar-user-role {
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.45);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ---- Main Panel ---- */
+    .main-panel {
+      margin-left: 260px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      background: #F4F6F9;
+    }
+
+    /* ---- Top Header Bar ---- */
+    .top-header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0 28px;
+      height: 64px;
+      min-height: 64px;
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: 0 1px 4px rgba(15,23,42,0.06);
+      z-index: 40;
+      flex-shrink: 0;
+    }
+
+    .top-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+    }
+
+    .breadcrumb-sep {
+      color: var(--text-subtle);
+      font-size: 0.75rem;
+    }
+
+    .breadcrumb-active {
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    .top-header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #059669;
+      background: #D1FAE5;
+      border: 1px solid #A7F3D0;
+      padding: 4px 12px;
+      border-radius: 999px;
+    }
+
+    .status-pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10B981;
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .top-role-switcher {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #F8FAFC;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 5px 12px;
+      transition: border-color var(--transition-fast);
+    }
+
+    .top-role-switcher:hover,
+    .top-role-switcher:focus-within {
+      border-color: #00A3A6;
+      box-shadow: 0 0 0 2px rgba(0,163,166,0.15);
+    }
+
+    /* ---- Content Area ---- */
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px;
+    }
+
+    /* Override .app-main-content to remove old centering/max-width in sidebar mode */
+    .app-main-content {
+      max-width: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      flex: none !important;
+    }
+
+    /* Hide the old navbar in sidebar mode */
+    .navbar-wrapper {
+      display: none !important;
+    }
+
+    /* Rizurf visual system overrides for legacy component selectors. */
+    .brand-logo-icon,
+    .btn-give-kudos,
+    .btn-submit-feedback,
+    .btn-submit-comment,
+    .btn-submit-reply,
+    .btn-save-inline {
+      background: var(--brand-navy);
+      color: var(--neutral-white);
+      border-radius: var(--radius-pill);
+    }
+
+    .brand-logo-icon {
+      background: linear-gradient(135deg, var(--brand-teal) 0%, var(--brand-teal-dark) 100%);
+    }
+
+    .btn-give-kudos:hover,
+    .btn-submit-feedback:hover,
+    .btn-submit-comment:hover,
+    .btn-submit-reply:hover,
+    .btn-save-inline:hover {
+      background: var(--brand-dark);
+    }
+
+    .top-role-switcher {
+      background: var(--neutral-white);
+    }
+
+    .top-role-switcher:hover,
+    .top-role-switcher:focus-within {
+      border-color: var(--brand-teal);
+      box-shadow: 0 0 0 2px rgba(3, 157, 177, 0.15);
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- ========================================
+       SIDEBAR DASHBOARD LAYOUT
+       ======================================== -->
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar">
+
+    <!-- Brand Header -->
+    <div class="sidebar-brand" style="padding: 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <img src="/assets/logo-0Yo0gl14.png" alt="Rizurf Realty Logo" class="brand-logo-img" style="max-height: 44px; width: auto; max-width: 100%; object-fit: contain; display: block;" />
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="sidebar-nav">
+      <span class="sidebar-nav-label">Main Menu</span>
+
+      <!-- ME -->
+      <a class="sidebar-nav-link active" id="sidebarBtnMe" onclick="switchMainTab('me'); setSidebarActive(this)" href="#">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </span>
+        ME
+        <span class="nav-badge" id="meTotalBadge">3</span>
+      </a>
+
+      <!-- Employee Wall -->
+      <a class="sidebar-nav-link" id="sidebarBtnWall" onclick="switchMainTab('wall'); setSidebarActive(this)" href="#">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+        </span>
+        Employee Wall
+        <span class="nav-badge" id="wallTotalBadge">7</span>
+      </a>
+
+    </nav>
+
+    <!-- Bottom User Badge -->
+    <div class="sidebar-user-badge">
+      <div class="sidebar-user-avatar">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80" alt="Alex Morgan" />
+        <div class="status-dot"></div>
+      </div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name" id="sidebarUserName">Alex Morgan</div>
+        <div class="sidebar-user-role" id="sidebarUserRole">Senior Product Designer</div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- MAIN PANEL -->
+  <div class="main-panel">
+
+    <!-- Top Header Bar -->
+    <header class="top-header-bar">
+      <div class="top-header-left">
+        <nav class="breadcrumb">
+          <span>Feedback</span>
+          <span class="breadcrumb-sep">/</span>
+          <span class="breadcrumb-active" id="breadcrumbActive">ME</span>
+        </nav>
+      </div>
+      <div class="top-header-right">
+        <!-- <div class="status-pill">
+          <span class="status-pill-dot"></span>
+          All Systems Operational
+        </div> -->
+        <div class="top-role-switcher role-switcher-box">
+          <span class="role-label">View as:</span>
+          <select class="role-select" id="userSelector" onchange="handleUserChange(this.value)">
+            <option value="u_alex">Alex Morgan</option>
+          </select>
+        </div>
+        <div class="top-role-switcher role-switcher-box">
+          <span class="role-label">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            Role:
+          </span>
+          <select class="role-select" id="roleSelector" onchange="handleRoleChange(this.value)">
+            <option value="employee">Employee View</option>
+            <option value="manager">Manager View</option>
+            <option value="admin">Admin View</option>
+          </select>
+          <span class="role-indicator-badge role-employee" id="roleBadge">Standard</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <div class="content-area">
+
+  <!-- Keep legacy navbar hidden (elements like tabBtnMe are still needed for JS) -->
+  <header class="navbar-wrapper" aria-hidden="true" style="display:none!important">
+    <div class="navbar-container">
+      <button class="nav-tab-btn active" id="tabBtnMe" onclick="switchMainTab('me')"></button>
+      <button class="nav-tab-btn" id="tabBtnWall" onclick="switchMainTab('wall')"></button>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       MAIN APP CONTAINER
+       ========================================================================== -->
+  <main class="app-main-content">
+
+    <!-- ========================================================================
+         TAB 1: "ME" VIEW (WITH SUB-NAVIGATION TOGGLE TABS: RECEIVED vs GIVEN)
+         ======================================================================== -->
+    <section id="meViewPane" class="view-pane active">
+
+      <!-- ME Hero Card -->
+      <div class="me-hero-card">
+        <div class="me-profile-left">
+          <div class="me-avatar-lg">
+            <img id="meAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
+              alt="Alex Morgan" />
+          </div>
+          <div class="me-details">
+            <h2>
+              <span id="meUserName">Alex Morgan</span>
+              <span class="verified-icon" title="Verified Employee">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--primary)" stroke="#FFFFFF" stroke-width="2">
+                </svg>
+              </span>
+            </h2>
+            <p class="me-role-title" id="meUserRole">Senior Product Designer • Product & Experience Group</p>
+            <div class="me-tags">
+              <!-- <span class="badge-pill highlight">🌟 Top Contributor</span>
+              <span class="badge-pill">📍 San Francisco Hub</span>
+              <span class="badge-pill">⚡ Core Design System</span> -->
+            </div>
+          </div>
+        </div>
+
+        <div class="me-stats-right">
+          <div class="stat-card-box">
+            <div class="stat-number" id="statReceivedCount">3</div>
+            <div class="stat-label">Received</div>
+          </div>
+          <div class="stat-card-box">
+            <div class="stat-number" id="statGivenCount">3</div>
+            <div class="stat-label">Given</div>
+          </div>
+          <!-- <button class="btn-give-kudos" onclick="openGiveFeedbackModal('all')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="16"></line>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+            Give Feedback
+          </button> -->
+        </div>
+      </div>
+
+      <!-- ME Sub-Navigation Toggle Tabs -->
+      <div class="me-subtabs-wrapper">
+        <div class="me-subtabs-nav">
+          <button class="me-subtab-btn active" id="meSubtabReceivedBtn" onclick="switchMeSubTab('received')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Feedback Received
+            <span class="me-subtab-badge" id="meSubtabReceivedBadge">3</span>
+          </button>
+          <button class="me-subtab-btn" id="meSubtabGivenBtn" onclick="switchMeSubTab('given')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+            Feedback Given
+            <span class="me-subtab-badge" id="meSubtabGivenBadge">3</span>
+          </button>
+        </div>
+        <div class="me-subtab-hint" id="meSubtabHintText">
+          Showing feedback left on your wall
+        </div>
+      </div>
+
+      <!-- Sub-Pane A: Feedback Received (Default Active) -->
+      <div id="meSubpaneReceived" class="me-subpane active">
+        <div class="feed-cards-list" id="meReceivedFeed">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- Sub-Pane B: Feedback Given -->
+      <div id="meSubpaneGiven" class="me-subpane">
+        <div class="feed-cards-list" id="meGivenFeed">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ========================================================================
+         TAB 2: "EMPLOYEE WALL" VIEW
+         ======================================================================== -->
+    <section id="wallViewPane" class="view-pane">
+
+      <!-- Search & Department Filters -->
+      <div class="wall-controls-bar">
+        <div class="search-filter-row">
+          <div class="search-input-wrapper">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="employeeSearchInput" class="search-input-field"
+              placeholder="Search employee by name, title, department, or skills..."
+              oninput="handleSearch(this.value)" />
+          </div>
+        </div>
+
+        <!-- Department Filter Pills -->
+        <div class="department-chips-group" id="deptFilterContainer">
+          <button class="dept-chip-btn active" onclick="filterDepartment('All')">All Departments</button>
+          <button class="dept-chip-btn" onclick="filterDepartment('Engineering')">Engineering</button>
+          <button class="dept-chip-btn" onclick="filterDepartment('Product')">Product & UX</button>
+          <button class="dept-chip-btn" onclick="filterDepartment('Marketing')">Marketing</button>
+          <button class="dept-chip-btn" onclick="filterDepartment('Sales')">Sales & RevOps</button>
+          <button class="dept-chip-btn" onclick="filterDepartment('People')">People & Culture</button>
+        </div>
+      </div>
+
+      <!-- Employee Tiles Grid -->
+      <div class="employee-grid" id="employeeTilesGrid">
+        <!-- Rendered by JS: First tile is Workplace Suggestions Wall, followed by individual clean employee cards -->
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ==========================================================================
+       WALL DETAIL & WRITE FEEDBACK MODAL
+       ========================================================================== -->
+  <div class="modal-overlay" id="wallModalOverlay" onclick="handleModalBackdropClick(event)">
+    <div class="modal-content-card" onclick="event.stopPropagation()">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="modal-target-profile" id="modalTargetHeader">
+          <!-- Rendered dynamically -->
+        </div>
+        <button class="btn-modal-close" onclick="closeWallModal()" title="Close dialog">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-scrollable-body">
+
+        <!-- Write Feedback Form Panel -->
+        <div class="write-feedback-panel">
+          <div class="write-panel-title" id="writePanelTitle">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+            Write Feedback & Recognition
+          </div>
+
+          <!-- Textarea -->
+          <textarea id="feedbackTextInput" class="feedback-textarea"
+            placeholder="Share specific feedback, recognition, workplace suggestion, or collaborative impact..."></textarea>
+
+          <!-- Bottom Action Bar -->
+          <div class="form-bottom-bar">
+
+            <!-- Anonymous Toggle -->
+            <label class="anon-toggle-container">
+              <div class="toggle-switch-wrapper">
+                <input type="checkbox" id="anonCheckbox" class="toggle-checkbox" />
+                <span class="toggle-slider"></span>
+              </div>
+              <div class="anon-label-group">
+                <span class="anon-label-title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                      d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+                    </path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                  </svg>
+                  Post Anonymously
+                </span>
+                <span class="anon-label-subtext">Hides your name from peers (Audit viewable by Managers/Admins)</span>
+              </div>
+            </label>
+
+            <!-- Submit Button -->
+            <button class="btn-submit-feedback" onclick="submitNewFeedback()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+              Post Feedback
+            </button>
+
+          </div>
+        </div>
+
+        <!-- Private Remark Panel: never included in the public wall feed. -->
+        <div class="private-remark-panel" id="privateRemarkPanel" hidden>
+          <div class="private-remark-title">
+            <span aria-hidden="true">🔒</span>
+            Private remark for you
+            <button type="button" class="private-remark-close" onclick="togglePersonalRemark()" aria-label="Close personal remark">Close</button>
+          </div>
+          <div class="private-remark-subtitle">Only you can see this note about this colleague.</div>
+          <textarea id="privateRemarkInput" class="private-remark-input" maxlength="500"
+            placeholder="Add a personal reminder about this colleague..."></textarea>
+          <div class="private-remark-actions">
+            <button class="btn-submit-feedback" onclick="savePrivateRemark()">Save remark</button>
+          </div>
+          <div class="private-remark-display" id="privateRemarkDisplay"></div>
+        </div>
+
+        <!-- Target Wall Feed -->
+        <div>
+          <div class="modal-feed-title" id="modalFeedTitle">
+            Wall Activity & Feedback
+          </div>
+          <div class="feedback-feed-tools">
+            <input
+              type="search"
+              id="feedbackFeedSearch"
+              class="feedback-feed-search"
+              placeholder="Search feedback topics..."
+              aria-label="Search feedback topics"
+              oninput="handleFeedbackSearch(this.value)" />
+            <select id="feedbackFeedSort" class="feedback-feed-sort" aria-label="Sort feedback" onchange="handleFeedbackSort(this.value)">
+              <option value="latest">Latest</option>
+              <option value="oldest">Oldest</option>
+            </select>
+          </div>
+          <div class="feed-cards-list" id="modalTargetFeed" style="margin-top: 14px;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ==========================================================================
+       JAVASCRIPT LOGIC & STATE MANAGEMENT
+       ========================================================================== -->
+  <script>
+    /* ==========================================================================
+       APP STATE & MOCK DATA
+       ========================================================================== */
+    const CURRENT_USER = {
+      id: "u_alex",
+      name: "Alex Morgan",
+      role: "Senior Product Designer",
+      department: "Product",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
+    };
+
+    let currentRoleView = "employee"; // "employee" | "manager" | "admin"
+    let currentMainTab = "me"; // "me" | "wall"
+    let currentMeSubTab = "received"; // "received" | "given"
+    let selectedDepartment = "All";
+    let searchQuery = "";
+    let activeModalTargetId = null; // target employee id or "company"
+    let personalRemarkOpen = false;
+    let feedbackSearchQuery = "";
+    let feedbackSortOrder = "latest";
+    const PRIVATE_REMARKS_STORAGE_KEY = "pulseFeedback.privateRemarks";
+    let privateRemarks = loadPrivateRemarks();
+
+    // Tracking active inline editing states
+    let editingPostId = null;
+    let editingCommentKey = null; // format: "postId_commentId"
+
+    function getEmployeeById(userId) {
+      return EMPLOYEES.find(employee => employee.id === userId);
+    }
+
+    function updateUserSelector() {
+      const selector = document.getElementById("userSelector");
+      if (!selector) return;
+
+      selector.innerHTML = EMPLOYEES
+        .map(employee => `<option value="${employee.id}">${escapeHtml(employee.name)}</option>`)
+        .join("");
+      selector.value = CURRENT_USER.id;
+    }
+
+    function updateCurrentUserProfile() {
+      const avatar = document.getElementById("meAvatar");
+      const name = document.getElementById("meUserName");
+      const role = document.getElementById("meUserRole");
+      const sidebarName = document.getElementById("sidebarUserName");
+      const sidebarRole = document.getElementById("sidebarUserRole");
+      const sidebarAvatar = document.querySelector(".sidebar-user-avatar img");
+
+      if (avatar) {
+        avatar.src = CURRENT_USER.avatar;
+        avatar.alt = CURRENT_USER.name;
+      }
+      if (name) name.textContent = CURRENT_USER.name;
+      if (role) role.textContent = `${CURRENT_USER.role} • ${CURRENT_USER.department}`;
+      if (sidebarName) sidebarName.textContent = CURRENT_USER.name;
+      if (sidebarRole) sidebarRole.textContent = CURRENT_USER.role;
+      if (sidebarAvatar) {
+        sidebarAvatar.src = CURRENT_USER.avatar;
+        sidebarAvatar.alt = CURRENT_USER.name;
+      }
+    }
+
+    function handleUserChange(userId) {
+      const selectedUser = getEmployeeById(userId);
+      if (!selectedUser) return;
+
+      Object.assign(CURRENT_USER, {
+        id: selectedUser.id,
+        name: selectedUser.name,
+        role: selectedUser.role,
+        department: selectedUser.department,
+        avatar: selectedUser.avatar
+      });
+
+      updateCurrentUserProfile();
+      loadPrivateRemarksFromBackend().then(() => renderAll());
+      showToast(`Viewing PulseFeedback as ${CURRENT_USER.name}`);
+    }
+
+    function loadPrivateRemarks() {
+      try {
+        const stored = JSON.parse(localStorage.getItem(PRIVATE_REMARKS_STORAGE_KEY) || "{}");
+        return stored && typeof stored === "object" ? stored : {};
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function savePrivateRemarksStore() {
+      localStorage.setItem(PRIVATE_REMARKS_STORAGE_KEY, JSON.stringify(privateRemarks));
+    }
+
+    // Employees Database
+    const EMPLOYEES = [
+      {
+        id: "u_sarah",
+        name: "Sarah Jenkins",
+        role: "Principal Frontend Architect",
+        department: "Engineering",
+        avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+        skills: ["React", "Design Systems", "Web Performance"]
+      },
+      {
+        id: "u_marcus",
+        name: "Marcus Vance",
+        role: "Head of Product Strategy",
+        department: "Product",
+        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+        skills: ["Roadmapping", "UX Discovery", "ERP Modernization"]
+      },
+      {
+        id: "u_priya",
+        name: "Priya Sharma",
+        role: "Senior Backend Engineer",
+        department: "Engineering",
+        avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80",
+        skills: ["Microservices", "PostgreSQL", "Scalability"]
+      },
+      {
+        id: "u_david",
+        name: "David Kim",
+        role: "Growth & Product Marketing Lead",
+        department: "Marketing",
+        avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
+        skills: ["Customer Insights", "Go-To-Market", "Analytics"]
+      },
+      {
+        id: "u_elena",
+        name: "Elena Rostova",
+        role: "VP of People & Culture",
+        department: "People",
+        avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80",
+        skills: ["Team Engagement", "DEI", "Leadership Coaching"]
+      },
+      {
+        id: "u_jordan",
+        name: "Jordan Hayes",
+        role: "Enterprise Solutions Executive",
+        department: "Sales",
+        avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80",
+        skills: ["Client Partnerships", "Revenue", "ERP Demos"]
+      },
+      {
+        id: "u_carlos",
+        name: "Carlos Mendez",
+        role: "Senior DevOps Engineer",
+        department: "Engineering",
+        avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80",
+        skills: ["Kubernetes", "CI/CD Pipeline", "Cloud Infra"]
+      }
+    ];
+
+    // Feedback Posts Database
+    let FEEDBACKS = [
+      {
+        id: "fb_1",
+        senderId: "u_marcus",
+        senderName: "Marcus Vance",
+        senderAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+        targetId: "u_alex",
+        targetName: "Alex Morgan",
+        isAnonymous: false,
+        timestamp: "2 hours ago",
+        isEdited: false,
+        content: "Alex completely transformed the new ERP navigation prototype. Her empathy for end-users and ability to bridge complex enterprise workflows into intuitive micro-interactions made our executive demo a massive win!",
+        reactions: { "❤️": 5, "👏": 12, "💡": 8, "🙌": 4 },
+        userReactions: ["👏", "❤️"],
+        comments: [
+          {
+            id: "cm_1_1",
+            senderId: "u_elena",
+            senderName: "Elena Rostova",
+            senderAvatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80",
+            isAnonymous: false,
+            text: "Huge congratulations Alex! The simplicity of this UI is game changing for all our global users.",
+            time: "1 hour ago",
+            isEdited: false,
+            reactions: { "❤️": 3, "👏": 2, "💡": 0, "🙌": 1 },
+            userReactions: ["❤️"]
+          },
+          {
+            id: "cm_1_2",
+            senderId: "u_sarah",
+            senderName: "Sarah Jenkins",
+            senderAvatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+            isAnonymous: true, // Anonymous Comment
+            text: "100% agreed! Super clean implementation and tokens are extremely developer-friendly.",
+            time: "30 mins ago",
+            isEdited: false,
+            reactions: { "❤️": 1, "👏": 4, "💡": 1, "🙌": 0 },
+            userReactions: []
+          }
+        ]
+      },
+      {
+        id: "fb_2",
+        senderId: "u_sarah",
+        senderName: "Sarah Jenkins",
+        senderAvatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+        targetId: "u_alex",
+        targetName: "Alex Morgan",
+        isAnonymous: true, // ANONYMOUS POST
+        timestamp: "Yesterday",
+        isEdited: false,
+        content: "Thank you for staying late on Thursday to help unblock the component tokens for the design system release. Your dedication and fast turnarounds kept the entire front-end squad on track!",
+        reactions: { "❤️": 8, "👏": 6, "💡": 2, "🙌": 9 },
+        userReactions: ["🙌"],
+        comments: []
+      },
+      {
+        id: "fb_3",
+        senderId: "u_priya",
+        senderName: "Priya Sharma",
+        senderAvatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80",
+        targetId: "u_alex",
+        targetName: "Alex Morgan",
+        isAnonymous: false,
+        timestamp: "3 days ago",
+        isEdited: false,
+        content: "The dynamic feedback filtering UX was brilliant. Alex created a crystal clear spec that made our backend payload caching effortless to implement.",
+        reactions: { "❤️": 3, "👏": 7, "💡": 11, "🙌": 2 },
+        userReactions: ["💡"],
+        comments: []
+      },
+      {
+        id: "fb_4",
+        senderId: "u_alex",
+        senderName: "Alex Morgan",
+        senderAvatar: CURRENT_USER.avatar,
+        targetId: "u_sarah",
+        targetName: "Sarah Jenkins",
+        isAnonymous: false,
+        timestamp: "4 days ago",
+        isEdited: false,
+        content: "Sarah's architectural refactor on our atomic CSS tokens boosted rendering performance by 40%. It's always an absolute joy collaborating with her!",
+        reactions: { "❤️": 9, "👏": 15, "💡": 6, "🙌": 7 },
+        userReactions: ["❤️"],
+        comments: []
+      },
+      {
+        id: "fb_5",
+        senderId: "u_alex",
+        senderName: "Alex Morgan",
+        senderAvatar: CURRENT_USER.avatar,
+        targetId: "company",
+        targetName: "Workplace & Company Suggestions",
+        isAnonymous: false,
+        timestamp: "5 days ago",
+        isEdited: false,
+        content: "Workplace Suggestion: Can we introduce dedicated 'Deep Work Wednesdays' (no internal meetings from 9am-1pm)? Cross-functional productivity would rise substantially across both engineering and design.",
+        reactions: { "❤️": 24, "👏": 42, "💡": 18, "🙌": 31 },
+        userReactions: ["👏", "🙌"],
+        comments: [
+          {
+            id: "cm_5_1",
+            senderId: "u_jordan",
+            senderName: "Jordan Hayes",
+            senderAvatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&auto=format&fit=crop&q=80",
+            isAnonymous: false,
+            text: "Huge +1 from Sales! Having uninterrupted pitch deck and follow-up prep blocks is invaluable.",
+            time: "3 days ago",
+            isEdited: false,
+            reactions: { "❤️": 5, "👏": 8, "💡": 0, "🙌": 2 },
+            userReactions: ["👏"]
+          },
+          {
+            id: "cm_5_2",
+            senderId: "u_elena",
+            senderName: "Elena Rostova",
+            senderAvatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80",
+            isAnonymous: false,
+            text: "Leadership is actively reviewing this for Q4 policy adoption! Thanks Alex.",
+            time: "2 days ago",
+            isEdited: false,
+            reactions: { "❤️": 7, "👏": 10, "💡": 4, "🙌": 6 },
+            userReactions: ["❤️"]
+          }
+        ]
+      },
+      {
+        id: "fb_6",
+        senderId: "u_jordan",
+        senderName: "Jordan Hayes",
+        senderAvatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80",
+        targetId: "company",
+        targetName: "Workplace & Company Suggestions",
+        isAnonymous: true, // ANONYMOUS Workplace Feedback
+        timestamp: "6 days ago",
+        isEdited: false,
+        content: "Company Improvement: Our onboarding hardware dispatch in APAC took over 2 weeks last month. Could we partner with regional fulfillment vendors to reduce downtime for new joiners?",
+        reactions: { "❤️": 14, "👏": 19, "💡": 25, "🙌": 8 },
+        userReactions: ["💡"],
+        comments: [
+          {
+            id: "cm_6_1",
+            senderId: "u_marcus",
+            senderName: "Marcus Vance",
+            senderAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+            isAnonymous: false,
+            text: "Great point. We have opened a ticket with IT Ops to streamline hardware provisioning.",
+            time: "5 days ago",
+            isEdited: false,
+            reactions: { "❤️": 4, "👏": 6, "💡": 2, "🙌": 0 },
+            userReactions: []
+          }
+        ]
+      },
+      {
+        id: "fb_7",
+        senderId: "u_alex",
+        senderName: "Alex Morgan",
+        senderAvatar: CURRENT_USER.avatar,
+        targetId: "u_carlos",
+        targetName: "Carlos Mendez",
+        isAnonymous: true, // Posted anonymously by Alex
+        timestamp: "1 week ago",
+        isEdited: false,
+        content: "Carlos fixed the staging deployment glitch in under 15 minutes during our critical usability testing session. Incredible speed and calm under pressure!",
+        reactions: { "❤️": 6, "👏": 9, "💡": 3, "🙌": 5 },
+        userReactions: [],
+        comments: []
+      },
+      {
+        id: "fb_8",
+        senderId: "u_david",
+        senderName: "David Kim",
+        senderAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
+        targetId: "u_sarah",
+        targetName: "Sarah Jenkins",
+        isAnonymous: false,
+        timestamp: "1 week ago",
+        isEdited: false,
+        content: "Sarah built the marketing landing page templates with such high fidelity. Our bounce rates dropped immediately!",
+        reactions: { "❤️": 4, "👏": 8, "💡": 1, "🙌": 2 },
+        userReactions: [],
+        comments: []
+      },
+      {
+        id: "fb_9",
+        senderId: "u_elena",
+        senderName: "Elena Rostova",
+        senderAvatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80",
+        targetId: "u_marcus",
+        targetName: "Marcus Vance",
+        isAnonymous: false,
+        timestamp: "1 week ago",
+        isEdited: false,
+        content: "Marcus consistently fosters an environment of open dialogue and radical candor. Fantastic leadership on the Q3 strategic vision.",
+        reactions: { "❤️": 12, "👏": 15, "💡": 9, "🙌": 6 },
+        userReactions: [],
+        comments: []
+      }
+    ];
+
+    /* ==========================================================================
+       INITIALIZATION & RENDERING
+       ========================================================================== */
+    const API_BASE_URL = "http://127.0.0.1:3001/api";
+
+    async function loadBackendData() {
+      try {
+        const [employeesResponse, feedbackResponse] = await Promise.all([
+          fetch(`${API_BASE_URL}/employees`),
+          fetch(`${API_BASE_URL}/feedback`)
+        ]);
+
+        if (!employeesResponse.ok || !feedbackResponse.ok) throw new Error("API request failed");
+
+        const [employees, feedbacks] = await Promise.all([
+          employeesResponse.json(),
+          feedbackResponse.json()
+        ]);
+
+        if (!Array.isArray(employees) || !Array.isArray(feedbacks)) throw new Error("Invalid API response");
+
+        EMPLOYEES.splice(0, EMPLOYEES.length, ...employees);
+        const currentEmployee = getEmployeeById(CURRENT_USER.id);
+        if (currentEmployee) {
+          Object.assign(CURRENT_USER, {
+            name: currentEmployee.name,
+            role: currentEmployee.role,
+            department: currentEmployee.department,
+            avatar: currentEmployee.avatar
+          });
+          updateCurrentUserProfile();
+        }
+        await loadPrivateRemarksFromBackend();
+        updateUserSelector();
+        const commentsByFeedback = await Promise.all(feedbacks.map(async feedback => {
+          const response = await fetch(`${API_BASE_URL}/feedback/${feedback.id}/comments`);
+          const comments = response.ok ? await response.json() : [];
+          return [feedback.id, buildCommentTree(comments)];
+        }));
+        const commentsMap = Object.fromEntries(commentsByFeedback);
+
+        FEEDBACKS.splice(0, FEEDBACKS.length, ...feedbacks.map(feedback => ({
+          ...feedback,
+          reactions: feedback.reactions || { "❤️": 0, "👏": 0, "💡": 0, "🙌": 0 },
+          userReactions: [],
+          comments: commentsMap[feedback.id] || []
+        })));
+      } catch (error) {
+        console.warn("Using local fallback data because the API is unavailable.", error);
+      }
+    }
+
+    async function loadPrivateRemarksFromBackend() {
+      const response = await fetch(`${API_BASE_URL}/private-remarks?authorId=${encodeURIComponent(CURRENT_USER.id)}`);
+      if (!response.ok) throw new Error("Private remarks request failed");
+
+      let remarks = await response.json();
+      const localRemarks = privateRemarks[CURRENT_USER.id] || {};
+      if (remarks.length === 0 && Object.keys(localRemarks).length > 0) {
+        const migratedRemarks = [];
+        for (const [targetId, targetRemarks] of Object.entries(localRemarks)) {
+          for (const remark of Array.isArray(targetRemarks) ? targetRemarks : [{ text: targetRemarks }]) {
+            const migrationResponse = await fetch(`${API_BASE_URL}/private-remarks`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                authorId: CURRENT_USER.id,
+                targetId,
+                content: remark.text
+              })
+            });
+            if (migrationResponse.ok) migratedRemarks.push(await migrationResponse.json());
+          }
+        }
+        remarks = migratedRemarks;
+        localStorage.removeItem(PRIVATE_REMARKS_STORAGE_KEY);
+      }
+      privateRemarks = {
+        [CURRENT_USER.id]: remarks.reduce((byTarget, remark) => {
+          if (!byTarget[remark.targetId]) byTarget[remark.targetId] = [];
+          byTarget[remark.targetId].push({ id: remark.id, text: remark.content });
+          return byTarget;
+        }, {})
+      };
+    }
+
+    async function refreshBackendData() {
+      if (document.visibilityState !== "visible" || editingPostId || editingCommentKey || activeModalTargetId) return;
+
+      await loadBackendData();
+      renderAll();
+    }
+
+    function buildCommentTree(comments) {
+      const commentMap = new Map(comments.map(comment => [comment.id, {
+        ...comment,
+        time: comment.timestamp || "Just now",
+        reactions: comment.reactions || {},
+        userReactions: [],
+        replies: []
+      }]));
+      const roots = [];
+
+      commentMap.forEach(comment => {
+        if (comment.parentId && commentMap.has(comment.parentId)) {
+          commentMap.get(comment.parentId).replies.push(comment);
+        } else {
+          roots.push(comment);
+        }
+      });
+
+      return roots;
+    }
+
+    window.addEventListener("DOMContentLoaded", async () => {
+      await loadBackendData();
+      renderAll();
+      window.setInterval(refreshBackendData, 10000);
+    });
+
+    function renderAll() {
+      renderMeView();
+      renderEmployeeTiles();
+      updateBadgesAndStats();
+    }
+
+    /* Tab Switcher */
+    function switchMainTab(tab) {
+      currentMainTab = tab;
+      const mePane = document.getElementById("meViewPane");
+      const wallPane = document.getElementById("wallViewPane");
+      const tabBtnMe = document.getElementById("tabBtnMe");
+      const tabBtnWall = document.getElementById("tabBtnWall");
+
+      if (tab === "me") {
+        mePane.classList.add("active");
+        wallPane.classList.remove("active");
+        tabBtnMe.classList.add("active");
+        tabBtnWall.classList.remove("active");
+        renderMeView();
+      } else {
+        wallPane.classList.add("active");
+        mePane.classList.remove("active");
+        tabBtnWall.classList.add("active");
+        tabBtnMe.classList.remove("active");
+        renderEmployeeTiles();
+      }
+    }
+
+    /* ME Tab Sub-Navigation Switcher */
+    function switchMeSubTab(subTab) {
+      currentMeSubTab = subTab;
+      const btnReceived = document.getElementById("meSubtabReceivedBtn");
+      const btnGiven = document.getElementById("meSubtabGivenBtn");
+      const paneReceived = document.getElementById("meSubpaneReceived");
+      const paneGiven = document.getElementById("meSubpaneGiven");
+      const hintText = document.getElementById("meSubtabHintText");
+
+      if (subTab === "received") {
+        btnReceived.classList.add("active");
+        btnGiven.classList.remove("active");
+        paneReceived.classList.add("active");
+        paneGiven.classList.remove("active");
+        hintText.textContent = "Showing feedback left on your wall";
+      } else {
+        btnGiven.classList.add("active");
+        btnReceived.classList.remove("active");
+        paneGiven.classList.add("active");
+        paneReceived.classList.remove("active");
+        hintText.textContent = "Showing feedback and workplace ideas you posted";
+      }
+    }
+
+    /* Role Switcher Handler */
+    function handleRoleChange(newRole) {
+      currentRoleView = newRole;
+      const badge = document.getElementById("roleBadge");
+      badge.className = "role-indicator-badge " + (
+        newRole === "manager" ? "role-manager" :
+          newRole === "admin" ? "role-admin" : "role-employee"
+      );
+      badge.textContent = newRole === "manager" ? "Manager" :
+        newRole === "admin" ? "Admin" : "Standard";
+
+      showToast(`Switched to ${newRole.charAt(0).toUpperCase() + newRole.slice(1)} View mode`);
+
+      // Re-render currently visible views to update identity, permissions, etc.
+      renderMeView();
+      renderEmployeeTiles();
+      if (activeModalTargetId) {
+        renderModalWallFeed(activeModalTargetId);
+      }
+    }
+
+    /* Permission Check Helpers */
+    function canDeleteItem(item) {
+      const isPrivileged = currentRoleView === "manager" || currentRoleView === "admin";
+      const isAuthor = item.senderId === CURRENT_USER.id;
+      return isAuthor || isPrivileged;
+    }
+
+    /* Edit Permission: STRICTLY author only */
+    function canEditItem(item) {
+      return item.senderId === CURRENT_USER.id;
+    }
+
+    /* ==========================================================================
+       IDENTITY RENDERING HELPER (POSTS & COMMENTS)
+       ========================================================================== */
+    function getIdentityDetails(item) {
+      const isAnon = Boolean(item.isAnonymous);
+      const isPrivileged = currentRoleView === "manager" || currentRoleView === "admin";
+
+      if (!isAnon) {
+        return {
+          name: item.senderName,
+          avatar: item.senderAvatar,
+          isMasked: false,
+          showAnonTag: false
+        };
+      }
+
+      // If Anonymous:
+      if (isPrivileged) {
+        // Manager/Admin View: Display author's real name with distinct [Anon] tag
+        return {
+          name: item.senderName,
+          avatar: item.senderAvatar,
+          isMasked: false,
+          showAnonTag: true
+        };
+      } else {
+        // Regular Employee View: Strictly Anonymous Team Member
+        return {
+          name: "Anonymous Team Member",
+          avatar: null,
+          isMasked: true,
+          showAnonTag: false
+        };
+      }
+    }
+
+    /* ==========================================================================
+       FEEDBACK CARD GENERATOR COMPONENT (WITH INLINE EDITING & DELETION)
+       ========================================================================== */
+    function renderNestedReplies(replies, post) {
+      if (!replies || replies.length === 0) return "";
+
+      const isPrivileged = currentRoleView === "manager" || currentRoleView === "admin";
+      const destination = post.targetId === "company"
+        ? "🏢 Workplace Suggestions"
+        : post.targetName;
+
+      return `<div class="comment-replies">${replies.map(reply => {
+        const replyAuthor = getIdentityDetails(reply);
+        const allowReplyEdit = canEditItem(reply);
+        const allowReplyDelete = canDeleteItem(reply);
+        const replyKey = `${post.id}_${reply.id}`;
+        const isEditingThisReply = editingCommentKey === replyKey;
+        const auditIdentityHtml = isPrivileged && reply.isAnonymous
+          ? `<span class="comment-author">${replyAuthor.name}</span><span class="reply-destination">to ${destination}</span><span class="anon-manager-tag" title="Reply posted anonymously • Visible only in Manager/Admin audit">[Anon]</span>`
+          : `<span class="comment-author">${replyAuthor.name}</span>${replyAuthor.showAnonTag ? '<span class="anon-manager-tag" title="Reply posted anonymously • Visible only in Manager/Admin audit">[Anon]</span>' : ''}`;
+        let replyActionsHtml = "";
+        if (allowReplyEdit || allowReplyDelete) {
+          replyActionsHtml = `<div class="comment-action-icons">`;
+          if (allowReplyEdit && !isEditingThisReply) {
+            replyActionsHtml += `<button type="button" class="btn-action-icon-mini" onclick="startCommentEdit('${post.id}', '${reply.id}')" title="Edit reply"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>`;
+          }
+          if (allowReplyDelete) {
+            replyActionsHtml += `<button type="button" class="btn-action-icon-mini danger" onclick="deleteComment('${post.id}', '${reply.id}')" title="Delete reply"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>`;
+          }
+          replyActionsHtml += `</div>`;
+        }
+        const replyBodyHtml = isEditingThisReply
+          ? `<div class="inline-edit-box" style="margin-top:6px;"><textarea id="edit_textarea_cm_${replyKey}" class="inline-edit-textarea" style="min-height:60px;">${escapeHtml(reply.text)}</textarea><div class="inline-edit-controls"><button class="btn-cancel-inline" onclick="cancelCommentEdit('${post.id}')">Cancel</button><button class="btn-save-inline" onclick="saveCommentEdit('${post.id}', '${reply.id}')">Save</button></div></div>`
+          : `<div class="comment-text">${escapeHtml(reply.text)}</div>`;
+        return `
+          <div class="single-comment nested-comment" id="comment_${reply.id}">
+            <div class="comment-avatar ${replyAuthor.isMasked ? 'anon-avatar' : ''}">
+              ${replyAuthor.isMasked ? '👤' : `<img src="${replyAuthor.avatar}" alt="${replyAuthor.name}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`}
+            </div>
+            <div class="comment-content">
+              <div class="comment-header">
+                <div class="comment-author-group">
+                  ${auditIdentityHtml}
+                </div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <span class="comment-time">${reply.time || reply.timestamp || 'Just now'} ${reply.isEdited ? '<span class="edited-badge">• (Edited)</span>' : ''}</span>
+                  ${replyActionsHtml}
+                </div>
+              </div>
+              ${replyBodyHtml}
+              <div class="comment-footer-actions">
+                <button type="button" class="comment-reply-btn" onclick="toggleReplyBox('${post.id}', '${reply.id}', this)">Reply</button>
+              </div>
+              <div class="reply-input-box" id="reply_box_${reply.id}" style="display:none;">
+                <input type="text" id="reply_input_${reply.id}" placeholder="Write a reply..." onkeydown="handleReplyKeydown(event, '${post.id}', '${reply.id}', this)">
+                <label class="reply-anon-toggle">
+                  <input type="checkbox" id="reply_anon_${reply.id}">
+                  <span>Post anonymously</span>
+                </label>
+                <button type="button" onclick="submitReply('${post.id}', '${reply.id}', this)">Post Reply</button>
+              </div>
+              ${renderNestedReplies(reply.replies, post)}
+            </div>
+          </div>
+        `;
+      }).join('')}</div>`;
+    }
+
+    function createFeedbackCardHTML(post, context = "general") {
+      const authorInfo = getIdentityDetails(post);
+      const allowPostDelete = canDeleteItem(post);
+      const allowPostEdit = canEditItem(post);
+      const isEditingThisPost = editingPostId === post.id;
+
+      // Target representation if relevant
+      let targetHtml = "";
+      if (post.targetId === "company") {
+        targetHtml = `<span class="target-direction">to <span class="target-name-link">🏢 Workplace Suggestions</span></span>`;
+      } else if (post.targetId !== CURRENT_USER.id && context !== "targetModal") {
+        targetHtml = `<span class="target-direction">to <span class="target-name-link">${post.targetName}</span></span>`;
+      }
+
+      // Anonymous Badge Tag for Manager/Admin View
+      let anonTagHtml = "";
+      if (authorInfo.showAnonTag) {
+        anonTagHtml = `<span class="anon-manager-tag" title="Sent anonymously • Visible only in Manager/Admin audit">[Anon]</span>`;
+      }
+
+      // Header Actions (Edit & Delete buttons for Post)
+      let headerActionsHtml = "";
+      if (allowPostEdit || allowPostDelete) {
+        headerActionsHtml = `<div class="card-header-actions">`;
+        if (allowPostEdit && !isEditingThisPost) {
+          headerActionsHtml += `
+            <button 
+              type="button" 
+              class="btn-action-icon" 
+              onclick="startPostEdit('${post.id}')" 
+              title="Edit feedback post"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </button>
+          `;
+        }
+        if (allowPostDelete) {
+          headerActionsHtml += `
+            <button 
+              type="button" 
+              class="btn-action-icon danger" 
+              onclick="deletePost('${post.id}')" 
+              title="Delete feedback post"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+            </button>
+          `;
+        }
+        headerActionsHtml += `</div>`;
+      }
+
+      // Body text OR inline edit textarea
+      let bodyContentHtml = "";
+      if (isEditingThisPost) {
+        bodyContentHtml = `
+          <div class="inline-edit-box">
+            <textarea id="edit_textarea_post_${post.id}" class="inline-edit-textarea">${escapeHtml(post.content)}</textarea>
+            <div class="inline-edit-controls">
+              <button class="btn-cancel-inline" onclick="cancelPostEdit()">Cancel</button>
+              <button class="btn-save-inline" onclick="savePostEdit('${post.id}')">Save Changes</button>
+            </div>
+          </div>
+        `;
+      } else {
+        bodyContentHtml = `<div class="feedback-body-text">${escapeHtml(post.content)}</div>`;
+      }
+
+      // Reactions buttons on post
+      const emojiList = ["❤️", "👏", "💡", "🙌"];
+      let reactionChipsHtml = emojiList.map(emoji => {
+        const count = (post.reactions && post.reactions[emoji]) || 0;
+        const isActive = post.userReactions && post.userReactions.includes(emoji);
+        return `
+          <button 
+            type="button" 
+            class="reaction-chip ${isActive ? 'active' : ''}" 
+            onclick="toggleReaction('${post.id}', '${emoji}')"
+            title="React with ${emoji}"
+          >
+            <span class="emoji-icon">${emoji}</span>
+            <span>${count}</span>
+          </button>
+        `;
+      }).join("");
+
+      // Comments list rendering
+      const comments = post.comments || [];
+      const commentCount = comments.length;
+
+      let commentsListHtml = "";
+      if (commentCount === 0) {
+        commentsListHtml = `
+          <div class="empty-comments-message">
+            💬 No comments yet. Be the first to leave feedback!
+          </div>
+        `;
+      } else {
+        commentsListHtml = comments.map(c => {
+          const cAuthor = getIdentityDetails(c);
+          const allowCommentDelete = canDeleteItem(c);
+          const allowCommentEdit = canEditItem(c);
+          const cKey = `${post.id}_${c.id}`;
+          const isEditingThisComment = editingCommentKey === cKey;
+
+          let cAnonTag = cAuthor.showAnonTag ? `<span class="anon-manager-tag" title="Comment posted anonymously • Manager/Admin Audit">[Anon]</span>` : '';
+
+          // Comment action buttons (Edit & Delete)
+          let cActionsHtml = "";
+          if (allowCommentEdit || allowCommentDelete) {
+            cActionsHtml = `<div class="comment-action-icons">`;
+            if (allowCommentEdit && !isEditingThisComment) {
+              cActionsHtml += `
+                <button 
+                  type="button" 
+                  class="btn-action-icon-mini" 
+                  onclick="startCommentEdit('${post.id}', '${c.id}')" 
+                  title="Edit comment"
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                </button>
+              `;
+            }
+            if (allowCommentDelete) {
+              cActionsHtml += `
+                <button 
+                  type="button" 
+                  class="btn-action-icon-mini danger" 
+                  onclick="deleteComment('${post.id}', '${c.id}')" 
+                  title="Delete comment"
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                </button>
+              `;
+            }
+            cActionsHtml += `</div>`;
+          }
+
+          // Comment content or edit textarea
+          let commentBodyHtml = "";
+          if (isEditingThisComment) {
+            commentBodyHtml = `
+              <div class="inline-edit-box" style="margin-top:6px;">
+                <textarea id="edit_textarea_cm_${cKey}" class="inline-edit-textarea" style="min-height:60px;">${escapeHtml(c.text)}</textarea>
+                <div class="inline-edit-controls">
+                  <button class="btn-cancel-inline" onclick="cancelCommentEdit('${post.id}')">Cancel</button>
+                  <button class="btn-save-inline" onclick="saveCommentEdit('${post.id}', '${c.id}')">Save</button>
+                </div>
+              </div>
+            `;
+          } else {
+            commentBodyHtml = `<div class="comment-text">${escapeHtml(c.text)}</div>`;
+          }
+
+          // Comment reaction buttons
+          let cReactionsHtml = emojiList.map(emoji => {
+            const cCount = (c.reactions && c.reactions[emoji]) || 0;
+            const cIsActive = c.userReactions && c.userReactions.includes(emoji);
+            return `
+              <button 
+                type="button" 
+                class="comment-reaction-btn ${cIsActive ? 'active' : ''}" 
+                onclick="toggleCommentReaction('${post.id}', '${c.id}', '${emoji}')"
+              >
+                <span>${emoji}</span>
+                ${cCount > 0 ? `<span>${cCount}</span>` : ''}
+              </button>
+            `;
+          }).join("");
+
+          return `
+            <div class="single-comment" id="comment_${c.id}">
+              <div class="comment-avatar ${cAuthor.isMasked ? 'anon-avatar' : ''}">
+                ${cAuthor.isMasked ? `
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                  </svg>
+                ` : `
+                  <img src="${cAuthor.avatar}" alt="${cAuthor.name}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                `}
+              </div>
+              <div class="comment-content">
+                <div class="comment-header">
+                  <div class="comment-author-group">
+                    <span class="comment-author">${cAuthor.name}</span>
+                    ${cAnonTag}
+                  </div>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span class="comment-time">${c.time} ${c.isEdited ? '<span class="edited-badge">• (Edited)</span>' : ''}</span>
+                    ${cActionsHtml}
+                  </div>
+                </div>
+                ${commentBodyHtml}
+                <div class="comment-footer-actions">
+                  <div class="comment-reactions-group">
+                    ${cReactionsHtml}
+                  </div>
+                  <button type="button" class="comment-reply-btn" onclick="toggleReplyBox('${post.id}', '${c.id}', this)">Reply</button>
+                </div>
+                <div class="reply-input-box" id="reply_box_${c.id}" style="display:none;">
+                  <input type="text" id="reply_input_${c.id}" placeholder="Write a reply..." onkeydown="handleReplyKeydown(event, '${post.id}', '${c.id}', this)">
+                  <label class="reply-anon-toggle">
+                    <input type="checkbox" id="reply_anon_${c.id}">
+                    <span>Post anonymously</span>
+                  </label>
+                  <button type="button" onclick="submitReply('${post.id}', '${c.id}', this)">Post Reply</button>
+                </div>
+                ${renderNestedReplies(c.replies, post)}
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      return `
+        <div class="feedback-card" id="card_${post.id}">
+          <div class="feedback-header">
+            <div class="author-info-group">
+              <div class="author-avatar ${authorInfo.isMasked ? 'anon-avatar' : ''}">
+                ${authorInfo.isMasked ? `
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                  </svg>
+                ` : `
+                  <img src="${authorInfo.avatar}" alt="${authorInfo.name}">
+                `}
+              </div>
+              <div class="author-meta">
+                <div class="author-name-row">
+                  <span class="author-name">${authorInfo.name}</span>
+                  ${targetHtml}
+                  ${anonTagHtml}
+                </div>
+                <div class="post-timestamp-row">
+                  <span class="post-timestamp">${post.timestamp} ${post.isEdited ? '<span class="edited-badge">• (Edited)</span>' : ''}</span>
+                </div>
+              </div>
+            </div>
+            ${headerActionsHtml}
+          </div>
+
+          ${bodyContentHtml}
+
+          <div class="card-footer-actions">
+            <div class="emoji-reactions-bar">
+              ${reactionChipsHtml}
+            </div>
+
+            <!-- Comment indicator / toggle button with live count -->
+            <button 
+              class="btn-comment-toggle" 
+              id="comment_btn_${post.id}" 
+              onclick="toggleCommentsThread('${post.id}', this)"
+              title="Click to view and add comments"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+              </svg>
+              <span>💬 ${commentCount} ${commentCount === 1 ? 'Comment' : 'Comments'}</span>
+            </button>
+          </div>
+
+          <!-- Threaded Comments Area -->
+          <div class="comments-thread" id="comments_${post.id}">
+            <div class="comments-container" id="comments_list_${post.id}">
+              ${commentsListHtml}
+            </div>
+            
+            <div class="comment-input-box">
+              <input 
+                type="text" 
+                class="comment-input-field" 
+                id="comment_input_${post.id}" 
+                placeholder="Write a comment or reply..." 
+                onkeydown="if(event.key==='Enter') submitComment('${post.id}')"
+              />
+              <div class="comment-action-bar">
+                <label class="mini-anon-toggle">
+                  <input type="checkbox" id="comment_anon_${post.id}" />
+                  <span>Post Anonymously</span>
+                </label>
+                <button class="btn-submit-comment" onclick="submitComment('${post.id}')">Post Comment</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* ==========================================================================
+       TAB 1: ME VIEW LOGIC (ACCURATE DYNAMIC COUNTERS)
+       ========================================================================== */
+    function renderMeView() {
+      // Received feedbacks for Alex
+      const received = FEEDBACKS.filter(f => f.targetId === CURRENT_USER.id);
+      const receivedContainer = document.getElementById("meReceivedFeed");
+      if (received.length === 0) {
+        receivedContainer.innerHTML = `
+          <div class="empty-feed-card">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+            <p>No feedback received yet on your wall.</p>
+          </div>
+        `;
+      } else {
+        receivedContainer.innerHTML = received.map(f => createFeedbackCardHTML(f, "received")).join("");
+      }
+
+      // Given feedbacks by Alex
+      const given = FEEDBACKS.filter(f => f.senderId === CURRENT_USER.id);
+      const givenContainer = document.getElementById("meGivenFeed");
+      if (given.length === 0) {
+        givenContainer.innerHTML = `
+          <div class="empty-feed-card">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+            <p>You haven't posted any feedback or workplace suggestions yet.</p>
+          </div>
+        `;
+      } else {
+        givenContainer.innerHTML = given.map(f => createFeedbackCardHTML(f, "given")).join("");
+      }
+
+      updateBadgesAndStats();
+    }
+
+    /* ==========================================================================
+       TAB 2: EMPLOYEE WALL LOGIC (CLEAN TILES, ACCURATE DYNAMIC COUNTERS)
+       ========================================================================== */
+    function renderEmployeeTiles() {
+      const grid = document.getElementById("employeeTilesGrid");
+      const search = searchQuery.toLowerCase().trim();
+
+      // Filter employees
+      const filtered = EMPLOYEES.filter(emp => {
+        const isCurrentUser = emp.id === CURRENT_USER.id;
+        const matchesDept = selectedDepartment === "All" || emp.department === selectedDepartment;
+        const matchesSearch = !search ||
+          emp.name.toLowerCase().includes(search) ||
+          emp.role.toLowerCase().includes(search) ||
+          emp.department.toLowerCase().includes(search) ||
+          (emp.skills && emp.skills.some(s => s.toLowerCase().includes(search)));
+        return !isCurrentUser && matchesDept && matchesSearch;
+      });
+
+      // Count for Company Wall
+      const companyFeedbacks = FEEDBACKS.filter(f => f.targetId === "company");
+
+      // Card 1: Workplace & Company Improvement Wall
+      let companyCardHtml = "";
+      if (!search || "company organization workplace improvement suggestions ideas culture".includes(search)) {
+        companyCardHtml = `
+          <div class="company-wall-card" onclick="openWallModal('company')">
+            <div>
+              <div class="company-badge-row">
+                <span class="company-pill">Company Wall</span>
+                <span style="font-size:0.75rem; color:#94A3B8;">Workplace Ideas</span>
+              </div>
+              <div class="company-icon-box">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+                  <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+                  <line x1="6" y1="1" x2="6" y2="4"></line>
+                  <line x1="10" y1="1" x2="10" y2="4"></line>
+                  <line x1="14" y1="1" x2="14" y2="4"></line>
+                </svg>
+              </div>
+              <h3 class="company-wall-title">🏢 Workplace & Company Suggestions</h3>
+              <p class="company-wall-desc">Dedicated space for company improvement ideas, workplace feedback, and organizational enhancement suggestions.</p>
+            </div>
+          </div>
+        `;
+      }
+
+      // Individual Clean Employee Cards
+      const employeeCardsHtml = filtered.map(emp => {
+        const empReceivedCount = FEEDBACKS.filter(f => f.targetId === emp.id).length;
+        const empGivenCount = FEEDBACKS.filter(f => f.senderId === emp.id).length;
+
+        return `
+          <div class="employee-tile-card" onclick="openWallModal('${emp.id}')">
+            <div class="employee-avatar-box">
+              <img src="${emp.avatar}" alt="${emp.name}" />
+            </div>
+            <h3 class="employee-name">${emp.name}</h3>
+            <p class="employee-role-tag">${emp.role}</p>
+            <span class="employee-dept-badge">${emp.department}</span>
+            
+            <div class="tile-stats-row">
+              <div class="tile-stat-item">
+                <span class="tile-stat-val">${empReceivedCount}</span>
+                <span class="tile-stat-lbl">Received</span>
+              </div>
+              <div class="tile-stat-item">
+                <span class="tile-stat-val">${empGivenCount}</span>
+                <span class="tile-stat-lbl">Given</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      if (!companyCardHtml && filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-feed-card" style="grid-column: 1 / -1;">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <p>No team members found matching "${escapeHtml(searchQuery)}"</p>
+          </div>
+        `;
+      } else {
+        grid.innerHTML = companyCardHtml + employeeCardsHtml;
+      }
+
+      updateBadgesAndStats();
+    }
+
+    function handleSearch(query) {
+      searchQuery = query;
+      renderEmployeeTiles();
+    }
+
+    function filterDepartment(dept) {
+      selectedDepartment = dept;
+      const chips = document.querySelectorAll(".dept-chip-btn");
+      chips.forEach(chip => {
+        if (chip.textContent.includes(dept) || (dept === "All" && chip.textContent.includes("All"))) {
+          chip.classList.add("active");
+        } else {
+          chip.classList.remove("active");
+        }
+      });
+      renderEmployeeTiles();
+    }
+
+    /* ==========================================================================
+       WALL MODAL & FEEDBACK SUBMISSION
+       ========================================================================== */
+    function openWallModal(targetId) {
+      activeModalTargetId = targetId;
+      const overlay = document.getElementById("wallModalOverlay");
+      const headerContainer = document.getElementById("modalTargetHeader");
+      const feedTitle = document.getElementById("modalFeedTitle");
+      const writeTitle = document.getElementById("writePanelTitle");
+      const textInput = document.getElementById("feedbackTextInput");
+
+      if (targetId === "company") {
+        headerContainer.innerHTML = `
+          <div class="modal-target-avatar" style="background:var(--brand-dark); color:var(--brand-teal);">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+              <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+              <line x1="6" y1="1" x2="6" y2="4"></line>
+              <line x1="10" y1="1" x2="10" y2="4"></line>
+              <line x1="14" y1="1" x2="14" y2="4"></line>
+            </svg>
+          </div>
+          <div class="modal-target-info">
+            <h3>🏢 Workplace & Company Suggestions</h3>
+            <p>Open channel for organizational feedback, workplace ideas & improvements</p>
+          </div>
+        `;
+        feedTitle.innerHTML = `Workplace Improvement Suggestions`;
+        writeTitle.innerHTML = `
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          Post Workplace or Company Improvement Feedback
+        `;
+        textInput.placeholder = "Share a constructive workplace suggestion, process enhancement, or company improvement idea...";
+      } else {
+        const emp = EMPLOYEES.find(e => e.id === targetId);
+        if (emp) {
+          headerContainer.innerHTML = `
+            <div class="modal-target-avatar">
+              <img src="${emp.avatar}" alt="${emp.name}" />
+            </div>
+            <div class="modal-target-info">
+              <h3>${emp.name}<button type="button" class="personal-remark-link" id="personalRemarkToggle" onclick="togglePersonalRemark()" aria-expanded="false">Personal remark</button></h3>
+              <p>${emp.role} • ${emp.department}</p>
+            </div>
+          `;
+          feedTitle.innerHTML = `Praise & Feedback for ${emp.name}`;
+          writeTitle.innerHTML = `
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            Write Feedback for ${emp.name}
+          `;
+          textInput.placeholder = `Share specific praise, feedback, or collaborative recognition for ${emp.name}...`;
+        }
+      }
+
+      // Reset form fields
+      personalRemarkOpen = false;
+      feedbackSearchQuery = "";
+      feedbackSortOrder = "latest";
+      textInput.value = "";
+      document.getElementById("anonCheckbox").checked = false;
+      document.getElementById("feedbackFeedSearch").value = "";
+      document.getElementById("feedbackFeedSort").value = feedbackSortOrder;
+      renderPrivateRemarkPanel(targetId);
+
+      renderModalWallFeed(targetId);
+      overlay.classList.add("open");
+      document.body.style.overflow = "hidden";
+    }
+
+    function renderPrivateRemarkPanel(targetId) {
+      const panel = document.getElementById("privateRemarkPanel");
+      const input = document.getElementById("privateRemarkInput");
+      const display = document.getElementById("privateRemarkDisplay");
+      const isEmployeeTarget = targetId && targetId !== "company" && targetId !== CURRENT_USER.id;
+
+      panel.hidden = !isEmployeeTarget || !personalRemarkOpen;
+      if (!isEmployeeTarget) return;
+
+      const toggle = document.getElementById("personalRemarkToggle");
+      if (toggle) {
+        toggle.setAttribute("aria-expanded", String(personalRemarkOpen));
+        toggle.textContent = personalRemarkOpen ? "Close remark" : "Personal remark";
+      }
+
+      const authorRemarks = privateRemarks[CURRENT_USER.id] || {};
+      const remarks = Array.isArray(authorRemarks[targetId])
+        ? authorRemarks[targetId]
+        : authorRemarks[targetId]
+          ? [{ id: `remark_migrated_${targetId}`, text: authorRemarks[targetId] }]
+          : [];
+      input.value = "";
+      display.innerHTML = remarks.map(remark => `
+        <div class="private-remark-item">
+          <div class="private-remark-item-text">${escapeHtml(remark.text)}</div>
+          <button type="button" class="private-remark-delete" onclick="deletePrivateRemark('${remark.id}')" title="Delete this remark">Delete</button>
+        </div>
+      `).join("");
+    }
+
+    function togglePersonalRemark() {
+      if (!activeModalTargetId || activeModalTargetId === "company" || activeModalTargetId === CURRENT_USER.id) return;
+
+      personalRemarkOpen = !personalRemarkOpen;
+      renderPrivateRemarkPanel(activeModalTargetId);
+
+      if (personalRemarkOpen) {
+        document.getElementById("privateRemarkInput").focus();
+      }
+    }
+
+    async function savePrivateRemark() {
+      if (!activeModalTargetId || activeModalTargetId === "company" || activeModalTargetId === CURRENT_USER.id) return;
+
+      const input = document.getElementById("privateRemarkInput");
+      const remark = input.value.trim();
+      if (!remark) {
+        showToast("⚠️ Write a remark before saving.");
+        input.focus();
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/private-remarks`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            authorId: CURRENT_USER.id,
+            targetId: activeModalTargetId,
+            content: remark
+          })
+        });
+        if (!response.ok) throw new Error("Remark could not be saved");
+
+        const savedRemark = await response.json();
+        if (!privateRemarks[CURRENT_USER.id]) privateRemarks[CURRENT_USER.id] = {};
+        if (!privateRemarks[CURRENT_USER.id][activeModalTargetId]) {
+          privateRemarks[CURRENT_USER.id][activeModalTargetId] = [];
+        }
+        privateRemarks[CURRENT_USER.id][activeModalTargetId].push({
+          id: savedRemark.id,
+          text: savedRemark.content
+        });
+        input.value = "";
+        renderPrivateRemarkPanel(activeModalTargetId);
+        showToast("🔒 Private remark saved.");
+      } catch (error) {
+        showToast("Could not save private remark. Please try again.");
+      }
+    }
+
+    async function deletePrivateRemark(remarkId) {
+      if (!activeModalTargetId || !privateRemarks[CURRENT_USER.id]) return;
+
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/private-remarks/${encodeURIComponent(remarkId)}?authorId=${encodeURIComponent(CURRENT_USER.id)}`,
+          { method: "DELETE" }
+        );
+        if (!response.ok) throw new Error("Remark could not be deleted");
+
+        const existingRemarks = privateRemarks[CURRENT_USER.id][activeModalTargetId];
+        privateRemarks[CURRENT_USER.id][activeModalTargetId] = existingRemarks.filter(remark => remark.id !== remarkId);
+        renderPrivateRemarkPanel(activeModalTargetId);
+        showToast("Private remark deleted.");
+      } catch (error) {
+        showToast("Could not delete private remark. Please try again.");
+      }
+    }
+
+    function renderModalWallFeed(targetId) {
+      const feedContainer = document.getElementById("modalTargetFeed");
+      const searchTerm = feedbackSearchQuery.toLowerCase().trim();
+      const feedbacks = FEEDBACKS
+        .filter(f => f.targetId === targetId)
+        .filter(f => !searchTerm || getFeedbackSearchText(f).includes(searchTerm))
+        .sort((first, second) => {
+          const difference = getFeedbackDateValue(second) - getFeedbackDateValue(first);
+          return feedbackSortOrder === "latest" ? difference : -difference;
+        });
+
+      if (feedbacks.length === 0) {
+        feedContainer.innerHTML = `
+          <div class="feedback-feed-empty">
+            <p>${searchTerm ? `No feedback matches “${escapeHtml(feedbackSearchQuery)}”.` : "No feedback posted on this wall yet. Be the first to post!"}</p>
+          </div>
+        `;
+      } else {
+        feedContainer.innerHTML = feedbacks.map(f => createFeedbackCardHTML(f, "targetModal")).join("");
+      }
+    }
+
+    function getFeedbackSearchText(feedback) {
+      return [
+        feedback.senderName,
+        feedback.authorName,
+        feedback.role,
+        feedback.targetName,
+        feedback.content,
+        ...(feedback.tags || []),
+        ...(feedback.comments || []).flatMap(comment => [comment.senderName, comment.text])
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+    }
+
+    function getFeedbackDateValue(feedback) {
+      if (feedback.timestamp && !Number.isNaN(Date.parse(feedback.timestamp))) {
+        return Date.parse(feedback.timestamp);
+      }
+
+      const timestamp = String(feedback.timestamp || "").toLowerCase();
+      const now = Date.now();
+      const amount = Number.parseInt(timestamp, 10) || 0;
+
+      if (timestamp.includes("just now")) return now;
+      if (timestamp.includes("minute")) return now - amount * 60 * 1000;
+      if (timestamp.includes("hour")) return now - amount * 60 * 60 * 1000;
+      if (timestamp.includes("yesterday")) return now - 24 * 60 * 60 * 1000;
+      if (timestamp.includes("day")) return now - amount * 24 * 60 * 60 * 1000;
+      if (timestamp.includes("week")) return now - amount * 7 * 24 * 60 * 60 * 1000;
+      return 0;
+    }
+
+    function handleFeedbackSearch(value) {
+      feedbackSearchQuery = value;
+      if (activeModalTargetId) renderModalWallFeed(activeModalTargetId);
+    }
+
+    function handleFeedbackSort(value) {
+      feedbackSortOrder = value === "oldest" ? "oldest" : "latest";
+      if (activeModalTargetId) renderModalWallFeed(activeModalTargetId);
+    }
+
+    function closeWallModal() {
+      const overlay = document.getElementById("wallModalOverlay");
+      overlay.classList.remove("open");
+      document.body.style.overflow = "auto";
+      activeModalTargetId = null;
+    }
+
+    function handleModalBackdropClick(e) {
+      if (e.target.id === "wallModalOverlay") {
+        closeWallModal();
+      }
+    }
+
+    function openGiveFeedbackModal(target) {
+      if (target === "all" || !target) {
+        switchMainTab("wall");
+        showToast("Select any colleague's tile or the Workplace Suggestions Wall to give feedback!");
+      } else {
+        openWallModal(target);
+      }
+    }
+
+    function submitNewFeedback() {
+      const textInput = document.getElementById("feedbackTextInput");
+      const content = textInput.value.trim();
+      const isAnon = document.getElementById("anonCheckbox").checked;
+
+      if (!content) {
+        showToast("⚠️ Please enter your feedback message.");
+        textInput.focus();
+        return;
+      }
+
+      if (!activeModalTargetId) return;
+
+      let targetName = "Workplace & Company Suggestions";
+      if (activeModalTargetId !== "company") {
+        const emp = EMPLOYEES.find(e => e.id === activeModalTargetId);
+        if (emp) targetName = emp.name;
+      }
+
+      const newPost = {
+        id: "fb_" + Date.now(),
+        senderId: CURRENT_USER.id,
+        senderName: CURRENT_USER.name,
+        senderAvatar: CURRENT_USER.avatar,
+        targetId: activeModalTargetId,
+        targetName: targetName,
+        isAnonymous: isAnon,
+        timestamp: "Just now",
+        isEdited: false,
+        content: content,
+        reactions: { "❤️": 1, "👏": 1, "💡": 0, "🙌": 0 },
+        userReactions: ["❤️"],
+        comments: []
+      };
+
+      // Add to front of feedback array
+      FEEDBACKS.unshift(newPost);
+
+      // Re-render
+      renderModalWallFeed(activeModalTargetId);
+      renderAll();
+
+      textInput.value = "";
+      showToast(isAnon ? "🎭 Anonymous post published!" : "🎉 Feedback published successfully!");
+    }
+
+    /* ==========================================================================
+       POST & COMMENT EDITING HANDLERS
+       ========================================================================== */
+    function startPostEdit(postId) {
+      editingPostId = postId;
+      renderMeView();
+      if (activeModalTargetId) renderModalWallFeed(activeModalTargetId);
+
+      setTimeout(() => {
+        const textarea = document.getElementById(`edit_textarea_post_${postId}`);
+        if (textarea) {
+          textarea.focus();
+          textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+        }
+      }, 30);
+    }
+
+    function cancelPostEdit() {
+      editingPostId = null;
+      renderMeView();
+      if (activeModalTargetId) renderModalWallFeed(activeModalTargetId);
+    }
+
+    function savePostEdit(postId) {
+      const textarea = document.getElementById(`edit_textarea_post_${postId}`);
+      if (!textarea) return;
+
+      const newText = textarea.value.trim();
+      if (!newText) {
+        showToast("⚠️ Post content cannot be empty.");
+        return;
+      }
+
+      const post = FEEDBACKS.find(f => f.id === postId);
+      if (post && canEditItem(post)) {
+        if (post.content !== newText) {
+          post.content = newText;
+          post.isEdited = true;
+        }
+        editingPostId = null;
+
+        renderMeView();
+        if (activeModalTargetId) renderModalWallFeed(activeModalTargetId);
+        showToast("✏️ Post updated successfully!");
+      }
+    }
+
+    function startCommentEdit(postId, commentId) {
+      editingCommentKey = `${postId}_${commentId}`;
+      renderMeView();
+      if (activeModalTargetId) renderModalWallFeed(activeModalTargetId);
+
+      setTimeout(() => {
+        const thread = document.getElementById(`comments_${postId}`);
+        if (thread) thread.classList.add("open");
+        const textarea = document.getElementById(`edit_textarea_cm_${editingCommentKey}`);
+        if (textarea) {
+          textarea.focus();
+          textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+        }
+      }, 40);
+    }
+
+    function cancelCommentEdit(postId) {
+      editingCommentKey = null;
+      renderMeView();
+      if (activeModalTargetId) renderModalWallFeed(activeModalTargetId);
+
+      setTimeout(() => {
+        const thread = document.getElementById(`comments_${postId}`);
+        if (thread) thread.classList.add("open");
+      }, 40);
+    }
+
+    function saveCommentEdit(postId, commentId) {
+      const cKey = `${postId}_${commentId}`;
+      const textarea = document.getElementById(`edit_textarea_cm_${cKey}`);
+      if (!textarea) return;
+
+      const newText = textarea.value.trim();
+      if (!newText) {
+        showToast("⚠️ Comment text cannot be empty.");
+        return;
+      }
+
+      const post = FEEDBACKS.find(f => f.id === postId);
+      if (post && post.comments) {
+        const comment = findComment(post.comments, commentId);
+        if (comment && canEditItem(comment)) {
+          if (comment.text !== newText) {
+            comment.text = newText;
+            comment.isEdited = true;
+          }
+          editingCommentKey = null;
+
+          renderMeView();
+          if (activeModalTargetId) renderModalWallFeed(activeModalTargetId);
+
+          setTimeout(() => {
+            const thread = document.getElementById(`comments_${postId}`);
+            if (thread) thread.classList.add("open");
+          }, 40);
+
+          showToast("✏️ Comment updated!");
+        }
+      }
+    }
+
+    /* ==========================================================================
+       POST & COMMENT DELETION HANDLERS
+       ========================================================================== */
+    function deletePost(postId) {
+      const index = FEEDBACKS.findIndex(f => f.id === postId);
+      if (index === -1) return;
+
+      const post = FEEDBACKS[index];
+      if (!canDeleteItem(post)) {
+        showToast("❌ Permission denied: You can only delete your own posts.");
+        return;
+      }
+
+      FEEDBACKS.splice(index, 1);
+
+      renderMeView();
+      renderEmployeeTiles();
+      if (activeModalTargetId) {
+        renderModalWallFeed(activeModalTargetId);
+      }
+
+      showToast("🗑️ Feedback post deleted successfully.");
+    }
+
+    function deleteComment(postId, commentId) {
+      const post = FEEDBACKS.find(f => f.id === postId);
+      if (!post || !post.comments) return;
+
+      const comment = findComment(post.comments, commentId);
+      if (!comment) return;
+      if (!canDeleteItem(comment)) {
+        showToast("❌ Permission denied: You can only delete your own comments or replies.");
+        return;
+      }
+
+      removeComment(post.comments, commentId);
+
+      renderMeView();
+      if (activeModalTargetId) {
+        renderModalWallFeed(activeModalTargetId);
+      }
+
+      setTimeout(() => {
+        const thread = document.getElementById(`comments_${postId}`);
+        if (thread) thread.classList.add("open");
+        const btn = document.getElementById(`comment_btn_${postId}`);
+        if (btn) btn.classList.add("active");
+      }, 40);
+
+      showToast("🗑️ Comment or reply deleted.");
+    }
+
+    /* ==========================================================================
+       INTERACTIONS: EMOJI REACTIONS & THREADED COMMENTS
+       ========================================================================== */
+    function toggleReaction(postId, emoji) {
+      const post = FEEDBACKS.find(f => f.id === postId);
+      if (!post) return;
+
+      if (!post.reactions) post.reactions = {};
+      if (!post.userReactions) post.userReactions = [];
+
+      const currentCount = post.reactions[emoji] || 0;
+      const hasReacted = post.userReactions.includes(emoji);
+
+      if (hasReacted) {
+        post.reactions[emoji] = Math.max(0, currentCount - 1);
+        post.userReactions = post.userReactions.filter(e => e !== emoji);
+      } else {
+        post.reactions[emoji] = currentCount + 1;
+        post.userReactions.push(emoji);
+      }
+
+      renderMeView();
+      if (activeModalTargetId) {
+        renderModalWallFeed(activeModalTargetId);
+      }
+    }
+
+    function toggleCommentReaction(postId, commentId, emoji) {
+      const post = FEEDBACKS.find(f => f.id === postId);
+      if (!post || !post.comments) return;
+
+      const comment = post.comments.find(c => c.id === commentId);
+      if (!comment) return;
+
+      if (!comment.reactions) comment.reactions = {};
+      if (!comment.userReactions) comment.userReactions = [];
+
+      const currentCount = comment.reactions[emoji] || 0;
+      const hasReacted = comment.userReactions.includes(emoji);
+
+      if (hasReacted) {
+        comment.reactions[emoji] = Math.max(0, currentCount - 1);
+        comment.userReactions = comment.userReactions.filter(e => e !== emoji);
+      } else {
+        comment.reactions[emoji] = currentCount + 1;
+        comment.userReactions.push(emoji);
+      }
+
+      renderMeView();
+      if (activeModalTargetId) {
+        renderModalWallFeed(activeModalTargetId);
+      }
+
+      setTimeout(() => {
+        const thread = document.getElementById(`comments_${postId}`);
+        if (thread) thread.classList.add("open");
+        const btn = document.getElementById(`comment_btn_${postId}`);
+        if (btn) btn.classList.add("active");
+      }, 30);
+    }
+
+    /* Toggle comments on any post */
+    function toggleCommentsThread(postId, button) {
+      const card = button ? button.closest('.feedback-card') : null;
+      const thread = card
+        ? card.querySelector(`#comments_${postId}`)
+        : document.getElementById(`comments_${postId}`);
+      const btn = button || document.getElementById(`comment_btn_${postId}`);
+      if (thread) {
+        thread.classList.toggle("open");
+        if (btn) btn.classList.toggle("active", thread.classList.contains("open"));
+        const input = document.getElementById(`comment_input_${postId}`);
+        if (thread.classList.contains("open") && input) {
+          input.focus();
+        }
+      }
+    }
+
+    function toggleReplyBox(postId, commentId, button) {
+      const card = button ? button.closest('.feedback-card') : null;
+      const box = card
+        ? card.querySelector(`#reply_box_${commentId}`)
+        : document.getElementById(`reply_box_${commentId}`);
+      if (!box) return;
+
+      box.style.display = box.style.display === "none" ? "flex" : "none";
+      if (box.style.display === "flex") {
+        const input = box.querySelector(`#reply_input_${commentId}`);
+        if (input) input.focus();
+      }
+    }
+
+    function findComment(comments, commentId) {
+      for (const comment of comments || []) {
+        if (comment.id === commentId) return comment;
+        const nestedComment = findComment(comment.replies, commentId);
+        if (nestedComment) return nestedComment;
+      }
+      return null;
+    }
+
+    function removeComment(comments, commentId) {
+      const commentIndex = (comments || []).findIndex(comment => comment.id === commentId);
+      if (commentIndex !== -1) {
+        comments.splice(commentIndex, 1);
+        return true;
+      }
+
+      return (comments || []).some(comment => removeComment(comment.replies, commentId));
+    }
+
+    function reopenVisibleCommentThread(postId) {
+      const threads = [...document.querySelectorAll(`#comments_${postId}`)];
+      const visibleThread = threads.find(thread => thread.offsetParent !== null) || threads[0];
+      if (visibleThread) visibleThread.classList.add("open");
+
+      const buttons = [...document.querySelectorAll(`#comment_btn_${postId}`)];
+      const visibleButton = buttons.find(button => button.offsetParent !== null) || buttons[0];
+      if (visibleButton) visibleButton.classList.add("active");
+    }
+
+    function handleReplyKeydown(event, postId, parentCommentId, input) {
+      if (event.key !== "Enter") return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      submitReply(postId, parentCommentId, input);
+    }
+
+    function refreshAfterCommentChange(postId, itemId) {
+      // Re-render only the view the user is currently looking at, keeping any
+      // open wall modal in place instead of returning the user to another page.
+      if (activeModalTargetId) {
+        renderModalWallFeed(activeModalTargetId);
+      } else if (currentMainTab === "me") {
+        renderMeView();
+      } else if (currentMainTab === "wall") {
+        renderEmployeeTiles();
+      }
+      updateBadgesAndStats();
+
+      const overlay = document.getElementById("wallModalOverlay");
+      if (activeModalTargetId && overlay) {
+        overlay.classList.add("open");
+        document.body.style.overflow = "hidden";
+      }
+
+      setTimeout(() => {
+        reopenVisibleCommentThread(postId);
+        const items = [...document.querySelectorAll(`#comment_${itemId}`)];
+        const visibleItem = items.find(item => item.offsetParent !== null) || items[0];
+        if (visibleItem) visibleItem.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }, 50);
+    }
+
+    /* Anyone can reply to any comment, including replies in the same chain. */
+    async function submitReply(postId, parentCommentId, source) {
+      const card = source ? source.closest('.feedback-card') : null;
+      const input = card
+        ? card.querySelector(`#reply_input_${parentCommentId}`)
+        : document.getElementById(`reply_input_${parentCommentId}`);
+      if (!input) return;
+
+      const text = input.value.trim();
+      if (!text) return;
+
+      const replyBox = input.closest('.reply-input-box');
+      const anonBox = replyBox ? replyBox.querySelector(`#reply_anon_${parentCommentId}`) : null;
+      const isAnon = anonBox ? anonBox.checked : false;
+
+      const post = FEEDBACKS.find(feedback => feedback.id === postId);
+      const parentComment = post ? findComment(post.comments, parentCommentId) : null;
+      if (!parentComment) return;
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/feedback/${postId}/comments`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            senderId: CURRENT_USER.id,
+            parentId: parentCommentId,
+            text,
+            isAnonymous: isAnon
+          })
+        });
+
+        if (!response.ok) throw new Error("Reply could not be saved");
+
+        input.value = "";
+        if (anonBox) anonBox.checked = false;
+        await loadBackendData();
+        refreshAfterCommentChange(postId, parentCommentId);
+        showToast(isAnon ? "🎭 Anonymous reply posted!" : "💬 Reply posted!");
+      } catch (error) {
+        showToast("Could not save reply. Please try again.");
+      }
+    }
+
+    /* Self-commenting allowed on own posts as well as peer posts */
+    function submitComment(postId) {
+      const input = document.getElementById(`comment_input_${postId}`);
+      const anonBox = document.getElementById(`comment_anon_${postId}`);
+      if (!input) return;
+      const text = input.value.trim();
+      if (!text) return;
+
+      const isAnon = anonBox ? anonBox.checked : false;
+
+      const post = FEEDBACKS.find(f => f.id === postId);
+      if (post) {
+        if (!post.comments) post.comments = [];
+        const commentId = "cm_" + Date.now();
+        post.comments.push({
+          id: commentId,
+          senderId: CURRENT_USER.id,
+          senderName: CURRENT_USER.name,
+          senderAvatar: CURRENT_USER.avatar,
+          isAnonymous: isAnon,
+          text: text,
+          time: "Just now",
+          isEdited: false,
+          reactions: { "❤️": 0, "👏": 0, "💡": 0, "🙌": 0 },
+          userReactions: []
+        });
+
+        input.value = "";
+        if (anonBox) anonBox.checked = false;
+
+
+        refreshAfterCommentChange(postId, commentId);
+
+        showToast(isAnon ? "🎭 Anonymous comment posted!" : "💬 Comment posted!");
+      }
+    }
+
+    /* Accurate Dynamic Badges & Stats */
+    function updateBadgesAndStats() {
+      const receivedCount = FEEDBACKS.filter(f => f.targetId === CURRENT_USER.id).length;
+      const givenCount = FEEDBACKS.filter(f => f.senderId === CURRENT_USER.id).length;
+
+      const meTotal = document.getElementById("meTotalBadge");
+      const meReceivedBadge = document.getElementById("meSubtabReceivedBadge");
+      const meGivenBadge = document.getElementById("meSubtabGivenBadge");
+      const statReceived = document.getElementById("statReceivedCount");
+      const statGiven = document.getElementById("statGivenCount");
+
+      if (meTotal) meTotal.textContent = receivedCount;
+      if (meReceivedBadge) meReceivedBadge.textContent = receivedCount;
+      if (meGivenBadge) meGivenBadge.textContent = givenCount;
+      if (statReceived) statReceived.textContent = receivedCount;
+      if (statGiven) statGiven.textContent = givenCount;
+    }
+
+    /* ==========================================================================
+       UTILITIES & TOASTS
+       ========================================================================== */
+    function showToast(message) {
+      const container = document.getElementById("toastContainer");
+      const toast = document.createElement("div");
+      toast.className = "toast-card";
+      toast.innerHTML = `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+        <span>${escapeHtml(message)}</span>
+      `;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(10px)";
+        toast.style.transition = "all 0.3s ease";
+        setTimeout(() => toast.remove(), 300);
+      }, 3200);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+    /* Sidebar navigation active state helper */
+    function setSidebarActive(el) {
+      document.querySelectorAll('.sidebar-nav-link').forEach(function(link) {
+        link.classList.remove('active');
+      });
+      el.classList.add('active');
+      // Update breadcrumb
+      var labels = { 'sidebarBtnMe': 'ME', 'sidebarBtnWall': 'Employee Wall', 'sidebarBtnOrg': 'Organization Wall' };
+      var bc = document.getElementById('breadcrumbActive');
+      if (bc) bc.textContent = labels[el.id] || '';
+    }
+  </script>
+
+    </div><!-- /.content-area -->
+  </div><!-- /.main-panel -->
+
+</body>
+
+</html>

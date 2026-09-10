@@ -1,0 +1,234 @@
+/* Feedback Wall Styles */
+
+.feedback-wall-header {
+  background: linear-gradient(135deg, var(--accent-blue), #64b5f6);
+  color: white;
+  padding: var(--space-xl) var(--space-lg);
+  margin-bottom: var(--space-md);
+}
+
+.feedback-wall-header h1 {
+  color: white;
+  text-align: center;
+  margin-bottom: var(--space-sm);
+}
+
+.wall-subtitle {
+  text-align: center;
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+.user-stats-badges {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  margin-top: var(--space-md);
+}
+
+.stat-badge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: var(--space-xs) var(--space-lg);
+  border-radius: var(--radius-full);
+  font-weight: 500;
+}
+
+.stat-badge-received {
+  background: rgba(76, 175, 80, 0.3);
+}
+
+.stat-badge-sent {
+  background: rgba(255, 152, 0, 0.3);
+}
+
+.feedback-wall-main {
+  display: grid;
+  gap: var(--space-lg);
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+}
+
+/* Feedback Card */
+.feedback-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.feedback-card-header {
+  padding: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.feedback-card-label {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+}
+
+.feedback-card-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.feedback-card-info {
+  flex: 1;
+}
+
+.feedback-card-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.feedback-card-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.feedback-card-time {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.feedback-card-badge {
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.role-admin { background: #f3e5f5; color: #7b1fa2; }
+.role-manager { background: #e3f2fd; color: #1976d2; }
+.role-employee { background: #fff3e0; color: #f57c00; }
+
+.feedback-card-badge-anonymous {
+  font-size: 1rem;
+}
+
+/* Card Content */
+.feedback-card-content {
+  padding: var(--space-md);
+}
+
+.feedback-card-text {
+  margin-bottom: var(--space-md);
+  color: var(--text-secondary);
+}
+
+.feedback-card-target-info {
+  background: var(--bg-secondary);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+}
+
+/* Reactions Bar */
+.feedback-card-reactions-bar {
+  display: flex;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+}
+
+.reaction-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  padding: var(--space-xs) var(--space-sm);
+  font-size: 0.875rem;
+  min-width: 46px;
+}
+
+.reaction-btn:hover {
+  background: var(--bg-hover);
+}
+
+.reaction-btn.my-reaction {
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+  font-weight: 600;
+}
+
+/* Card Footer */
+.feedback-card-footer {
+  padding: var(--space-md);
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-medium);
+  color: var(--text-secondary);
+}
+
+.action-btn:hover {
+  background: var(--border-light);
+}
+
+/* Comment Section */
+.comment-section {
+  padding: var(--space-md);
+  border-top: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+}
+
+.comment-item {
+  padding: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-sm);
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.comment-author {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.comment-time {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.edited-badge {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.comment-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.comment-input {
+  width: 100%;
+  padding: var(--space-sm);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 0.875rem;
+  resize: vertical;
+  min-height: 60px;
+}
+
+.comment-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+}

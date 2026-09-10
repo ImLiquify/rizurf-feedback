@@ -1,0 +1,31 @@
+{
+  "name": "pulse-feedback",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:api": "node server/rizurfApi.js",
+    "start": "node server/rizurfApi.js",
+    "start:xampp": "powershell -ExecutionPolicy Bypass -File server/start-xampp.ps1",
+    "db:setup": "powershell -ExecutionPolicy Bypass -File server/setup-xampp.ps1",
+    "db:stop": "powershell -ExecutionPolicy Bypass -File server/stop-xampp.ps1",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mysql2": "^3.11.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "vite": "^6.0.1"
+  }
+}
