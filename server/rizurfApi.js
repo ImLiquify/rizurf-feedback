@@ -67,6 +67,9 @@ const openapi = {
       get: operation('List comments on feedback.', 'feedback:read', discovery('List Comments', 'Read a feedback item discussion thread.', ['feedbackId', 'limit', 'offset'], ['data'], ['GET /api/feedback'])),
       post: operation('Create a feedback comment.', 'feedback:write', discovery('Create Comment', 'Add a comment or reply to feedback.', ['feedbackId', 'senderId', 'parentId', 'text', 'isAnonymous'], ['id'], ['GET /api/feedback/{feedbackId}/comments']))
     },
+    '/api/feedback/{feedbackId}/reactions': {
+      post: operation('Toggle an emoji reaction.', 'feedback:write', discovery('Toggle Reaction', 'Add or remove one emoji reaction on a feedback item or a comment.', ['feedbackId', 'reaction', 'commentId'], ['reacted'], ['GET /api/feedback']))
+    },
     '/api/private-remarks': {
       get: operation('List a caller-owned private remarks.', 'remark:read', discovery('List Private Remarks', 'Read private follow-up notes by author.', ['authorId', 'limit', 'offset'], ['data'])),
       post: operation('Create a private remark.', 'remark:write', discovery('Create Private Remark', 'Save a private follow-up note.', ['authorId', 'targetId', 'content'], ['id'], ['GET /api/private-remarks']))
@@ -80,6 +83,7 @@ const openapi = {
 function routeKey(pathname) {
   if (openapi.paths[pathname]) return pathname;
   if (/^\/api\/feedback\/[^/]+\/comments$/.test(pathname)) return '/api/feedback/{feedbackId}/comments';
+  if (/^\/api\/feedback\/[^/]+\/reactions$/.test(pathname)) return '/api/feedback/{feedbackId}/reactions';
   if (/^\/api\/private-remarks\/[^/]+$/.test(pathname)) return '/api/private-remarks/{remarkId}';
   return null;
 }
@@ -210,13 +214,39 @@ app.get('/api/feedback', async (request, response, next) => {
   const page = pagination(request, response); if (!page) return;
   try {
     const data = await feedbacks.listFeedback({ ...page, targetId: request.query.targetId, senderId: request.query.senderId });
-    const comments = await feedbacks.listCommentsForFeedback(data.map(item => item.id));
+    const ids = data.map(item => item.id);
+    const viewerId = await feedbacks.findAccountIdByEmail(request.auth?.email)
+      || (request.auth?.sub ? `gw_${request.auth.sub}`.slice(0, 50) : null);
+    const [comments, reactions] = await Promise.all([
+      feedbacks.listCommentsForFeedback(ids),
+      feedbacks.listReactionsForFeedback(ids, viewerId)
+    ]);
+
+    // reactionsFor: "<feedbackId>\0<commentId>" -> { counts:{emoji:n}, mine:[emoji] }
+    const reactionsFor = new Map();
+    for (const row of reactions) {
+      const key = `${row.feedbackId} ${row.commentId || ''}`;
+      if (!reactionsFor.has(key)) reactionsFor.set(key, { counts: {}, mine: [] });
+      const bucket = reactionsFor.get(key);
+      bucket.counts[row.reaction] = Number(row.count);
+      if (Number(row.mine)) bucket.mine.push(row.reaction);
+    }
+    const applyReactions = (target, feedbackId, commentId) => {
+      const bucket = reactionsFor.get(`${feedbackId} ${commentId || ''}`);
+      target.reactions = bucket ? bucket.counts : {};
+      target.userReactions = bucket ? bucket.mine : [];
+    };
+
     const byFeedback = new Map();
     for (const comment of comments) {
+      applyReactions(comment, comment.feedbackId, comment.id);
       if (!byFeedback.has(comment.feedbackId)) byFeedback.set(comment.feedbackId, []);
       byFeedback.get(comment.feedbackId).push(comment);
     }
-    for (const item of data) item.comments = byFeedback.get(item.id) || [];
+    for (const item of data) {
+      item.comments = byFeedback.get(item.id) || [];
+      applyReactions(item, item.id, '');
+    }
     return sendJson(response, 200, { data, ...page });
   } catch (error) { return next(error); }
 });
@@ -235,6 +265,20 @@ app.post('/api/feedback/:feedbackId/comments', async (request, response, next) =
   if (![senderId, text].every(validText)) return sendError(response, request, 422, 'VALIDATION_ERROR', 'senderId and text are required.', { fields: ['senderId', 'text'] });
   try { if (!await feedbacks.feedbackExists(request.params.feedbackId)) return sendError(response, request, 404, 'RESOURCE_NOT_FOUND', 'No feedback item with that id.');
     return sendJson(response, 201, await feedbacks.createComment({ id: `cm_${crypto.randomUUID()}`, feedbackId: request.params.feedbackId, parentId, senderId, text: text.trim(), isAnonymous: Boolean(isAnonymous) })); } catch (error) { return next(error); }
+});
+const ALLOWED_REACTIONS = new Set(['❤️', '👏', '💡', '🙌']);
+app.post('/api/feedback/:feedbackId/reactions', async (request, response, next) => {
+  const { reaction, commentId = '' } = request.body || {};
+  if (!ALLOWED_REACTIONS.has(reaction)) return sendError(response, request, 422, 'VALIDATION_ERROR', 'reaction must be one of ❤️ 👏 💡 🙌.', { fields: ['reaction'] });
+  const auth = request.auth || {};
+  if (!auth.sub) return sendError(response, request, 401, 'UNAUTHORIZED', 'This endpoint needs a signed-in session.');
+  const feedbackId = request.params.feedbackId;
+  try {
+    if (!await feedbacks.feedbackExists(feedbackId)) return sendError(response, request, 404, 'RESOURCE_NOT_FOUND', 'No feedback item with that id.');
+    if (commentId && !await feedbacks.commentExists(commentId, feedbackId)) return sendError(response, request, 404, 'RESOURCE_NOT_FOUND', 'No comment with that id on this feedback.');
+    const userId = await feedbacks.resolveIdentityAccount({ sub: auth.sub, email: auth.email, name: auth.name, role: auth.role });
+    return sendJson(response, 200, await feedbacks.toggleReaction({ userId, feedbackId, commentId: commentId || '', reaction }));
+  } catch (error) { return next(error); }
 });
 app.get('/api/private-remarks', async (request, response, next) => {
   const page = pagination(request, response); if (!page) return;

@@ -46,6 +46,19 @@ export async function upsertGatewayUser({ sub, email, name, role }) {
 // intern directory, or provisioned on an earlier sign-in — reuse it instead
 // of minting a second `gw_<sub>` row (which is what produced duplicate
 // accounts). A `gw_<sub>` row is created only when the email is new here.
+// Read-only counterpart of resolveIdentityAccount: the canonical account id
+// for an email, or null. Used on hot read paths (the feedback poll) that must
+// not write on every call.
+export async function findAccountIdByEmail(email) {
+  if (!email) return null;
+  const [rows] = await pool.execute(
+    `SELECT id FROM users WHERE email = ?
+     ORDER BY (source = 'intern-api') DESC, synced_at DESC, id ASC LIMIT 1`,
+    [email]
+  );
+  return rows[0]?.id || null;
+}
+
 export async function resolveIdentityAccount({ sub, email, name, role }) {
   if (email) {
     const [rows] = await pool.execute(
@@ -181,6 +194,49 @@ export async function listCommentsForFeedback(feedbackIds) {
      WHERE c.feedback_id IN (${placeholders})
      ORDER BY c.created_at ASC`,
     feedbackIds
+  );
+  return rows;
+}
+
+export async function commentExists(id, feedbackId) {
+  const [rows] = await pool.execute('SELECT 1 FROM comments WHERE id = ? AND feedback_id = ? LIMIT 1', [id, feedbackId]);
+  return rows.length > 0;
+}
+
+// Toggle one emoji reaction by one user on a feedback item (commentId = '')
+// or on one of its comments. Returns whether the reaction is now set.
+export async function toggleReaction({ userId, feedbackId, commentId = '', reaction }) {
+  const [existing] = await pool.execute(
+    'SELECT 1 FROM reactions WHERE user_id = ? AND feedback_id = ? AND comment_id = ? AND reaction = ? LIMIT 1',
+    [userId, feedbackId, commentId, reaction]
+  );
+  if (existing.length) {
+    await pool.execute(
+      'DELETE FROM reactions WHERE user_id = ? AND feedback_id = ? AND comment_id = ? AND reaction = ?',
+      [userId, feedbackId, commentId, reaction]
+    );
+    return { reacted: false };
+  }
+  await pool.execute(
+    'INSERT INTO reactions (user_id, feedback_id, comment_id, reaction) VALUES (?, ?, ?, ?)',
+    [userId, feedbackId, commentId, reaction]
+  );
+  return { reacted: true };
+}
+
+// Reaction tallies for a set of feedback ids, feedback-level and per-comment,
+// plus which ones the viewer has set.
+export async function listReactionsForFeedback(feedbackIds, viewerId) {
+  if (!feedbackIds.length) return [];
+  const placeholders = feedbackIds.map(() => '?').join(',');
+  const [rows] = await pool.execute(
+    `SELECT feedback_id AS feedbackId, comment_id AS commentId, reaction,
+            COUNT(*) AS count,
+            MAX(CASE WHEN user_id = ? THEN 1 ELSE 0 END) AS mine
+     FROM reactions
+     WHERE feedback_id IN (${placeholders})
+     GROUP BY feedback_id, comment_id, reaction`,
+    [viewerId || '', ...feedbackIds]
   );
   return rows;
 }

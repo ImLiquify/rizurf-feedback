@@ -42,4 +42,17 @@ export async function ensureSchemaCompatibility() {
   for (const [column, definition] of wanted) {
     if (!existing.has(column)) await pool.query(`ALTER TABLE users ADD COLUMN ${column} ${definition}`);
   }
+
+  // `reactions` originally keyed on (user_id, feedback_id, reaction) — feedback
+  // only. Add `comment_id` ('' = a reaction on the feedback itself, otherwise
+  // the comment id) and widen the primary key so a comment can carry its own
+  // reactions. NOT NULL DEFAULT '' because a primary-key column cannot be NULL.
+  const [reactionRows] = await pool.query(
+    'SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?',
+    ['reactions']
+  );
+  if (reactionRows.length && !reactionRows.some(row => row.COLUMN_NAME === 'comment_id')) {
+    await pool.query("ALTER TABLE reactions ADD COLUMN comment_id VARCHAR(60) NOT NULL DEFAULT ''");
+    await pool.query('ALTER TABLE reactions DROP PRIMARY KEY, ADD PRIMARY KEY (user_id, feedback_id, comment_id, reaction)');
+  }
 }

@@ -2884,7 +2884,7 @@
           FEEDBACKS.splice(0, FEEDBACKS.length, ...list.map(f => ({
             ...f,
             reactions: f.reactions || { "❤️": 0, "👏": 0, "💡": 0, "🙌": 0 },
-            userReactions: [],
+            userReactions: f.userReactions || [],
             comments: buildCommentTree(f.comments || [])
           })));
         } else {
@@ -2970,7 +2970,7 @@
         ...comment,
         time: comment.timestamp || "Just now",
         reactions: comment.reactions || {},
-        userReactions: [],
+        userReactions: comment.userReactions || [],
         replies: []
       }]));
       const roots = [];
@@ -4077,50 +4077,52 @@
     /* ==========================================================================
        INTERACTIONS: EMOJI REACTIONS & THREADED COMMENTS
        ========================================================================== */
+    function applyReactionToggle(bucket, emoji) {
+      if (!bucket.reactions) bucket.reactions = {};
+      if (!bucket.userReactions) bucket.userReactions = [];
+      const count = bucket.reactions[emoji] || 0;
+      if (bucket.userReactions.includes(emoji)) {
+        bucket.reactions[emoji] = Math.max(0, count - 1);
+        bucket.userReactions = bucket.userReactions.filter(e => e !== emoji);
+      } else {
+        bucket.reactions[emoji] = count + 1;
+        bucket.userReactions.push(emoji);
+      }
+    }
+
+    async function persistReaction(postId, emoji, commentId) {
+      if (!CURRENT_USER.id) { showToast("You need to be signed in to react."); return; }
+      try {
+        const response = await fetch(`${API_BASE_URL}/feedback/${postId}/reactions`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(commentId ? { reaction: emoji, commentId } : { reaction: emoji })
+        });
+        if (!response.ok) throw new Error("Reaction could not be saved");
+      } catch (error) {
+        showToast("Could not save your reaction.");
+        await loadBackendData();
+        renderMeView();
+        if (activeModalTargetId) renderModalWallFeed(activeModalTargetId);
+      }
+    }
+
     function toggleReaction(postId, emoji) {
       const post = FEEDBACKS.find(f => f.id === postId);
       if (!post) return;
-
-      if (!post.reactions) post.reactions = {};
-      if (!post.userReactions) post.userReactions = [];
-
-      const currentCount = post.reactions[emoji] || 0;
-      const hasReacted = post.userReactions.includes(emoji);
-
-      if (hasReacted) {
-        post.reactions[emoji] = Math.max(0, currentCount - 1);
-        post.userReactions = post.userReactions.filter(e => e !== emoji);
-      } else {
-        post.reactions[emoji] = currentCount + 1;
-        post.userReactions.push(emoji);
-      }
-
+      applyReactionToggle(post, emoji);
       renderMeView();
-      if (activeModalTargetId) {
-        renderModalWallFeed(activeModalTargetId);
-      }
+      if (activeModalTargetId) renderModalWallFeed(activeModalTargetId);
+      persistReaction(postId, emoji, null);
     }
 
     function toggleCommentReaction(postId, commentId, emoji) {
       const post = FEEDBACKS.find(f => f.id === postId);
       if (!post || !post.comments) return;
-
-      const comment = post.comments.find(c => c.id === commentId);
+      const comment = findComment(post.comments, commentId);
       if (!comment) return;
-
-      if (!comment.reactions) comment.reactions = {};
-      if (!comment.userReactions) comment.userReactions = [];
-
-      const currentCount = comment.reactions[emoji] || 0;
-      const hasReacted = comment.userReactions.includes(emoji);
-
-      if (hasReacted) {
-        comment.reactions[emoji] = Math.max(0, currentCount - 1);
-        comment.userReactions = comment.userReactions.filter(e => e !== emoji);
-      } else {
-        comment.reactions[emoji] = currentCount + 1;
-        comment.userReactions.push(emoji);
-      }
+      applyReactionToggle(comment, emoji);
+      persistReaction(postId, emoji, commentId);
 
       renderMeView();
       if (activeModalTargetId) {
