@@ -40,6 +40,30 @@ export async function upsertGatewayUser({ sub, email, name, role }) {
   return localId;
 }
 
+// The gateway identity token carries no photo (MICROAPP_AUTH.md section 2:
+// sub / email / name / role only), so a freshly provisioned gateway account
+// has no avatar or department. The same person is usually also in the synced
+// intern directory, which does. Fill the gateway row's still-empty identity
+// fields from the newest directory row that shares its email.
+export async function backfillGatewayProfileFromDirectory(id, email) {
+  if (!id || !email) return;
+  const [rows] = await pool.execute(
+    `SELECT avatar, department FROM users
+     WHERE email = ? AND source = 'intern-api' AND id <> ?
+     ORDER BY synced_at DESC LIMIT 1`,
+    [email, id]
+  );
+  const source = rows[0];
+  if (!source) return;
+  await pool.execute(
+    `UPDATE users SET
+       avatar = COALESCE(avatar, ?),
+       department = CASE WHEN department IS NULL OR department = '' OR department = 'General' THEN ? ELSE department END
+     WHERE id = ?`,
+    [source.avatar || null, source.department || 'General', id]
+  );
+}
+
 export async function getUserById(id) {
   const [rows] = await pool.execute(
     `SELECT id, external_id AS externalId, name, email, role_title AS role, department, avatar, skills, source

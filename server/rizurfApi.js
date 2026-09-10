@@ -202,6 +202,12 @@ app.get('/api/me', async (request, response, next) => {
       user = await feedbacks.getUserById(localId);
     }
     if (!user) return sendError(response, request, 404, 'RESOURCE_NOT_FOUND', 'No local account for this caller.');
+    // A gateway account has no photo of its own; pull one from the matching
+    // synced intern-directory row when this row is still missing it.
+    if (!user.avatar || !user.department || user.department === 'General') {
+      await feedbacks.backfillGatewayProfileFromDirectory(localId, user.email);
+      user = await feedbacks.getUserById(localId);
+    }
     return sendJson(response, 200, { data: user });
   } catch (error) { return next(error); }
 });
