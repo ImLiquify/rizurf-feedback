@@ -89,6 +89,15 @@ function sendError(response, request, status, code, message, details = null) {
 function requiredScopes(operationDefinition) {
   return (operationDefinition.security || []).flatMap(requirement => Object.values(requirement)).flat();
 }
+
+// Every scope this service's own OpenAPI declares, derived so it can't drift
+// from the routes. A first-party session (a signed-in human using the
+// microapp) is authorised for all of them — none of these endpoints is
+// gated on the gateway role.
+const FIRST_PARTY_SCOPES = [...new Set(
+  Object.values(openapi.paths).flatMap(pathDefinition =>
+    Object.values(pathDefinition).flatMap(operationDefinition => requiredScopes(operationDefinition)))
+)];
 function pagination(request, response) {
   const parse = (name, fallback, minimum) => {
     const value = request.query[name];
@@ -130,12 +139,31 @@ app.use(async (request, response, next) => {
   }
   const operationDefinition = pathDefinition[method];
   if (!operationDefinition.security) return next();
+  const required = requiredScopes(operationDefinition);
   const match = /^Bearer\s+(\S+)$/i.exec(request.headers.authorization || '');
-  if (!match) return sendError(response, request, 401, 'UNAUTHORIZED', 'A bearer token is required.');
+
+  // First-party path: the browser running this service's own microapp calls
+  // these routes with the session cookie from the sign-in flow
+  // (MICROAPP_AUTH.md section 4), not a gateway access token — the gateway
+  // only mints those for service-to-service callers (section 10). A live
+  // session is proof the gateway authenticated this person, so it stands in
+  // for the scopes this service's own endpoints need, and gets the same
+  // per-request liveness check every authenticated request gets (section 5).
+  // The cookie is HMAC-signed, so a forged one fails readSession() — no
+  // identity is ever trusted from a plain header (SS-25).
+  if (!match) {
+    const session = readSession(request);
+    if (session && await gatewaySessionIsLive(session)) {
+      request.auth = { ...session, token_use: 'session', scope: FIRST_PARTY_SCOPES.join(' ') };
+      return next();
+    }
+    return sendError(response, request, 401, 'UNAUTHORIZED', 'Sign in or present a bearer token to use this endpoint.');
+  }
+
   try {
     const claims = await verifyGatewayToken(match[1], 'access');
     const granted = new Set(String(claims.scope || '').split(/\s+/).filter(Boolean));
-    const required = requiredScopes(operationDefinition); const missing = required.filter(scope => !granted.has(scope));
+    const missing = required.filter(scope => !granted.has(scope));
     if (missing.length) return sendError(response, request, 403, 'FORBIDDEN', `This endpoint needs ${missing.join(', ')}.`, { required, granted: [...granted] });
     request.auth = claims;
     return next();
