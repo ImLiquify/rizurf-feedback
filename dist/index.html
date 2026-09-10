@@ -4,6 +4,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>PulseFeedback — Enterprise Feedback & Workplace Improvement Hub</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2479,12 +2482,12 @@
     <!-- Bottom User Badge -->
     <div class="sidebar-user-badge">
       <div class="sidebar-user-avatar">
-        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80" alt="Alex Morgan" />
+        <img src="" alt="User" />
         <div class="status-dot"></div>
       </div>
       <div class="sidebar-user-info">
-        <div class="sidebar-user-name" id="sidebarUserName">Alex Morgan</div>
-        <div class="sidebar-user-role" id="sidebarUserRole">Senior Product Designer</div>
+        <div class="sidebar-user-name" id="sidebarUserName">No User Selected</div>
+        <div class="sidebar-user-role" id="sidebarUserRole">--</div>
       </div>
     </div>
 
@@ -2503,30 +2506,6 @@
         </nav>
       </div>
       <div class="top-header-right">
-        <!-- <div class="status-pill">
-          <span class="status-pill-dot"></span>
-          All Systems Operational
-        </div> -->
-        <div class="top-role-switcher role-switcher-box">
-          <span class="role-label">View as:</span>
-          <select class="role-select" id="userSelector" onchange="handleUserChange(this.value)">
-            <option value="u_alex">Alex Morgan</option>
-          </select>
-        </div>
-        <div class="top-role-switcher role-switcher-box">
-          <span class="role-label">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-            </svg>
-            Role:
-          </span>
-          <select class="role-select" id="roleSelector" onchange="handleRoleChange(this.value)">
-            <option value="employee">Employee View</option>
-            <option value="manager">Manager View</option>
-            <option value="admin">Admin View</option>
-          </select>
-          <span class="role-indicator-badge role-employee" id="roleBadge">Standard</span>
-        </div>
       </div>
     </header>
 
@@ -2555,18 +2534,17 @@
       <div class="me-hero-card">
         <div class="me-profile-left">
           <div class="me-avatar-lg">
-            <img id="meAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
-              alt="Alex Morgan" />
+            <img id="meAvatar" src="" alt="User" />
           </div>
           <div class="me-details">
             <h2>
-              <span id="meUserName">Alex Morgan</span>
+              <span id="meUserName">No User Selected</span>
               <span class="verified-icon" title="Verified Employee">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--primary)" stroke="#FFFFFF" stroke-width="2">
                 </svg>
               </span>
             </h2>
-            <p class="me-role-title" id="meUserRole">Senior Product Designer • Product & Experience Group</p>
+            <p class="me-role-title" id="meUserRole">Database empty • Syncing...</p>
             <div class="me-tags">
               <!-- <span class="badge-pill highlight">🌟 Top Contributor</span>
               <span class="badge-pill">📍 San Francisco Hub</span>
@@ -2806,11 +2784,11 @@
        APP STATE & MOCK DATA
        ========================================================================== */
     const CURRENT_USER = {
-      id: "u_alex",
-      name: "Alex Morgan",
-      role: "Senior Product Designer",
-      department: "Product",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
+      id: "",
+      name: "No User Selected",
+      role: "--",
+      department: "",
+      avatar: ""
     };
 
     let currentRoleView = "employee"; // "employee" | "manager" | "admin"
@@ -2837,10 +2815,15 @@
       const selector = document.getElementById("userSelector");
       if (!selector) return;
 
+      if (!EMPLOYEES.length) {
+        selector.innerHTML = `<option value="">No Users Found</option>`;
+        return;
+      }
+
       selector.innerHTML = EMPLOYEES
         .map(employee => `<option value="${employee.id}">${escapeHtml(employee.name)}</option>`)
         .join("");
-      selector.value = CURRENT_USER.id;
+      selector.value = CURRENT_USER.id || (EMPLOYEES[0] && EMPLOYEES[0].id) || "";
     }
 
     function updateCurrentUserProfile() {
@@ -2852,16 +2835,16 @@
       const sidebarAvatar = document.querySelector(".sidebar-user-avatar img");
 
       if (avatar) {
-        avatar.src = CURRENT_USER.avatar;
-        avatar.alt = CURRENT_USER.name;
+        avatar.src = CURRENT_USER.avatar || "";
+        avatar.alt = CURRENT_USER.name || "User";
       }
-      if (name) name.textContent = CURRENT_USER.name;
-      if (role) role.textContent = `${CURRENT_USER.role} • ${CURRENT_USER.department}`;
-      if (sidebarName) sidebarName.textContent = CURRENT_USER.name;
-      if (sidebarRole) sidebarRole.textContent = CURRENT_USER.role;
+      if (name) name.textContent = CURRENT_USER.name || "No User Selected";
+      if (role) role.textContent = CURRENT_USER.role ? `${CURRENT_USER.role} • ${CURRENT_USER.department}` : "Database Empty";
+      if (sidebarName) sidebarName.textContent = CURRENT_USER.name || "No User Selected";
+      if (sidebarRole) sidebarRole.textContent = CURRENT_USER.role || "--";
       if (sidebarAvatar) {
-        sidebarAvatar.src = CURRENT_USER.avatar;
-        sidebarAvatar.alt = CURRENT_USER.name;
+        sidebarAvatar.src = CURRENT_USER.avatar || "";
+        sidebarAvatar.alt = CURRENT_USER.name || "User";
       }
     }
 
@@ -2896,271 +2879,15 @@
     }
 
     // Employees Database
-    const EMPLOYEES = [
-      {
-        id: "u_sarah",
-        name: "Sarah Jenkins",
-        role: "Principal Frontend Architect",
-        department: "Engineering",
-        avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
-        skills: ["React", "Design Systems", "Web Performance"]
-      },
-      {
-        id: "u_marcus",
-        name: "Marcus Vance",
-        role: "Head of Product Strategy",
-        department: "Product",
-        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-        skills: ["Roadmapping", "UX Discovery", "ERP Modernization"]
-      },
-      {
-        id: "u_priya",
-        name: "Priya Sharma",
-        role: "Senior Backend Engineer",
-        department: "Engineering",
-        avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80",
-        skills: ["Microservices", "PostgreSQL", "Scalability"]
-      },
-      {
-        id: "u_david",
-        name: "David Kim",
-        role: "Growth & Product Marketing Lead",
-        department: "Marketing",
-        avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
-        skills: ["Customer Insights", "Go-To-Market", "Analytics"]
-      },
-      {
-        id: "u_elena",
-        name: "Elena Rostova",
-        role: "VP of People & Culture",
-        department: "People",
-        avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80",
-        skills: ["Team Engagement", "DEI", "Leadership Coaching"]
-      },
-      {
-        id: "u_jordan",
-        name: "Jordan Hayes",
-        role: "Enterprise Solutions Executive",
-        department: "Sales",
-        avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80",
-        skills: ["Client Partnerships", "Revenue", "ERP Demos"]
-      },
-      {
-        id: "u_carlos",
-        name: "Carlos Mendez",
-        role: "Senior DevOps Engineer",
-        department: "Engineering",
-        avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80",
-        skills: ["Kubernetes", "CI/CD Pipeline", "Cloud Infra"]
-      }
-    ];
+    const EMPLOYEES = [];
 
     // Feedback Posts Database
-    let FEEDBACKS = [
-      {
-        id: "fb_1",
-        senderId: "u_marcus",
-        senderName: "Marcus Vance",
-        senderAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-        targetId: "u_alex",
-        targetName: "Alex Morgan",
-        isAnonymous: false,
-        timestamp: "2 hours ago",
-        isEdited: false,
-        content: "Alex completely transformed the new ERP navigation prototype. Her empathy for end-users and ability to bridge complex enterprise workflows into intuitive micro-interactions made our executive demo a massive win!",
-        reactions: { "❤️": 5, "👏": 12, "💡": 8, "🙌": 4 },
-        userReactions: ["👏", "❤️"],
-        comments: [
-          {
-            id: "cm_1_1",
-            senderId: "u_elena",
-            senderName: "Elena Rostova",
-            senderAvatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80",
-            isAnonymous: false,
-            text: "Huge congratulations Alex! The simplicity of this UI is game changing for all our global users.",
-            time: "1 hour ago",
-            isEdited: false,
-            reactions: { "❤️": 3, "👏": 2, "💡": 0, "🙌": 1 },
-            userReactions: ["❤️"]
-          },
-          {
-            id: "cm_1_2",
-            senderId: "u_sarah",
-            senderName: "Sarah Jenkins",
-            senderAvatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
-            isAnonymous: true, // Anonymous Comment
-            text: "100% agreed! Super clean implementation and tokens are extremely developer-friendly.",
-            time: "30 mins ago",
-            isEdited: false,
-            reactions: { "❤️": 1, "👏": 4, "💡": 1, "🙌": 0 },
-            userReactions: []
-          }
-        ]
-      },
-      {
-        id: "fb_2",
-        senderId: "u_sarah",
-        senderName: "Sarah Jenkins",
-        senderAvatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
-        targetId: "u_alex",
-        targetName: "Alex Morgan",
-        isAnonymous: true, // ANONYMOUS POST
-        timestamp: "Yesterday",
-        isEdited: false,
-        content: "Thank you for staying late on Thursday to help unblock the component tokens for the design system release. Your dedication and fast turnarounds kept the entire front-end squad on track!",
-        reactions: { "❤️": 8, "👏": 6, "💡": 2, "🙌": 9 },
-        userReactions: ["🙌"],
-        comments: []
-      },
-      {
-        id: "fb_3",
-        senderId: "u_priya",
-        senderName: "Priya Sharma",
-        senderAvatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80",
-        targetId: "u_alex",
-        targetName: "Alex Morgan",
-        isAnonymous: false,
-        timestamp: "3 days ago",
-        isEdited: false,
-        content: "The dynamic feedback filtering UX was brilliant. Alex created a crystal clear spec that made our backend payload caching effortless to implement.",
-        reactions: { "❤️": 3, "👏": 7, "💡": 11, "🙌": 2 },
-        userReactions: ["💡"],
-        comments: []
-      },
-      {
-        id: "fb_4",
-        senderId: "u_alex",
-        senderName: "Alex Morgan",
-        senderAvatar: CURRENT_USER.avatar,
-        targetId: "u_sarah",
-        targetName: "Sarah Jenkins",
-        isAnonymous: false,
-        timestamp: "4 days ago",
-        isEdited: false,
-        content: "Sarah's architectural refactor on our atomic CSS tokens boosted rendering performance by 40%. It's always an absolute joy collaborating with her!",
-        reactions: { "❤️": 9, "👏": 15, "💡": 6, "🙌": 7 },
-        userReactions: ["❤️"],
-        comments: []
-      },
-      {
-        id: "fb_5",
-        senderId: "u_alex",
-        senderName: "Alex Morgan",
-        senderAvatar: CURRENT_USER.avatar,
-        targetId: "company",
-        targetName: "Workplace & Company Suggestions",
-        isAnonymous: false,
-        timestamp: "5 days ago",
-        isEdited: false,
-        content: "Workplace Suggestion: Can we introduce dedicated 'Deep Work Wednesdays' (no internal meetings from 9am-1pm)? Cross-functional productivity would rise substantially across both engineering and design.",
-        reactions: { "❤️": 24, "👏": 42, "💡": 18, "🙌": 31 },
-        userReactions: ["👏", "🙌"],
-        comments: [
-          {
-            id: "cm_5_1",
-            senderId: "u_jordan",
-            senderName: "Jordan Hayes",
-            senderAvatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&auto=format&fit=crop&q=80",
-            isAnonymous: false,
-            text: "Huge +1 from Sales! Having uninterrupted pitch deck and follow-up prep blocks is invaluable.",
-            time: "3 days ago",
-            isEdited: false,
-            reactions: { "❤️": 5, "👏": 8, "💡": 0, "🙌": 2 },
-            userReactions: ["👏"]
-          },
-          {
-            id: "cm_5_2",
-            senderId: "u_elena",
-            senderName: "Elena Rostova",
-            senderAvatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80",
-            isAnonymous: false,
-            text: "Leadership is actively reviewing this for Q4 policy adoption! Thanks Alex.",
-            time: "2 days ago",
-            isEdited: false,
-            reactions: { "❤️": 7, "👏": 10, "💡": 4, "🙌": 6 },
-            userReactions: ["❤️"]
-          }
-        ]
-      },
-      {
-        id: "fb_6",
-        senderId: "u_jordan",
-        senderName: "Jordan Hayes",
-        senderAvatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80",
-        targetId: "company",
-        targetName: "Workplace & Company Suggestions",
-        isAnonymous: true, // ANONYMOUS Workplace Feedback
-        timestamp: "6 days ago",
-        isEdited: false,
-        content: "Company Improvement: Our onboarding hardware dispatch in APAC took over 2 weeks last month. Could we partner with regional fulfillment vendors to reduce downtime for new joiners?",
-        reactions: { "❤️": 14, "👏": 19, "💡": 25, "🙌": 8 },
-        userReactions: ["💡"],
-        comments: [
-          {
-            id: "cm_6_1",
-            senderId: "u_marcus",
-            senderName: "Marcus Vance",
-            senderAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-            isAnonymous: false,
-            text: "Great point. We have opened a ticket with IT Ops to streamline hardware provisioning.",
-            time: "5 days ago",
-            isEdited: false,
-            reactions: { "❤️": 4, "👏": 6, "💡": 2, "🙌": 0 },
-            userReactions: []
-          }
-        ]
-      },
-      {
-        id: "fb_7",
-        senderId: "u_alex",
-        senderName: "Alex Morgan",
-        senderAvatar: CURRENT_USER.avatar,
-        targetId: "u_carlos",
-        targetName: "Carlos Mendez",
-        isAnonymous: true, // Posted anonymously by Alex
-        timestamp: "1 week ago",
-        isEdited: false,
-        content: "Carlos fixed the staging deployment glitch in under 15 minutes during our critical usability testing session. Incredible speed and calm under pressure!",
-        reactions: { "❤️": 6, "👏": 9, "💡": 3, "🙌": 5 },
-        userReactions: [],
-        comments: []
-      },
-      {
-        id: "fb_8",
-        senderId: "u_david",
-        senderName: "David Kim",
-        senderAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
-        targetId: "u_sarah",
-        targetName: "Sarah Jenkins",
-        isAnonymous: false,
-        timestamp: "1 week ago",
-        isEdited: false,
-        content: "Sarah built the marketing landing page templates with such high fidelity. Our bounce rates dropped immediately!",
-        reactions: { "❤️": 4, "👏": 8, "💡": 1, "🙌": 2 },
-        userReactions: [],
-        comments: []
-      },
-      {
-        id: "fb_9",
-        senderId: "u_elena",
-        senderName: "Elena Rostova",
-        senderAvatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80",
-        targetId: "u_marcus",
-        targetName: "Marcus Vance",
-        isAnonymous: false,
-        timestamp: "1 week ago",
-        isEdited: false,
-        content: "Marcus consistently fosters an environment of open dialogue and radical candor. Fantastic leadership on the Q3 strategic vision.",
-        reactions: { "❤️": 12, "👏": 15, "💡": 9, "🙌": 6 },
-        userReactions: [],
-        comments: []
-      }
-    ];
+    let FEEDBACKS = [];
 
     /* ==========================================================================
        INITIALIZATION & RENDERING
        ========================================================================== */
-    const API_BASE_URL = "http://127.0.0.1:3001/api";
+    const API_BASE_URL = "/api";
 
     async function loadBackendData() {
       try {
@@ -3169,43 +2896,50 @@
           fetch(`${API_BASE_URL}/feedback`)
         ]);
 
-        if (!employeesResponse.ok || !feedbackResponse.ok) throw new Error("API request failed");
-
-        const [employees, feedbacks] = await Promise.all([
-          employeesResponse.json(),
-          feedbackResponse.json()
-        ]);
-
-        if (!Array.isArray(employees) || !Array.isArray(feedbacks)) throw new Error("Invalid API response");
-
-        EMPLOYEES.splice(0, EMPLOYEES.length, ...employees);
-        const currentEmployee = getEmployeeById(CURRENT_USER.id);
-        if (currentEmployee) {
-          Object.assign(CURRENT_USER, {
-            name: currentEmployee.name,
-            role: currentEmployee.role,
-            department: currentEmployee.department,
-            avatar: currentEmployee.avatar
-          });
-          updateCurrentUserProfile();
+        if (employeesResponse.ok) {
+          const empJson = await employeesResponse.json();
+          const list = Array.isArray(empJson) ? empJson : (empJson.data || []);
+          EMPLOYEES.splice(0, EMPLOYEES.length, ...list.map(e => ({
+            id: e.id,
+            name: e.name,
+            role: e.department || e.role || 'Member',
+            department: e.department || 'General',
+            avatar: e.picture || e.avatar || ''
+          })));
+        } else {
+          EMPLOYEES.splice(0, EMPLOYEES.length);
         }
-        await loadPrivateRemarksFromBackend();
-        updateUserSelector();
-        const commentsByFeedback = await Promise.all(feedbacks.map(async feedback => {
-          const response = await fetch(`${API_BASE_URL}/feedback/${feedback.id}/comments`);
-          const comments = response.ok ? await response.json() : [];
-          return [feedback.id, buildCommentTree(comments)];
-        }));
-        const commentsMap = Object.fromEntries(commentsByFeedback);
 
-        FEEDBACKS.splice(0, FEEDBACKS.length, ...feedbacks.map(feedback => ({
-          ...feedback,
-          reactions: feedback.reactions || { "❤️": 0, "👏": 0, "💡": 0, "🙌": 0 },
-          userReactions: [],
-          comments: commentsMap[feedback.id] || []
-        })));
+        if (feedbackResponse.ok) {
+          const fbJson = await feedbackResponse.json();
+          const list = Array.isArray(fbJson) ? fbJson : (fbJson.data || []);
+          FEEDBACKS.splice(0, FEEDBACKS.length, ...list.map(f => ({
+            ...f,
+            reactions: f.reactions || { "❤️": 0, "👏": 0, "💡": 0, "🙌": 0 },
+            userReactions: [],
+            comments: f.comments || []
+          })));
+        } else {
+          FEEDBACKS.splice(0, FEEDBACKS.length);
+        }
+
+        if (EMPLOYEES.length > 0) {
+          const found = EMPLOYEES.find(e => e.id === CURRENT_USER.id) || EMPLOYEES[0];
+          Object.assign(CURRENT_USER, found);
+        } else {
+          Object.assign(CURRENT_USER, {
+            id: "",
+            name: "No User Selected",
+            role: "Database Empty",
+            department: "Sync Pending",
+            avatar: ""
+          });
+        }
+        updateCurrentUserProfile();
+        updateUserSelector();
+        renderAll();
       } catch (error) {
-        console.warn("Using local fallback data because the API is unavailable.", error);
+        console.warn("Backend data fetch error:", error);
       }
     }
 

@@ -94,7 +94,4 @@ export async function fetchInterns({ limit = 100, offset = 0, correlationId } = 
     avatar: intern.avatar || intern.profile_photo || null,
     skills: Array.isArray(intern.skills) ? intern.skills : []
   })).filter(intern => intern.externalId !== 'undefined');
-    picture: intern.picture || intern.avatar || intern.profile_photo || null,
-    department: intern.department || 'General'
-  })).filter(intern => intern.id !== 'undefined');
 }

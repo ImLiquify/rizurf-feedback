@@ -31,10 +31,15 @@ export function RoleProvider({ children }) {
   const user = useMemo(() => ({
     id: 'u_alex',
     name: 'Alex Morgan',
+    id: '',
+    name: 'No User Selected',
     role: ROLES.EMPLOYEE,
     department: 'Engineering',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
     skills: ['React', 'TypeScript', 'CSS Tokens', 'UI/UX']
+    department: '',
+    avatar: '',
+    skills: []
   }), [currentRole]);
 
   const switchRole = (role) => {
@@ -59,14 +64,19 @@ export function RoleProvider({ children }) {
       return true; // Managers can edit team member posts
     }
     return senderId === 'u_alex'; // Alex Morgan (current user)
+    return false;
   };
 
   const currentUser = useMemo(() => ({
     id: 'u_alex',
     name: 'Alex Morgan',
+    id: '',
+    name: 'No User Selected',
     role: currentRole,
     department: 'Engineering',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80'
+    department: '',
+    avatar: ''
   }), [currentRole]);
 
   return (

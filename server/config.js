@@ -20,7 +20,7 @@ export const config = Object.freeze({
   db: {
     host: process.env.DB_HOST || '127.0.0.1', port: Number(process.env.DB_PORT || 3306),
     database: process.env.DB_NAME || 'pulsefeedback', user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || ''
+    password: process.env.DB_PASSWORD || '', ssl: process.env.DB_SSL === 'true'
   },
   internApiBaseUrl: process.env.INTERN_API_BASE_URL?.replace(/\/+$/, ''),
   internApiAudience: process.env.INTERN_API_AUDIENCE,

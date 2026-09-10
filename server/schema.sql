@@ -7,11 +7,23 @@ GRANT ALL PRIVILEGES ON pulsefeedback.* TO 'pulseuser'@'localhost';
 GRANT ALL PRIVILEGES ON pulsefeedback.* TO 'pulseuser'@'127.0.0.1';
 FLUSH PRIVILEGES;
 
+-- This table is a local, read-only-by-sync cache of identity data pulled
+-- from the main directory service's API (SS-13: never a direct DB link).
+-- It holds no passwords and is not used for authentication (SS-24) — it
+-- exists only so feedback/comments/private_remarks have a local row to
+-- foreign-key against and display a name/avatar for.
 CREATE TABLE IF NOT EXISTS users (
   id VARCHAR(50) PRIMARY KEY,
+  external_id VARCHAR(50) NULL,
   name VARCHAR(120) NOT NULL,
-  picture VARCHAR(500) NULL,
-  department VARCHAR(80) NOT NULL
+  email VARCHAR(190) NULL,
+  role_title VARCHAR(120) NULL,
+  department VARCHAR(80) NOT NULL,
+  avatar VARCHAR(500) NULL,
+  skills TEXT NULL,
+  source VARCHAR(30) NOT NULL DEFAULT 'local',
+  synced_at TIMESTAMP NULL,
+  INDEX idx_users_external_id (external_id)
 );
 
 CREATE TABLE IF NOT EXISTS feedback (

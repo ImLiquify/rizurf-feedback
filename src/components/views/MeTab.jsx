@@ -145,4 +145,5 @@ function getTopPerformers() {
     { id: 'u_sarah', name: 'Sarah Jenkins', role: 'Engineering Manager', avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80', received: 3, sent: 1 },
     { id: 'u_elena', name: 'Elena Rostova', role: 'VP of Engineering', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80', received: 2, sent: 0 }
   ].sort((a, b) => (b.received + b.sent) - (a.received + a.sent)).slice(0, 3);
+  return [];
 }
