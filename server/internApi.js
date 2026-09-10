@@ -65,12 +65,10 @@ function getInternsFromResponse(payload) {
   return [];
 }
 
-export async function fetchInterns({ limit = 100, offset = 0, correlationId } = {}) {
+async function internApiGet(pathname, searchParams, correlationId) {
   requireInternClientConfig();
-  const url = new URL(`${config.internApiBaseUrl}/api/interns`);
-  url.searchParams.set('limit', String(Math.min(Math.max(Number(limit) || 100, 1), 100)));
-  url.searchParams.set('offset', String(Math.max(Number(offset) || 0, 0)));
-
+  const url = new URL(`${config.internApiBaseUrl}${pathname}`);
+  for (const [key, value] of Object.entries(searchParams || {})) url.searchParams.set(key, String(value));
   const response = await fetch(url, {
     headers: {
       Authorization: `Bearer ${await getInternAccessToken(correlationId)}`,
@@ -78,18 +76,45 @@ export async function fetchInterns({ limit = 100, offset = 0, correlationId } = 
       ...(correlationId ? { 'X-Correlation-ID': correlationId } : {})
     }
   });
+  if (!response.ok) throw new Error(`Intern API GET ${pathname} failed with status ${response.status}`);
+  return response.json();
+}
 
-  if (!response.ok) {
-    throw new Error(`Intern API request failed with status ${response.status}`);
+let cachedRoleMap = null;
+let cachedRoleMapExpiresAt = 0;
+
+// intern-database returns `role_id`, not a role name; GET /api/roles maps the
+// two. Cached for a few minutes so a directory sync of many interns is one
+// extra request, not one per intern.
+async function getRoleMap(correlationId) {
+  if (cachedRoleMap && cachedRoleMapExpiresAt > Date.now()) return cachedRoleMap;
+  try {
+    const payload = await internApiGet('/api/roles', null, correlationId);
+    const roles = getInternsFromResponse(payload);
+    cachedRoleMap = new Map(roles.map(role => [String(role.id), role.name]));
+    cachedRoleMapExpiresAt = Date.now() + 5 * 60_000;
+  } catch {
+    cachedRoleMap = cachedRoleMap || new Map();
   }
+  return cachedRoleMap;
+}
 
-  const payload = await response.json();
+export async function fetchInterns({ limit = 100, offset = 0, correlationId } = {}) {
+  const [payload, roleMap] = await Promise.all([
+    internApiGet('/api/interns', {
+      limit: Math.min(Math.max(Number(limit) || 100, 1), 100),
+      offset: Math.max(Number(offset) || 0, 0)
+    }, correlationId),
+    getRoleMap(correlationId)
+  ]);
+
   return getInternsFromResponse(payload).map(intern => ({
     externalId: String(getInternId(intern)),
     id: String(getInternId(intern)),
+    refNumber: intern.ref_number || null,
     name: getInternName(intern),
-    role: intern.position || intern.role || 'Intern',
-    department: intern.department || 'Internship',
+    role: roleMap.get(String(intern.role_id)) || intern.position || intern.role || 'Intern',
+    department: intern.department || intern.department_id || 'Internship',
     email: intern.email_address || intern.email || null,
     avatar: intern.photo_url || intern.avatar || intern.profile_photo || null,
     skills: Array.isArray(intern.skills) ? intern.skills : []

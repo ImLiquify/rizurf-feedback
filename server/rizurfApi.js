@@ -58,6 +58,7 @@ const openapi = {
     '/openapi.json': { get: publicOperation('Read this API contract.', discovery('Read API Contract', 'Discover available PulseFeedback operations.', [], ['openapi', 'paths'])) },
     '/api/employees': { get: operation('List local feedback participants.', 'intern:read', discovery('List Participants', 'Read participants available for feedback.', ['limit', 'offset'], ['data'], ['GET /api/interns'])) },
     '/api/interns': { get: operation('Synchronize and list intern profiles.', 'intern:read', discovery('List Interns', 'Refresh and read profiles from the intern service.', ['limit', 'offset'], ['data', 'synced'], ['GET /api/employees'])) },
+    '/api/me': { get: operation('Read the signed-in caller profile.', 'feedback:read', discovery('Read My Profile', 'Read the local account of the person signed in to this microapp.', [], ['data'], ['GET /api/employees'])) },
     '/api/feedback': {
       get: operation('List workplace feedback.', 'feedback:read', discovery('List Feedback', 'Read feedback filtered by sender or target.', ['targetId', 'senderId', 'limit', 'offset'], ['data'])),
       post: operation('Create workplace feedback.', 'feedback:write', discovery('Create Feedback', 'Submit feedback for a participant or the company.', ['senderId', 'targetId', 'targetName', 'content', 'isAnonymous'], ['id'], ['GET /api/feedback']))
@@ -186,6 +187,23 @@ app.get('/api/employees', async (request, response, next) => {
 app.get('/api/interns', async (request, response, next) => {
   const page = pagination(request, response); if (!page) return;
   try { const synced = await synchronizeInterns(request.correlationId); return sendJson(response, 200, { data: await feedbacks.listSyncedInterns(page), synced, ...page }); } catch (error) { return next(error); }
+});
+app.get('/api/me', async (request, response, next) => {
+  const auth = request.auth || {};
+  if (!auth.sub) return sendError(response, request, 401, 'UNAUTHORIZED', 'This endpoint needs a signed-in session.');
+  const localId = `gw_${auth.sub}`.slice(0, 50);
+  try {
+    let user = await feedbacks.getUserById(localId);
+    // Self-heal: a session that signed in before provisioning existed (or
+    // while the database was unreachable) still has no row — create it now
+    // from the same identity claims the sign-in flow uses.
+    if (!user && auth.token_use === 'session') {
+      await feedbacks.upsertGatewayUser({ sub: auth.sub, email: auth.email, name: auth.name, role: auth.role });
+      user = await feedbacks.getUserById(localId);
+    }
+    if (!user) return sendError(response, request, 404, 'RESOURCE_NOT_FOUND', 'No local account for this caller.');
+    return sendJson(response, 200, { data: user });
+  } catch (error) { return next(error); }
 });
 app.get('/api/feedback', async (request, response, next) => {
   const page = pagination(request, response); if (!page) return;

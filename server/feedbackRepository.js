@@ -40,6 +40,16 @@ export async function upsertGatewayUser({ sub, email, name, role }) {
   return localId;
 }
 
+export async function getUserById(id) {
+  const [rows] = await pool.execute(
+    `SELECT id, external_id AS externalId, name, email, role_title AS role, department, avatar, skills, source
+     FROM users WHERE id = ? LIMIT 1`,
+    [id]
+  );
+  if (!rows[0]) return null;
+  return { ...rows[0], skills: rows[0].skills ? JSON.parse(rows[0].skills) : [] };
+}
+
 export async function listEmployees({ limit, offset }) {
   const [rows] = await pool.execute(
     'SELECT id, name, role_title AS role, department, avatar, skills FROM users ORDER BY name LIMIT ? OFFSET ?',

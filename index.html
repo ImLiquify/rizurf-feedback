@@ -2462,7 +2462,7 @@
           </svg>
         </span>
         ME
-        <span class="nav-badge" id="meTotalBadge">3</span>
+        <span class="nav-badge" id="meTotalBadge">0</span>
       </a>
 
       <!-- Employee Wall -->
@@ -2474,7 +2474,7 @@
           </svg>
         </span>
         Employee Wall
-        <span class="nav-badge" id="wallTotalBadge">7</span>
+        <span class="nav-badge" id="wallTotalBadge">0</span>
       </a>
 
     </nav>
@@ -2582,7 +2582,7 @@
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
             Feedback Received
-            <span class="me-subtab-badge" id="meSubtabReceivedBadge">3</span>
+            <span class="me-subtab-badge" id="meSubtabReceivedBadge">0</span>
           </button>
           <button class="me-subtab-btn" id="meSubtabGivenBtn" onclick="switchMeSubTab('given')">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
@@ -2591,7 +2591,7 @@
               <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
             </svg>
             Feedback Given
-            <span class="me-subtab-badge" id="meSubtabGivenBadge">3</span>
+            <span class="me-subtab-badge" id="meSubtabGivenBadge">0</span>
           </button>
         </div>
         <div class="me-subtab-hint" id="meSubtabHintText">
@@ -2637,12 +2637,7 @@
 
         <!-- Department Filter Pills -->
         <div class="department-chips-group" id="deptFilterContainer">
-          <button class="dept-chip-btn active" onclick="filterDepartment('All')">All Departments</button>
-          <button class="dept-chip-btn" onclick="filterDepartment('Engineering')">Engineering</button>
-          <button class="dept-chip-btn" onclick="filterDepartment('Product')">Product & UX</button>
-          <button class="dept-chip-btn" onclick="filterDepartment('Marketing')">Marketing</button>
-          <button class="dept-chip-btn" onclick="filterDepartment('Sales')">Sales & RevOps</button>
-          <button class="dept-chip-btn" onclick="filterDepartment('People')">People & Culture</button>
+          <!-- Rendered by JS from the departments present in the synced directory -->
         </div>
       </div>
 
@@ -2807,25 +2802,6 @@
     let editingPostId = null;
     let editingCommentKey = null; // format: "postId_commentId"
 
-    function getEmployeeById(userId) {
-      return EMPLOYEES.find(employee => employee.id === userId);
-    }
-
-    function updateUserSelector() {
-      const selector = document.getElementById("userSelector");
-      if (!selector) return;
-
-      if (!EMPLOYEES.length) {
-        selector.innerHTML = `<option value="">No Users Found</option>`;
-        return;
-      }
-
-      selector.innerHTML = EMPLOYEES
-        .map(employee => `<option value="${employee.id}">${escapeHtml(employee.name)}</option>`)
-        .join("");
-      selector.value = CURRENT_USER.id || (EMPLOYEES[0] && EMPLOYEES[0].id) || "";
-    }
-
     function updateCurrentUserProfile() {
       const avatar = document.getElementById("meAvatar");
       const name = document.getElementById("meUserName");
@@ -2846,23 +2822,6 @@
         sidebarAvatar.src = CURRENT_USER.avatar || "";
         sidebarAvatar.alt = CURRENT_USER.name || "User";
       }
-    }
-
-    function handleUserChange(userId) {
-      const selectedUser = getEmployeeById(userId);
-      if (!selectedUser) return;
-
-      Object.assign(CURRENT_USER, {
-        id: selectedUser.id,
-        name: selectedUser.name,
-        role: selectedUser.role,
-        department: selectedUser.department,
-        avatar: selectedUser.avatar
-      });
-
-      updateCurrentUserProfile();
-      loadPrivateRemarksFromBackend().then(() => renderAll());
-      showToast(`Viewing PulseFeedback as ${CURRENT_USER.name}`);
     }
 
     function loadPrivateRemarks() {
@@ -2889,9 +2848,17 @@
        ========================================================================== */
     const API_BASE_URL = "/api";
 
+    function mapRoleToView(role) {
+      const value = String(role || "").toLowerCase();
+      if (value === "admin") return "admin";
+      if (value === "manager" || value === "supervisor") return "manager";
+      return "employee";
+    }
+
     async function loadBackendData() {
       try {
-        const [employeesResponse, feedbackResponse] = await Promise.all([
+        const [meResponse, employeesResponse, feedbackResponse] = await Promise.all([
+          fetch(`${API_BASE_URL}/me`),
           fetch(`${API_BASE_URL}/employees`),
           fetch(`${API_BASE_URL}/feedback`)
         ]);
@@ -2902,9 +2869,10 @@
           EMPLOYEES.splice(0, EMPLOYEES.length, ...list.map(e => ({
             id: e.id,
             name: e.name,
-            role: e.department || e.role || 'Member',
-            department: e.department || 'General',
-            avatar: e.picture || e.avatar || ''
+            role: e.role || 'Intern',
+            department: e.department || 'Internship',
+            avatar: e.avatar || '',
+            skills: Array.isArray(e.skills) ? e.skills : []
           })));
         } else {
           EMPLOYEES.splice(0, EMPLOYEES.length);
@@ -2923,20 +2891,32 @@
           FEEDBACKS.splice(0, FEEDBACKS.length);
         }
 
-        if (EMPLOYEES.length > 0) {
-          const found = EMPLOYEES.find(e => e.id === CURRENT_USER.id) || EMPLOYEES[0];
-          Object.assign(CURRENT_USER, found);
+        // The current user is whoever is signed in through the gateway, read
+        // from the local account provisioned at sign-in — never a hardcoded
+        // profile or "first row in the directory".
+        if (meResponse.ok) {
+          const me = (await meResponse.json()).data || {};
+          Object.assign(CURRENT_USER, {
+            id: me.id || "",
+            name: me.name || "Unknown",
+            role: me.role || "",
+            department: me.department || "",
+            avatar: me.avatar || ""
+          });
+          currentRoleView = mapRoleToView(me.role);
         } else {
           Object.assign(CURRENT_USER, {
-            id: "",
-            name: "No User Selected",
-            role: "Database Empty",
-            department: "Sync Pending",
-            avatar: ""
+            id: "", name: "Not signed in", role: "", department: "", avatar: ""
           });
         }
+
         updateCurrentUserProfile();
-        updateUserSelector();
+        renderDepartmentChips();
+
+        if (CURRENT_USER.id) {
+          try { await loadPrivateRemarksFromBackend(); } catch (error) { console.warn("Private remarks fetch error:", error); }
+        }
+
         renderAll();
       } catch (error) {
         console.warn("Backend data fetch error:", error);
@@ -3061,27 +3041,6 @@
         paneGiven.classList.add("active");
         paneReceived.classList.remove("active");
         hintText.textContent = "Showing feedback and workplace ideas you posted";
-      }
-    }
-
-    /* Role Switcher Handler */
-    function handleRoleChange(newRole) {
-      currentRoleView = newRole;
-      const badge = document.getElementById("roleBadge");
-      badge.className = "role-indicator-badge " + (
-        newRole === "manager" ? "role-manager" :
-          newRole === "admin" ? "role-admin" : "role-employee"
-      );
-      badge.textContent = newRole === "manager" ? "Manager" :
-        newRole === "admin" ? "Admin" : "Standard";
-
-      showToast(`Switched to ${newRole.charAt(0).toUpperCase() + newRole.slice(1)} View mode`);
-
-      // Re-render currently visible views to update identity, permissions, etc.
-      renderMeView();
-      renderEmployeeTiles();
-      if (activeModalTargetId) {
-        renderModalWallFeed(activeModalTargetId);
       }
     }
 
@@ -3635,15 +3594,20 @@
       renderEmployeeTiles();
     }
 
+    function renderDepartmentChips() {
+      const container = document.getElementById("deptFilterContainer");
+      if (!container) return;
+      const departments = [...new Set(EMPLOYEES.map(e => e.department).filter(Boolean))].sort();
+      if (!departments.includes(selectedDepartment)) selectedDepartment = "All";
+      container.innerHTML = ["All", ...departments]
+        .map(dept => `<button class="dept-chip-btn${dept === selectedDepartment ? " active" : ""}" data-dept="${escapeHtml(dept)}" onclick="filterDepartment(this.dataset.dept)">${dept === "All" ? "All Departments" : escapeHtml(dept)}</button>`)
+        .join("");
+    }
+
     function filterDepartment(dept) {
       selectedDepartment = dept;
-      const chips = document.querySelectorAll(".dept-chip-btn");
-      chips.forEach(chip => {
-        if (chip.textContent.includes(dept) || (dept === "All" && chip.textContent.includes("All"))) {
-          chip.classList.add("active");
-        } else {
-          chip.classList.remove("active");
-        }
+      document.querySelectorAll(".dept-chip-btn").forEach(chip => {
+        chip.classList.toggle("active", chip.dataset.dept === dept);
       });
       renderEmployeeTiles();
     }
