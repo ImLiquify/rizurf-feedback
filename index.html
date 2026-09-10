@@ -2927,7 +2927,8 @@
       const response = await fetch(`${API_BASE_URL}/private-remarks?authorId=${encodeURIComponent(CURRENT_USER.id)}`);
       if (!response.ok) throw new Error("Private remarks request failed");
 
-      let remarks = await response.json();
+      const payload = await response.json();
+      let remarks = Array.isArray(payload) ? payload : (payload.data || []);
       const localRemarks = privateRemarks[CURRENT_USER.id] || {};
       if (remarks.length === 0 && Object.keys(localRemarks).length > 0) {
         const migratedRemarks = [];
