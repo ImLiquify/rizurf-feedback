@@ -218,21 +218,19 @@ app.use((error, request, response, _next) => {
   return sendError(response, request, 500, 'INTERNAL_ERROR', 'An unexpected internal error occurred.');
 });
 
-// `ready` resolves once the schema check has run. A persistent process
-// (local dev, a normal container host) awaits it once and then listens.
-// On Vercel there is no process to keep listening — api/index.js imports
-// `app` and `ready` instead and awaits `ready` on each invocation (the
-// underlying ALTER TABLE IF NOT EXISTS calls are cheap no-ops after the
-// first run, so re-awaiting on every cold start is not expensive).
+// `ready` resolves once the schema check has run — and never rejects. A DB
+// that is down or not yet configured must not take down `/health` and
+// `/openapi.json`: SS-2 requires those stay public and answer even when a
+// dependency is unreachable, and `/health` below already reports that via
+// `checks.database`, which is the correct place for this failure to surface.
 export const ready = ensureSchemaCompatibility().catch(error => {
   console.error(`Schema compatibility check failed: ${error.message}`);
-  throw error;
 });
 
 if (!process.env.VERCEL) {
   ready.then(() => app.listen(config.port, () => {
     console.log(`${config.serviceId} listening on ${config.publicUrl}`);
-  })).catch(error => { console.error(`PulseFeedback startup failed: ${error.message}`); process.exitCode = 1; });
+  }));
 }
 
 export default app;
