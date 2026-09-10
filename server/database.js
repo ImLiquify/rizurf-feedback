@@ -22,13 +22,24 @@ export async function databaseIsHealthy() {
 
 export async function ensureSchemaCompatibility() {
   // Idempotent migration path for a `users` table created from an older
-  // schema.sql. Safe to run repeatedly: each ADD COLUMN is a no-op once the
-  // column exists.
-  await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS external_id VARCHAR(120) NULL UNIQUE');
-  await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS email VARCHAR(255) NULL');
-  await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS role_title VARCHAR(120) NULL');
-  await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar VARCHAR(500) NULL');
-  await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS skills TEXT NULL');
-  await pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS source VARCHAR(40) NOT NULL DEFAULT 'local'");
-  await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS synced_at TIMESTAMP NULL');
+  // schema.sql. `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` is MariaDB / MySQL
+  // 8.0.29+ only — the VPS runs MySQL 5.7 — so check information_schema and
+  // add just the missing columns.
+  const wanted = [
+    ['external_id', 'VARCHAR(120) NULL UNIQUE'],
+    ['email', 'VARCHAR(255) NULL'],
+    ['role_title', 'VARCHAR(120) NULL'],
+    ['avatar', 'VARCHAR(500) NULL'],
+    ['skills', 'TEXT NULL'],
+    ['source', "VARCHAR(40) NOT NULL DEFAULT 'local'"],
+    ['synced_at', 'TIMESTAMP NULL']
+  ];
+  const [rows] = await pool.query(
+    'SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?',
+    ['users']
+  );
+  const existing = new Set(rows.map(row => row.COLUMN_NAME));
+  for (const [column, definition] of wanted) {
+    if (!existing.has(column)) await pool.query(`ALTER TABLE users ADD COLUMN ${column} ${definition}`);
+  }
 }
