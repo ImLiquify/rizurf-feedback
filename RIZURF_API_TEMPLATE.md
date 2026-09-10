@@ -66,7 +66,19 @@ Request and response bodies are JSON. Responses carry
 - `service` — **MUST** be present. **This is the service's identity.** The
   gateway takes the id from here and from nowhere else, so a registration
   request cannot claim to be a service it does not run.
-- `version` — SHOULD.
+- `version` — **MUST**, and **MUST change whenever your API surface does** —
+  a new endpoint, a changed request or response shape, a route removed. The
+  gateway records every version it ever sees for a service (not just the
+  current one) specifically so it can tell people "this connected
+  successfully" after you ship a change — that only works if the number
+  actually moves. A service that bumps `version` on every deploy regardless
+  of whether the API changed gets the same result as one that never bumps it
+  at all: the signal stops meaning anything. Ordinary semver is enough —
+  patch for a fix that changes no contract, minor for an addition (new
+  endpoint, new optional field), major for anything a caller of the old
+  shape would break against. If `info.version` (SS-3) is also declared, keep
+  the two equal — this one is what the gateway actually reads, `info.version`
+  only as a fallback if this one is missing.
 - `checks` — SHOULD. A map of dependency → reachable. This is what makes
   `degraded` meaningful rather than a guess.
 
@@ -601,11 +613,13 @@ Then check, in this order, and reject with `401` on any failure:
 This identity token is deliberately thin — `sub`, `email`, `name`, `role`, and
 nothing else. It proves who is signed in, once, to bootstrap your app's own
 session; it does not carry scopes and is not meant to be held onto as an API
-credential. `role` is the gateway's console role (admin/platform/developer/
-viewer) — a hint, not an instruction, since it describes access to the
-*gateway*, not to your app. What a caller may do inside your app, per SS-6 and
-SS-7, is your app's own decision from here (SS-24) — usually a local role
-table keyed to `sub` or `email`.
+credential. `role` is the gateway's own role (`admin`/`hr`/`supervisor`/
+`user`) — already verified by the time you have it, and fine to gate simple
+UI differences on directly (hide an admin-only action from a `user`, show a
+`supervisor` their team's view instead of their own). What it can't do is
+describe something specific to your app that none of those four names
+covers — build that as your own table keyed to `sub` or `email`, layered on
+top of `role` rather than replacing it (SS-24).
 
 Your app holds **only the public key**. There is nothing secret in it to leak,
 and it needs no shared password with the gateway — which is exactly why RS256
