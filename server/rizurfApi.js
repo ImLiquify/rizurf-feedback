@@ -191,19 +191,14 @@ app.get('/api/interns', async (request, response, next) => {
 app.get('/api/me', async (request, response, next) => {
   const auth = request.auth || {};
   if (!auth.sub) return sendError(response, request, 401, 'UNAUTHORIZED', 'This endpoint needs a signed-in session.');
-  const localId = `gw_${auth.sub}`.slice(0, 50);
   try {
+    // Resolve to the one canonical account for this identity (an existing
+    // directory row when the email is known here), not a per-sub row.
+    const localId = await feedbacks.resolveIdentityAccount({ sub: auth.sub, email: auth.email, name: auth.name, role: auth.role });
     let user = await feedbacks.getUserById(localId);
-    // Self-heal: a session that signed in before provisioning existed (or
-    // while the database was unreachable) still has no row — create it now
-    // from the same identity claims the sign-in flow uses.
-    if (!user && auth.token_use === 'session') {
-      await feedbacks.upsertGatewayUser({ sub: auth.sub, email: auth.email, name: auth.name, role: auth.role });
-      user = await feedbacks.getUserById(localId);
-    }
     if (!user) return sendError(response, request, 404, 'RESOURCE_NOT_FOUND', 'No local account for this caller.');
-    // A gateway account has no photo of its own; pull one from the matching
-    // synced intern-directory row when this row is still missing it.
+    // A gateway-only account has no photo of its own; pull one from the
+    // matching synced intern-directory row when this row is still missing it.
     if (!user.avatar || !user.department || user.department === 'General') {
       await feedbacks.backfillGatewayProfileFromDirectory(localId, user.email);
       user = await feedbacks.getUserById(localId);
@@ -258,7 +253,7 @@ async function serveMicroapp(request, response) {
       // The gateway has already vouched for this identity, so a provisioning
       // failure is logged and swallowed rather than blocking the sign-in —
       // the same policy synchronizeInterns() uses for the intern pull.
-      try { await feedbacks.upsertGatewayUser(identity); }
+      try { await feedbacks.resolveIdentityAccount(identity); }
       catch (error) { console.warn(`User provisioning failed [${request.correlationId}]:`, error.message); }
       setSession(response, identity);
       return response.redirect(302, '/');

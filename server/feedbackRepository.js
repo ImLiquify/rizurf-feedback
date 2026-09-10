@@ -40,6 +40,33 @@ export async function upsertGatewayUser({ sub, email, name, role }) {
   return localId;
 }
 
+// Resolve the local account id for a signed-in gateway identity. The person
+// is identified by email, which is stable across sign-ins and shared with the
+// intern directory. If a row with that email already exists — synced from the
+// intern directory, or provisioned on an earlier sign-in — reuse it instead
+// of minting a second `gw_<sub>` row (which is what produced duplicate
+// accounts). A `gw_<sub>` row is created only when the email is new here.
+export async function resolveIdentityAccount({ sub, email, name, role }) {
+  if (email) {
+    const [rows] = await pool.execute(
+      `SELECT id FROM users WHERE email = ?
+       ORDER BY (source = 'intern-api') DESC, synced_at DESC, id ASC
+       LIMIT 1`,
+      [email]
+    );
+    if (rows[0]) {
+      if (name) {
+        await pool.execute(
+          'UPDATE users SET name = ? WHERE id = ? AND (name IS NULL OR name = ? OR name = ?)',
+          [name, rows[0].id, '', `User ${sub}`]
+        );
+      }
+      return rows[0].id;
+    }
+  }
+  return upsertGatewayUser({ sub, email, name, role });
+}
+
 // The gateway identity token carries no photo (MICROAPP_AUTH.md section 2:
 // sub / email / name / role only), so a freshly provisioned gateway account
 // has no avatar or department. The same person is usually also in the synced

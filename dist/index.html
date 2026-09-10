@@ -3868,7 +3868,7 @@
       }
     }
 
-    function submitNewFeedback() {
+    async function submitNewFeedback() {
       const textInput = document.getElementById("feedbackTextInput");
       const content = textInput.value.trim();
       const isAnon = document.getElementById("anonCheckbox").checked;
@@ -3880,6 +3880,7 @@
       }
 
       if (!activeModalTargetId) return;
+      if (!CURRENT_USER.id) { showToast("You need to be signed in to post feedback."); return; }
 
       let targetName = "Workplace & Company Suggestions";
       if (activeModalTargetId !== "company") {
@@ -3887,31 +3888,29 @@
         if (emp) targetName = emp.name;
       }
 
-      const newPost = {
-        id: "fb_" + Date.now(),
-        senderId: CURRENT_USER.id,
-        senderName: CURRENT_USER.name,
-        senderAvatar: CURRENT_USER.avatar,
-        targetId: activeModalTargetId,
-        targetName: targetName,
-        isAnonymous: isAnon,
-        timestamp: "Just now",
-        isEdited: false,
-        content: content,
-        reactions: { "❤️": 1, "👏": 1, "💡": 0, "🙌": 0 },
-        userReactions: ["❤️"],
-        comments: []
-      };
+      try {
+        const response = await fetch(`${API_BASE_URL}/feedback`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            senderId: CURRENT_USER.id,
+            targetId: activeModalTargetId,
+            targetName,
+            content,
+            isAnonymous: isAnon
+          })
+        });
+        if (!response.ok) throw new Error("Feedback could not be saved");
 
-      // Add to front of feedback array
-      FEEDBACKS.unshift(newPost);
-
-      // Re-render
-      renderModalWallFeed(activeModalTargetId);
-      renderAll();
-
-      textInput.value = "";
-      showToast(isAnon ? "🎭 Anonymous post published!" : "🎉 Feedback published successfully!");
+        textInput.value = "";
+        document.getElementById("anonCheckbox").checked = false;
+        await loadBackendData();
+        if (activeModalTargetId) renderModalWallFeed(activeModalTargetId);
+        renderAll();
+        showToast(isAnon ? "🎭 Anonymous post published!" : "🎉 Feedback published successfully!");
+      } catch (error) {
+        showToast("Could not publish feedback. Please try again.");
+      }
     }
 
     /* ==========================================================================
@@ -4273,39 +4272,31 @@
     }
 
     /* Self-commenting allowed on own posts as well as peer posts */
-    function submitComment(postId) {
+    async function submitComment(postId) {
       const input = document.getElementById(`comment_input_${postId}`);
       const anonBox = document.getElementById(`comment_anon_${postId}`);
       if (!input) return;
       const text = input.value.trim();
       if (!text) return;
+      if (!CURRENT_USER.id) { showToast("You need to be signed in to comment."); return; }
 
       const isAnon = anonBox ? anonBox.checked : false;
 
-      const post = FEEDBACKS.find(f => f.id === postId);
-      if (post) {
-        if (!post.comments) post.comments = [];
-        const commentId = "cm_" + Date.now();
-        post.comments.push({
-          id: commentId,
-          senderId: CURRENT_USER.id,
-          senderName: CURRENT_USER.name,
-          senderAvatar: CURRENT_USER.avatar,
-          isAnonymous: isAnon,
-          text: text,
-          time: "Just now",
-          isEdited: false,
-          reactions: { "❤️": 0, "👏": 0, "💡": 0, "🙌": 0 },
-          userReactions: []
+      try {
+        const response = await fetch(`${API_BASE_URL}/feedback/${postId}/comments`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ senderId: CURRENT_USER.id, text, isAnonymous: isAnon })
         });
+        if (!response.ok) throw new Error("Comment could not be saved");
 
         input.value = "";
         if (anonBox) anonBox.checked = false;
-
-
-        refreshAfterCommentChange(postId, commentId);
-
+        await loadBackendData();
+        refreshAfterCommentChange(postId);
         showToast(isAnon ? "🎭 Anonymous comment posted!" : "💬 Comment posted!");
+      } catch (error) {
+        showToast("Could not save comment. Please try again.");
       }
     }
 

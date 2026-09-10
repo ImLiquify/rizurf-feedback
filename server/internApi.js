@@ -1,4 +1,5 @@
 import { config } from './config.js';
+import { getDepartmentMap } from './departmentApi.js';
 
 let cachedAccessToken = null;
 let cachedAccessTokenExpiresAt = 0;
@@ -100,12 +101,13 @@ async function getRoleMap(correlationId) {
 }
 
 export async function fetchInterns({ limit = 100, offset = 0, correlationId } = {}) {
-  const [payload, roleMap] = await Promise.all([
+  const [payload, roleMap, departmentMap] = await Promise.all([
     internApiGet('/api/interns', {
       limit: Math.min(Math.max(Number(limit) || 100, 1), 100),
       offset: Math.max(Number(offset) || 0, 0)
     }, correlationId),
-    getRoleMap(correlationId)
+    getRoleMap(correlationId),
+    getDepartmentMap(correlationId)
   ]);
 
   return getInternsFromResponse(payload).map(intern => ({
@@ -114,7 +116,8 @@ export async function fetchInterns({ limit = 100, offset = 0, correlationId } = 
     refNumber: intern.ref_number || null,
     name: getInternName(intern),
     role: roleMap.get(String(intern.role_id)) || intern.position || intern.role || 'Intern',
-    department: intern.department || intern.department_id || 'Internship',
+    department: departmentMap.get(String(intern.department_id))
+      || intern.department || intern.department_id || 'Internship',
     email: intern.email_address || intern.email || null,
     avatar: intern.photo_url || intern.avatar || intern.profile_photo || null,
     skills: Array.isArray(intern.skills) ? intern.skills : []
