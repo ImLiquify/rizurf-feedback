@@ -2885,7 +2885,7 @@
             ...f,
             reactions: f.reactions || { "❤️": 0, "👏": 0, "💡": 0, "🙌": 0 },
             userReactions: [],
-            comments: f.comments || []
+            comments: buildCommentTree(f.comments || [])
           })));
         } else {
           FEEDBACKS.splice(0, FEEDBACKS.length);

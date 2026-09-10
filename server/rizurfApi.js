@@ -208,7 +208,17 @@ app.get('/api/me', async (request, response, next) => {
 });
 app.get('/api/feedback', async (request, response, next) => {
   const page = pagination(request, response); if (!page) return;
-  try { return sendJson(response, 200, { data: await feedbacks.listFeedback({ ...page, targetId: request.query.targetId, senderId: request.query.senderId }), ...page }); } catch (error) { return next(error); }
+  try {
+    const data = await feedbacks.listFeedback({ ...page, targetId: request.query.targetId, senderId: request.query.senderId });
+    const comments = await feedbacks.listCommentsForFeedback(data.map(item => item.id));
+    const byFeedback = new Map();
+    for (const comment of comments) {
+      if (!byFeedback.has(comment.feedbackId)) byFeedback.set(comment.feedbackId, []);
+      byFeedback.get(comment.feedbackId).push(comment);
+    }
+    for (const item of data) item.comments = byFeedback.get(item.id) || [];
+    return sendJson(response, 200, { data, ...page });
+  } catch (error) { return next(error); }
 });
 app.post('/api/feedback', async (request, response, next) => {
   const { senderId, targetId, targetName, content, isAnonymous = false } = request.body || {};

@@ -166,6 +166,25 @@ export async function listComments({ feedbackId, limit, offset }) {
   return rows;
 }
 
+// All comments for a set of feedback ids, in one query, oldest first — used
+// to attach threads to the feedback list so the UI can render them without
+// a request per card.
+export async function listCommentsForFeedback(feedbackIds) {
+  if (!feedbackIds.length) return [];
+  const placeholders = feedbackIds.map(() => '?').join(',');
+  const [rows] = await pool.execute(
+    `SELECT c.id, c.feedback_id AS feedbackId, c.parent_id AS parentId, c.sender_id AS senderId,
+       COALESCE(u.name, 'Unknown') AS senderName, u.avatar AS senderAvatar,
+       c.content AS text, c.is_anonymous AS isAnonymous, c.is_edited AS isEdited, c.created_at AS timestamp
+     FROM comments c
+     LEFT JOIN users u ON u.id = c.sender_id
+     WHERE c.feedback_id IN (${placeholders})
+     ORDER BY c.created_at ASC`,
+    feedbackIds
+  );
+  return rows;
+}
+
 export async function createComment({ id, feedbackId, parentId, senderId, text, isAnonymous }) {
   await pool.execute(
     'INSERT INTO comments (id, feedback_id, parent_id, sender_id, content, is_anonymous) VALUES (?, ?, ?, ?, ?, ?)',
