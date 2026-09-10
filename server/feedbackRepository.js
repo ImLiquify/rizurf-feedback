@@ -19,6 +19,27 @@ export async function upsertInternUsers(interns) {
   }
 }
 
+// A person who signs in through the gateway (MICROAPP_AUTH.md sections 4 and
+// 11) is provisioned here as a local account, so their feedback, comments,
+// and private remarks have a stable owner row to reference. The row id is
+// derived from the gateway `sub` so re-logins update the same record.
+// `role_title` carries the gateway role (admin / hr / supervisor / user).
+// `department` is not part of the identity token, so it is left as-is on
+// update — an intern sync or an admin may have set it.
+export async function upsertGatewayUser({ sub, email, name, role }) {
+  if (!sub) throw new Error('Gateway identity is missing sub.');
+  const localId = `gw_${sub}`.slice(0, 50);
+  await pool.execute(
+    `INSERT INTO users (id, external_id, name, email, role_title, source, synced_at)
+     VALUES (?, ?, ?, ?, ?, 'gateway', CURRENT_TIMESTAMP)
+     ON DUPLICATE KEY UPDATE
+       name = VALUES(name), email = VALUES(email), role_title = VALUES(role_title),
+       source = 'gateway', synced_at = CURRENT_TIMESTAMP`,
+    [localId, String(sub), name || email || `User ${sub}`, email || null, role || null]
+  );
+  return localId;
+}
+
 export async function listEmployees({ limit, offset }) {
   const [rows] = await pool.execute(
     'SELECT id, name, role_title AS role, department, avatar, skills FROM users ORDER BY name LIMIT ? OFFSET ?',

@@ -199,7 +199,18 @@ app.use('/assets', express.static(path.join(publicDist, 'assets'), { index: fals
 async function serveMicroapp(request, response) {
   Object.entries(noStoreHeaders).forEach(([key, value]) => response.setHeader(key, value));
   if (request.path === '/' && typeof request.query.code === 'string') {
-    try { setSession(response, await exchangeAuthorizationCode(request.query.code)); return response.redirect(302, '/'); }
+    try {
+      const identity = await exchangeAuthorizationCode(request.query.code);
+      // Provision the signed-in person as a local account (MICROAPP_AUTH.md
+      // section 11) so their feedback and comments have a stable owner row.
+      // The gateway has already vouched for this identity, so a provisioning
+      // failure is logged and swallowed rather than blocking the sign-in —
+      // the same policy synchronizeInterns() uses for the intern pull.
+      try { await feedbacks.upsertGatewayUser(identity); }
+      catch (error) { console.warn(`User provisioning failed [${request.correlationId}]:`, error.message); }
+      setSession(response, identity);
+      return response.redirect(302, '/');
+    }
     catch { clearSession(response); return response.redirect(302, gatewayAuthorizeUrl()); }
   }
   const session = readSession(request);
