@@ -2958,8 +2958,22 @@
       };
     }
 
+    // A background refresh re-renders the whole feed, which collapses any open
+    // comment thread and discards whatever is half-typed in it. Hold the
+    // refresh while the user is composing a comment or reply.
+    function isComposingComment() {
+      const active = document.activeElement;
+      if (active && typeof active.id === "string" &&
+        (active.id.startsWith("comment_input_") || active.id.startsWith("reply_input_"))) {
+        return true;
+      }
+      return [...document.querySelectorAll('[id^="comment_input_"], [id^="reply_input_"]')]
+        .some(el => el.value && el.value.trim());
+    }
+
     async function refreshBackendData() {
-      if (document.visibilityState !== "visible" || editingPostId || editingCommentKey || activeModalTargetId) return;
+      if (document.visibilityState !== "visible" || editingPostId || editingCommentKey
+        || activeModalTargetId || isComposingComment()) return;
 
       await loadBackendData();
       renderAll();
