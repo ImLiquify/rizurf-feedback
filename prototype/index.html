@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pulse Feedback — Prototype</title>
+<style>
+  :root {
+    --accent: #2f6fed;
+    --accent-light: #eaf1fe;
+    --text: #1c2430;
+    --muted: #667085;
+    --border: #e3e6eb;
+    --bg: #f6f7f9;
+    --card-bg: #ffffff;
+    --danger: #d92d20;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  #app { min-height: 100vh; }
+  header.topbar {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 12px 32px;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .brand { font-weight: 700; font-size: 18px; color: var(--accent); cursor: pointer; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 16px; position: relative; }
+  nav.topnav a { margin-right: 16px; color: var(--text); text-decoration: none; font-size: 14px; cursor: pointer; }
+  nav.topnav a.active { color: var(--accent); font-weight: 600; }
+  .bell-btn { position: relative; background: none; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; cursor: pointer; font-size: 14px; }
+  .badge { background: var(--danger); color: #fff; border-radius: 999px; font-size: 11px; padding: 1px 6px; margin-left: 6px; }
+  .notif-panel {
+    position: absolute; right: 0; top: 40px; width: 300px; background: var(--card-bg);
+    border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.08);
+    padding: 8px; max-height: 320px; overflow-y: auto; z-index: 20;
+  }
+  .notif-item { padding: 8px; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .notif-item:last-child { border-bottom: none; }
+  select.user-switcher { padding: 6px 8px; border-radius: 8px; border: 1px solid var(--border); font-size: 13px; background: #fff; }
+
+  main { max-width: 960px; margin: 0 auto; padding: 32px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 16px; margin: 0 0 8px; }
+  .muted { color: var(--muted); font-size: 14px; }
+
+  .employee-list { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 10px; }
+  .employee-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 18px; cursor: pointer;
+  }
+  .employee-row:hover { border-color: var(--accent); }
+  .avatar {
+    width: 36px; height: 36px; border-radius: 50%; background: var(--accent-light); color: var(--accent);
+    display: flex; align-items: center; justify-content: center; font-weight: 700; margin-right: 12px; flex-shrink: 0;
+  }
+  .employee-main { display: flex; align-items: center; }
+  .stars { color: #f5a623; letter-spacing: 1px; }
+
+  #search-input { width: 100%; max-width: 420px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; margin-top: 12px; }
+
+  .panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-top: 20px; }
+  label { display: block; font-size: 13px; margin: 10px 0 4px; font-weight: 600; }
+  select, textarea, input[type=text] {
+    width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: inherit;
+  }
+  textarea { min-height: 80px; resize: vertical; }
+
+  .rating-field { display: flex; align-items: center; }
+  .star-picker { display: flex; gap: 4px; }
+  .star-btn { background: none; border: none; cursor: pointer; font-size: 26px; line-height: 1; color: #d0d5dd; padding: 0; }
+  .star-btn.filled { color: #f5a623; }
+
+  .visibility-field { display: flex; align-items: center; gap: 10px; }
+  .switch {
+    width: 44px; height: 24px; border-radius: 999px; background: #d0d5dd; border: none;
+    cursor: pointer; position: relative; padding: 0; flex-shrink: 0; transition: background 0.15s ease;
+  }
+  .switch.active { background: var(--accent); }
+  .switch-knob {
+    position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,.25); transition: transform 0.15s ease;
+  }
+  .switch.active .switch-knob { transform: translateX(20px); }
+  .visibility-label { font-size: 13px; color: var(--muted); }
+
+  .btn {
+    background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 8px 16px;
+    font-size: 14px; cursor: pointer; margin-top: 12px;
+  }
+  .btn.secondary { background: #fff; color: var(--text); border: 1px solid var(--border); }
+  .btn.danger { background: #fff; color: var(--danger); border: 1px solid var(--danger); }
+  .btn.small { padding: 4px 10px; font-size: 12px; margin-top: 0; }
+  .error { color: var(--danger); font-size: 13px; margin-top: 6px; }
+
+  .review-card { border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-top: 14px; background: var(--card-bg); }
+  .review-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .review-body { margin: 8px 0; font-size: 14px; }
+  .review-meta { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
+  .edited-tag { color: var(--muted); font-style: italic; }
+  .reply-block { margin-top: 10px; padding: 10px 12px; background: var(--accent-light); border-radius: 8px; font-size: 13px; }
+  .flag-inline { margin-top: 10px; display: flex; gap: 8px; }
+  .flag-inline input { flex: 1; }
+
+  .menu-wrap { position: relative; }
+  .dots-btn { background: none; border: 1px solid var(--border); border-radius: 6px; padding: 2px 10px; font-size: 16px; line-height: 1.4; cursor: pointer; }
+  .dropdown-menu {
+    position: absolute; right: 0; top: 32px; background: #fff; border: 1px solid var(--border); border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0,0,0,.1); min-width: 130px; z-index: 15; overflow: hidden;
+  }
+  .dropdown-menu button { display: block; width: 100%; text-align: left; padding: 8px 14px; background: none; border: none; font-size: 13px; cursor: pointer; }
+  .dropdown-menu button:hover { background: var(--bg); }
+  .dropdown-menu button.danger-item { color: var(--danger); }
+
+  table.flags-table { width: 100%; border-collapse: collapse; margin-top: 16px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  table.flags-table th, table.flags-table td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 14px; vertical-align: top; }
+  table.flags-table th { background: #fafbfc; }
+  .empty-state { color: var(--muted); font-size: 14px; padding: 24px 0; text-align: center; }
+  .proto-banner { background: #fff7e6; border-bottom: 1px solid #f0d590; color: #8a6300; font-size: 12px; text-align: center; padding: 6px; }
+</style>
+</head>
+<body>
+<div class="proto-banner">Prototype — mock data only, stored in your browser's localStorage. Nothing here talks to a real backend.</div>
+<div id="app"></div>
+<script>
+(function () {
+  const STORAGE_KEY = 'pulse-proto-v1';
+
+  const seedEmployees = [
+    { id: 'emp-1', email: 'alice@rizurf.local', name: 'Alice Nguyen', role: 'employee' },
+    { id: 'emp-2', email: 'bob@rizurf.local', name: 'Bob Santos', role: 'employee' },
+    { id: 'emp-3', email: 'carla@rizurf.local', name: 'Carla Cruz', role: 'employee' },
+    { id: 'emp-4', email: 'diego@rizurf.local', name: 'Diego Reyes', role: 'supervisor' },
+    { id: 'emp-5', email: 'erika@rizurf.local', name: 'Erika Flores', role: 'admin' },
+  ];
+
+  const seedReviews = [
+    {
+      id: 'rev-1', authorId: 'emp-2', receiverId: 'emp-1', rating: 5,
+      body: 'Alice is always quick to help unblock the team.',
+      visibility: 'public', createdAt: '2026-09-01T09:00:00.000Z', updatedAt: '2026-09-01T09:00:00.000Z',
+    },
+    {
+      id: 'rev-2', authorId: 'emp-3', receiverId: 'emp-1', rating: 3,
+      body: 'Communication could be clearer during handoffs.',
+      visibility: 'anonymous', createdAt: '2026-09-05T09:00:00.000Z', updatedAt: '2026-09-05T09:00:00.000Z',
+    },
+  ];
+
+  function seedData() {
+    return { employees: seedEmployees, reviews: seedReviews, replies: [], flags: [], notifications: [] };
+  }
+
+  function loadStore() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      try { return JSON.parse(raw); } catch (e) { /* fall through to seed */ }
+    }
+    return seedData();
+  }
+
+  let db = loadStore();
+  function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
+
+  function nextId(prefix) { return prefix + '-' + Math.random().toString(36).slice(2, 10); }
+
+  class ApiError extends Error {
+    constructor(code, message) { super(message); this.code = code; }
+  }
+
+  // ---------- Mock API: mirrors the rules from the design spec ----------
+  function isAdminRole(role) { return role === 'admin' || role === 'hr'; }
+
+  function viewReviewFor(review, requester) {
+    if (review.visibility === 'public') return Object.assign({}, review);
+    // Anonymous: the receiver sees it with the author stripped. The
+    // author themselves and any admin/hr see it with the author included
+    // — you already know your own identity, so revealing it to yourself
+    // breaks nothing about the anonymity guarantee.
+    if (review.receiverId === requester.id) return Object.assign({}, review, { authorId: null });
+    if (review.authorId === requester.id || isAdminRole(requester.role)) return Object.assign({}, review);
+    return null;
+  }
+
+  function viewReviewsFor(reviews, requester) {
+    return reviews.map((r) => viewReviewFor(r, requester)).filter((r) => r !== null);
+  }
+
+  function requireEmployee(id) {
+    const e = db.employees.find((e) => e.id === id);
+    if (!e) throw new ApiError('RESOURCE_NOT_FOUND', 'No employee with id ' + id + '.');
+    return e;
+  }
+
+  function findReviewOrThrow(id) {
+    const r = db.reviews.find((r) => r.id === id);
+    if (!r) throw new ApiError('RESOURCE_NOT_FOUND', 'No review with id ' + id + '.');
+    return r;
+  }
+
+  function searchEmployees(query) {
+    const q = query.trim().toLowerCase();
+    if (!q) return db.employees;
+    return db.employees.filter((e) => e.name.toLowerCase().includes(q) || e.email.toLowerCase().includes(q));
+  }
+
+  function getEmployeeReviews(employeeId, requesterId) {
+    const requester = requireEmployee(requesterId);
+    const reviews = db.reviews.filter((r) => r.receiverId === employeeId);
+    return viewReviewsFor(reviews, requester);
+  }
+
+  function postReview(input) {
+    if (input.authorId === input.receiverId) throw new ApiError('VALIDATION_ERROR', 'You cannot review yourself.');
+    if (input.rating < 1 || input.rating > 5) throw new ApiError('VALIDATION_ERROR', 'Rating must be between 1 and 5.');
+    if (!input.body.trim()) throw new ApiError('VALIDATION_ERROR', 'Review text is required.');
+    requireEmployee(input.authorId);
+    requireEmployee(input.receiverId);
+    const now = new Date().toISOString();
+    const review = {
+      id: nextId('rev'), authorId: input.authorId, receiverId: input.receiverId,
+      rating: input.rating, body: input.body.trim(), visibility: input.visibility,
+      createdAt: now, updatedAt: now,
+    };
+    db.reviews.push(review);
+    db.notifications.push({ id: nextId('notif'), userId: input.receiverId, type: 'review_received', message: 'You received a new review.', createdAt: now, read: false });
+    save();
+    return review;
+  }
+
+  function editReview(input) {
+    const review = findReviewOrThrow(input.reviewId);
+    if (review.authorId !== input.requesterId) throw new ApiError('FORBIDDEN', 'Only the author can edit this review.');
+    if (input.rating !== undefined && (input.rating < 1 || input.rating > 5)) throw new ApiError('VALIDATION_ERROR', 'Rating must be between 1 and 5.');
+    review.rating = input.rating != null ? input.rating : review.rating;
+    review.body = (input.body != null ? input.body : review.body).trim();
+    review.visibility = input.visibility != null ? input.visibility : review.visibility;
+    review.updatedAt = new Date().toISOString();
+    save();
+    return review;
+  }
+
+  function deleteReview(reviewId, requesterId) {
+    const review = findReviewOrThrow(reviewId);
+    if (review.authorId !== requesterId) throw new ApiError('FORBIDDEN', 'Only the author can delete this review.');
+    db.reviews = db.reviews.filter((r) => r.id !== reviewId);
+    db.replies = db.replies.filter((r) => r.reviewId !== reviewId);
+    db.flags = db.flags.filter((f) => f.reviewId !== reviewId);
+    save();
+  }
+
+  function getReplyForReview(reviewId) { return db.replies.find((r) => r.reviewId === reviewId); }
+
+  function replyToReview(reviewId, authorId, body) {
+    const review = findReviewOrThrow(reviewId);
+    if (review.receiverId !== authorId) throw new ApiError('FORBIDDEN', 'Only the review recipient can reply.');
+    if (db.replies.some((r) => r.reviewId === reviewId)) throw new ApiError('VALIDATION_ERROR', 'This review already has a reply.');
+    if (!body.trim()) throw new ApiError('VALIDATION_ERROR', 'Reply text is required.');
+    const now = new Date().toISOString();
+    const reply = { id: nextId('reply'), reviewId, authorId, body: body.trim(), createdAt: now };
+    db.replies.push(reply);
+    db.notifications.push({ id: nextId('notif'), userId: review.authorId, type: 'reply_received', message: 'Someone replied to your review.', createdAt: now, read: false });
+    save();
+    return reply;
+  }
+
+  function flagReview(reviewId, flaggedBy, reason) {
+    findReviewOrThrow(reviewId);
+    if (!reason.trim()) throw new ApiError('VALIDATION_ERROR', 'A reason is required to flag a review.');
+    const flag = { id: nextId('flag'), reviewId, flaggedBy, reason: reason.trim(), status: 'open', createdAt: new Date().toISOString() };
+    db.flags.push(flag);
+    save();
+    return flag;
+  }
+
+  function requireAdmin(requesterId) {
+    const requester = requireEmployee(requesterId);
+    if (!isAdminRole(requester.role)) throw new ApiError('FORBIDDEN', 'Admin or HR role is required.');
+    return requester;
+  }
+
+  function listOpenFlags(requesterId) {
+    requireAdmin(requesterId);
+    return db.flags.filter((f) => f.status === 'open')
+      .map((flag) => ({ flag: flag, review: db.reviews.find((r) => r.id === flag.reviewId) }))
+      .filter((e) => e.review);
+  }
+
+  function resolveFlag(flagId, requesterId, deleteReviewToo) {
+    requireAdmin(requesterId);
+    const flag = db.flags.find((f) => f.id === flagId);
+    if (!flag) throw new ApiError('RESOURCE_NOT_FOUND', 'No flag with id ' + flagId + '.');
+    flag.status = 'resolved';
+    if (deleteReviewToo) db.reviews = db.reviews.filter((r) => r.id !== flag.reviewId);
+    db.notifications.push({ id: nextId('notif'), userId: flag.flaggedBy, type: 'flag_resolved', message: 'Your flag was resolved.', createdAt: new Date().toISOString(), read: false });
+    save();
+  }
+
+  function getNotifications(userId) {
+    return db.notifications.filter((n) => n.userId === userId).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  }
+
+  // ---------- UI state ----------
+  const state = { currentUserId: seedEmployees[0].id, view: { name: 'directory', query: '' }, notifOpen: false, editingReviewId: null, flaggingReviewId: null, menuOpenReviewId: null };
+
+  function currentUser() { return db.employees.find((e) => e.id === state.currentUserId); }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function stars(n) { return '★'.repeat(n) + '☆'.repeat(5 - n); }
+
+  function initials(name) { return name.split(' ').map((p) => p[0]).join('').slice(0, 2).toUpperCase(); }
+
+  function avgRating(employeeId) {
+    const reviews = db.reviews.filter((r) => r.receiverId === employeeId);
+    if (!reviews.length) return null;
+    return (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1);
+  }
+
+  function navigate(view) {
+    state.view = view;
+    state.notifOpen = false;
+    state.editingReviewId = null;
+    state.flaggingReviewId = null;
+    state.menuOpenReviewId = null;
+    render();
+  }
+
+  // ---------- Rendering ----------
+  function render() {
+    const user = currentUser();
+    document.getElementById('app').innerHTML = renderTopbar(user) + '<main>' + renderView(user) + '</main>';
+  }
+
+  function renderTopbar(user) {
+    const notifications = getNotifications(user.id);
+    return (
+      '<header class="topbar">' +
+        '<span class="brand" data-action="nav-directory">Pulse</span>' +
+        '<nav class="topnav">' +
+          '<a data-action="nav-directory" class="' + (state.view.name === 'directory' ? 'active' : '') + '">Directory</a>' +
+          (isAdminRole(user.role) ? '<a data-action="nav-admin" class="' + (state.view.name === 'admin' ? 'active' : '') + '">Admin: Flags</a>' : '') +
+        '</nav>' +
+        '<div class="topbar-right">' +
+          '<button class="bell-btn" data-action="toggle-notifications">🔔 Notifications' +
+            (notifications.length ? '<span class="badge">' + notifications.length + '</span>' : '') +
+          '</button>' +
+          (state.notifOpen ? renderNotifPanel(notifications) : '') +
+          '<select class="user-switcher" id="user-switcher">' +
+            db.employees.map(function (e) {
+              return '<option value="' + e.id + '" ' + (e.id === user.id ? 'selected' : '') + '>' + escapeHtml(e.name) + ' (' + e.role + ')</option>';
+            }).join('') +
+          '</select>' +
+        '</div>' +
+      '</header>'
+    );
+  }
+
+  function renderNotifPanel(notifications) {
+    if (!notifications.length) return '<div class="notif-panel"><div class="notif-item muted">No notifications yet.</div></div>';
+    return '<div class="notif-panel">' + notifications.map(function (n) {
+      return '<div class="notif-item">' + escapeHtml(n.message) + '</div>';
+    }).join('') + '</div>';
+  }
+
+  function renderView(user) {
+    if (state.view.name === 'admin') return renderAdminFlags(user);
+    if (state.view.name === 'profile') return renderProfile(user, state.view.employeeId);
+    return renderDirectory(user);
+  }
+
+  function renderDirectory(user) {
+    const results = searchEmployees(state.view.query || '');
+    return (
+      '<h1>Find a coworker</h1>' +
+      '<p class="muted">Search by name or email, then leave feedback on their profile.</p>' +
+      '<input type="text" id="search-input" placeholder="Search by name or email" value="' + escapeHtml(state.view.query || '') + '" />' +
+      '<ul class="employee-list">' +
+        (results.length ? results.map(function (e) {
+          const avg = avgRating(e.id);
+          return (
+            '<li class="employee-row" data-action="open-employee" data-id="' + e.id + '">' +
+              '<div class="employee-main">' +
+                '<div class="avatar">' + initials(e.name) + '</div>' +
+                '<div>' +
+                  '<div>' + escapeHtml(e.name) + '</div>' +
+                  '<div class="muted">' + e.role + '</div>' +
+                '</div>' +
+              '</div>' +
+              '<div class="stars">' + (avg ? stars(Math.round(avg)) + ' ' + avg : '<span class="muted">No reviews yet</span>') + '</div>' +
+            '</li>'
+          );
+        }).join('') : '<li class="empty-state">No matches.</li>') +
+      '</ul>'
+    );
+  }
+
+  function renderProfile(user, employeeId) {
+    const employee = db.employees.find((e) => e.id === employeeId);
+    if (!employee) return '<p>No employee with id ' + escapeHtml(employeeId) + '.</p>';
+    const reviews = getEmployeeReviews(employeeId, user.id);
+    const isSelf = employee.id === user.id;
+
+    return (
+      '<h1>' + escapeHtml(employee.name) + '</h1>' +
+      '<p class="muted">' + escapeHtml(employee.email) + ' · ' + employee.role + '</p>' +
+      (isSelf
+        ? '<p class="panel">You cannot review yourself.</p>'
+        : renderReviewForm({ formKey: 'post', submitLabel: 'Post review' })) +
+      '<h2 style="margin-top:28px;">Reviews</h2>' +
+      (reviews.length ? reviews.map(function (r) { return renderReviewCard(r, user); }).join('') : '<div class="empty-state">No reviews yet.</div>')
+    );
+  }
+
+  function renderReviewForm(opts) {
+    const initial = opts.initial || { rating: 5, body: '', visibility: 'public' };
+    const isAnon = initial.visibility === 'anonymous';
+    const starButtons = [1, 2, 3, 4, 5].map(function (n) {
+      return '<button type="button" class="star-btn ' + (n <= initial.rating ? 'filled' : '') + '" data-action="select-star" data-value="' + n + '">★</button>';
+    }).join('');
+    return (
+      '<form class="panel" data-form="' + opts.formKey + '" data-review-id="' + (opts.reviewId || '') + '">' +
+        '<h2>' + (opts.submitLabel === 'Save changes' ? 'Edit review' : 'Leave a review') + '</h2>' +
+        '<label>Rating</label>' +
+        '<div class="rating-field">' +
+          '<div class="star-picker">' + starButtons + '</div>' +
+          '<input type="hidden" name="rating" value="' + initial.rating + '" />' +
+        '</div>' +
+        '<label>Review</label>' +
+        '<textarea name="body">' + escapeHtml(initial.body) + '</textarea>' +
+        '<label>Visibility</label>' +
+        '<div class="visibility-field">' +
+          '<button type="button" class="switch ' + (isAnon ? 'active' : '') + '" data-action="toggle-anonymous" role="switch" aria-checked="' + isAnon + '" title="Toggle anonymous">' +
+            '<span class="switch-knob"></span>' +
+          '</button>' +
+          '<span class="visibility-label">' + (isAnon ? 'Posting Anonymously' : 'Visible with your name') + '</span>' +
+          '<input type="hidden" name="visibility" value="' + initial.visibility + '" />' +
+        '</div>' +
+        '<button type="submit" class="btn">' + opts.submitLabel + '</button>' +
+        (opts.formKey === 'edit' ? ' <button type="button" class="btn secondary" data-action="cancel-edit">Cancel</button>' : '') +
+      '</form>'
+    );
+  }
+
+  function renderReviewCard(review, user) {
+    const author = review.authorId ? db.employees.find((e) => e.id === review.authorId) : null;
+    const authorLabel = review.visibility === 'anonymous'
+      ? (author ? 'Anonymous (author visible to you: ' + escapeHtml(author.name) + ')' : 'Anonymous')
+      : ('— ' + (author ? escapeHtml(author.name) : 'Unknown'));
+    const canManage = review.authorId === user.id;
+    const reply = getReplyForReview(review.id);
+    const canReply = review.receiverId === user.id && !reply;
+    const edited = review.updatedAt !== review.createdAt ? ' <span class="edited-tag">- Edited</span>' : '';
+
+    if (state.editingReviewId === review.id) {
+      return '<div class="review-card">' + renderReviewForm({
+        formKey: 'edit', reviewId: review.id, submitLabel: 'Save changes',
+        initial: { rating: review.rating, body: review.body, visibility: review.visibility },
+      }) + '</div>';
+    }
+
+    const menuOpen = state.menuOpenReviewId === review.id;
+
+    return (
+      '<div class="review-card">' +
+        '<div class="review-top">' +
+          '<span class="stars">' + stars(review.rating) + '</span>' +
+          '<div class="menu-wrap">' +
+            '<button class="dots-btn" data-action="toggle-menu" data-id="' + review.id + '">⋮</button>' +
+            (menuOpen
+              ? '<div class="dropdown-menu">' +
+                  (canManage ? '<button data-action="edit-review" data-id="' + review.id + '">Edit</button>' : '') +
+                  (canManage ? '<button class="danger-item" data-action="delete-review" data-id="' + review.id + '">Delete</button>' : '') +
+                  '<button data-action="toggle-flag" data-id="' + review.id + '">Flag</button>' +
+                '</div>'
+              : '') +
+          '</div>' +
+        '</div>' +
+        '<p class="review-meta">' + authorLabel + edited + '</p>' +
+        '<p class="review-body">' + escapeHtml(review.body) + '</p>' +
+        (state.flaggingReviewId === review.id
+          ? '<form class="flag-inline" data-form="flag" data-review-id="' + review.id + '">' +
+              '<input type="text" name="reason" placeholder="Reason for flagging" required />' +
+              '<button type="submit" class="btn small">Submit flag</button>' +
+            '</form>'
+          : '') +
+        (reply ? '<div class="reply-block"><strong>Reply:</strong> ' + escapeHtml(reply.body) + '</div>' : '') +
+        (canReply
+          ? '<form class="panel" style="margin-top:10px;" data-form="reply" data-review-id="' + review.id + '">' +
+              '<label>Reply</label>' +
+              '<textarea name="body"></textarea>' +
+              '<button type="submit" class="btn small">Post reply</button>' +
+            '</form>'
+          : '') +
+      '</div>'
+    );
+  }
+
+  function renderAdminFlags(user) {
+    let flags;
+    try {
+      flags = listOpenFlags(user.id);
+    } catch (e) {
+      return '<p>' + escapeHtml(e.message) + '</p>';
+    }
+    if (!flags.length) return '<h1>Open flags</h1><div class="empty-state">No open flags.</div>';
+    return (
+      '<h1>Open flags</h1>' +
+      '<table class="flags-table">' +
+        '<thead><tr><th>Reason</th><th>Review</th><th>Author</th><th></th></tr></thead>' +
+        '<tbody>' +
+          flags.map(function (entry) {
+            const flag = entry.flag, review = entry.review;
+            const author = db.employees.find((e) => e.id === review.authorId);
+            return (
+              '<tr>' +
+                '<td>' + escapeHtml(flag.reason) + '</td>' +
+                '<td>&quot;' + escapeHtml(review.body) + '&quot;</td>' +
+                '<td>' + (author ? escapeHtml(author.name) : 'Unknown') + '</td>' +
+                '<td>' +
+                  '<button class="btn small secondary" data-action="resolve-flag" data-id="' + flag.id + '" data-delete="false">Resolve</button> ' +
+                  '<button class="btn small danger" data-action="resolve-flag" data-id="' + flag.id + '" data-delete="true">Resolve and delete review</button>' +
+                '</td>' +
+              '</tr>'
+            );
+          }).join('') +
+        '</tbody>' +
+      '</table>'
+    );
+  }
+
+  // ---------- Event wiring (delegated, attached once) ----------
+  document.addEventListener('click', function (e) {
+    const el = e.target.closest('[data-action]');
+
+    if (!el) {
+      if (state.menuOpenReviewId) { state.menuOpenReviewId = null; render(); }
+      return;
+    }
+
+    const action = el.dataset.action;
+
+    // These two mutate the currently-open form's DOM directly, without a
+    // full render(), so any text already typed into the textarea survives.
+    if (action === 'select-star') {
+      const wrapper = el.closest('.rating-field');
+      const value = Number(el.dataset.value);
+      wrapper.querySelector('input[name="rating"]').value = value;
+      wrapper.querySelectorAll('.star-btn').forEach(function (btn) {
+        btn.classList.toggle('filled', Number(btn.dataset.value) <= value);
+      });
+      return;
+    }
+    if (action === 'toggle-anonymous') {
+      const wrapper = el.closest('.visibility-field');
+      const input = wrapper.querySelector('input[name="visibility"]');
+      const label = wrapper.querySelector('.visibility-label');
+      const nowAnonymous = input.value !== 'anonymous';
+      input.value = nowAnonymous ? 'anonymous' : 'public';
+      el.classList.toggle('active', nowAnonymous);
+      el.setAttribute('aria-checked', String(nowAnonymous));
+      label.textContent = nowAnonymous ? 'Posting Anonymously' : 'Visible with your name';
+      return;
+    }
+
+    if (state.menuOpenReviewId && action !== 'toggle-menu') {
+      state.menuOpenReviewId = null;
+    }
+
+    const user = currentUser();
+
+    if (action === 'toggle-menu') { state.menuOpenReviewId = state.menuOpenReviewId === el.dataset.id ? null : el.dataset.id; render(); }
+    else if (action === 'nav-directory') navigate({ name: 'directory', query: '' });
+    else if (action === 'nav-admin') navigate({ name: 'admin' });
+    else if (action === 'open-employee') navigate({ name: 'profile', employeeId: el.dataset.id });
+    else if (action === 'toggle-notifications') { state.notifOpen = !state.notifOpen; render(); }
+    else if (action === 'edit-review') { state.editingReviewId = el.dataset.id; render(); }
+    else if (action === 'cancel-edit') { state.editingReviewId = null; render(); }
+    else if (action === 'toggle-flag') { state.flaggingReviewId = state.flaggingReviewId === el.dataset.id ? null : el.dataset.id; render(); }
+    else if (action === 'delete-review') {
+      try { deleteReview(el.dataset.id, user.id); render(); }
+      catch (err) { alert(err.message); }
+    } else if (action === 'resolve-flag') {
+      try { resolveFlag(el.dataset.id, user.id, el.dataset.delete === 'true'); render(); }
+      catch (err) { alert(err.message); }
+    }
+  });
+
+  document.addEventListener('submit', function (e) {
+    const form = e.target.closest('[data-form]');
+    if (!form) return;
+    e.preventDefault();
+    const user = currentUser();
+    const type = form.dataset.form;
+    const data = new FormData(form);
+
+    try {
+      if (type === 'post') {
+        postReview({
+          authorId: user.id,
+          receiverId: state.view.employeeId,
+          rating: Number(data.get('rating')),
+          body: data.get('body'),
+          visibility: data.get('visibility'),
+        });
+        render();
+      } else if (type === 'edit') {
+        editReview({
+          reviewId: form.dataset.reviewId,
+          requesterId: user.id,
+          rating: Number(data.get('rating')),
+          body: data.get('body'),
+          visibility: data.get('visibility'),
+        });
+        state.editingReviewId = null;
+        render();
+      } else if (type === 'reply') {
+        replyToReview(form.dataset.reviewId, user.id, data.get('body'));
+        render();
+      } else if (type === 'flag') {
+        flagReview(form.dataset.reviewId, user.id, data.get('reason'));
+        state.flaggingReviewId = null;
+        render();
+      }
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+
+  document.addEventListener('input', function (e) {
+    if (e.target.id === 'search-input') {
+      state.view.query = e.target.value;
+      render();
+      const input = document.getElementById('search-input');
+      input.focus();
+      input.setSelectionRange(input.value.length, input.value.length);
+    }
+  });
+
+  document.addEventListener('change', function (e) {
+    if (e.target.id === 'user-switcher') {
+      state.currentUserId = e.target.value;
+      state.editingReviewId = null;
+      state.flaggingReviewId = null;
+      render();
+    }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+import { Router } from 'express';
+import { asyncHandler } from '../asyncHandler.js';
+import { searchEmployees } from '../db/employees.js';
+import { findReviewsByReceiver } from '../db/reviews.js';
+import { findRepliesForReviews } from '../db/replies.js';
+import { viewReviewsFor } from '../visibility.js';
+
+export const employeesRouter = Router();
+
+employeesRouter.get(
+  '/employees',
+  asyncHandler(async (req, res) => {
+    const employees = await searchEmployees(String(req.query.q ?? ''));
+    res.json({ employees });
+  }),
+);
+
+employeesRouter.get(
+  '/employees/:id/reviews',
+  asyncHandler(async (req, res) => {
+    const reviews = await findReviewsByReceiver(req.params.id);
+    const visible = viewReviewsFor(reviews, req.user);
+    const replies = await findRepliesForReviews(visible.map((r) => r.id));
+    const repliesByReview = new Map(replies.map((reply) => [reply.reviewId, reply]));
+    res.json({ reviews: visible.map((review) => ({ ...review, reply: repliesByReview.get(review.id) ?? null })) });
+  }),
+);

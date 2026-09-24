@@ -1,0 +1,71 @@
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useCurrentUser } from '../context/CurrentUserContext';
+import { searchEmployees } from '../api';
+import type { Employee } from '../types';
+
+function initials(name: string): string {
+  return name
+    .split(' ')
+    .map((p) => p[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+}
+
+export function DirectoryPage() {
+  const { currentUser } = useCurrentUser();
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<Employee[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    searchEmployees(currentUser.id, query)
+      .then((r) => {
+        if (!cancelled) {
+          setResults(r);
+          setLoading(false);
+        }
+      })
+      .catch(() => setLoading(false));
+    return () => {
+      cancelled = true;
+    };
+  }, [currentUser.id, query]);
+
+  return (
+    <div>
+      <h1>Find a coworker</h1>
+      <p className="muted">Search by name or email, then leave feedback on their profile.</p>
+      <input
+        id="search-input"
+        aria-label="Search employees"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search by name or email"
+      />
+      {loading ? (
+        <p className="muted">Loading…</p>
+      ) : (
+        <ul className="employee-list">
+          {results.length === 0 && <li className="empty-state">No matches.</li>}
+          {results.map((e) => (
+            <li key={e.id} className="employee-row">
+              <Link to={`/employees/${e.id}`} className="employee-row-link">
+                <div className="employee-main">
+                  <div className="avatar">{initials(e.name)}</div>
+                  <div>
+                    <div>{e.name}</div>
+                    <div className="muted">{e.role}</div>
+                  </div>
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
