@@ -1,4 +1,4 @@
-# Pulse Feedback — Design Spec
+# Rizurf Feedback — Design Spec
 
 Date: 2026-09-18
 
@@ -154,7 +154,7 @@ events. No email/SMTP integration.
 
 ## Conformance (this app as a registered Rizurf microapp)
 
-- `GET /health` (public) → `{status, service: "pulse-feedback-api",
+- `GET /health` (public) → `{status, service: "rizurf-feedback-api",
   version, checks: {database: bool, gateway: bool}}`
 - `GET /openapi.json` (public) → OpenAPI 3.x with `info.x-rizurf`
   (`domain`, `owner`, `category`, `use_cases`, `capabilities`,

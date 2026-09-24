@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Pulse Feedback — Prototype</title>
+<title>Rizurf Feedback — Prototype</title>
 <style>
   :root {
     --accent: #2f6fed;
@@ -351,7 +351,7 @@
     const notifications = getNotifications(user.id);
     return (
       '<header class="topbar">' +
-        '<span class="brand" data-action="nav-directory">Pulse</span>' +
+        '<span class="brand" data-action="nav-directory">Rizurf Feedback</span>' +
         '<nav class="topnav">' +
           '<a data-action="nav-directory" class="' + (state.view.name === 'directory' ? 'active' : '') + '">Directory</a>' +
           (isAdminRole(user.role) ? '<a data-action="nav-admin" class="' + (state.view.name === 'admin' ? 'active' : '') + '">Admin: Flags</a>' : '') +

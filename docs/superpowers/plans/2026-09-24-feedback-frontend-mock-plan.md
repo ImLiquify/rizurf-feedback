@@ -1,8 +1,8 @@
-# Pulse Feedback Frontend (Mocked Backend) Implementation Plan
+# Rizurf Feedback Frontend (Mocked Backend) Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build a working Vite + React frontend for the Pulse Feedback system, backed entirely by an in-memory/localStorage mock data layer, so every core flow (search, post/edit/delete a review, reply, flag, admin flag queue, notifications) can be clicked through and verified before any real backend, database, or gateway integration exists.
+**Goal:** Build a working Vite + React frontend for the Rizurf Feedback system, backed entirely by an in-memory/localStorage mock data layer, so every core flow (search, post/edit/delete a review, reply, flag, admin flag queue, notifications) can be clicked through and verified before any real backend, database, or gateway integration exists.
 
 **Architecture:** A `frontend/` Vite+React+TypeScript SPA. All "backend" behavior lives in `src/mockApi/` — a data-access layer (seed data + a `localStorage`-persisted store) and an API-shaped function surface (`src/mockApi/mockApi.ts`) that enforces the same rules the real Express API will later enforce (visibility, no self-review, one reply per review, receiver-only reply, admin/hr role gate). Because the mock layer's function signatures mirror the future real API, swapping in real HTTP calls later changes only the data layer, not the pages/components. A dev-only `CurrentUserContext` + `UserSwitcher` stand in for gateway login, letting you click through every role/permission case.
 

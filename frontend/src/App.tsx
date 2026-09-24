@@ -16,7 +16,7 @@ export function App() {
   return (
     <div>
       <header className="topbar">
-        <span className="brand">Pulse</span>
+        <span className="brand">Rizurf Feedback</span>
         <nav className="topnav">
           <NavLink to="/" end>
             Directory

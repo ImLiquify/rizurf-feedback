@@ -33,5 +33,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(config.port, () => {
-  console.log(`pulse-feedback-api listening on http://127.0.0.1:${config.port}`);
+  console.log(`rizurf-feedback-api listening on http://127.0.0.1:${config.port}`);
 });

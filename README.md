@@ -1,4 +1,4 @@
-# Pulse Feedback
+# Rizurf Feedback
 
 Internal employee feedback tool — search a coworker, leave them a public or
 anonymous rating + review. See [docs/superpowers/specs/2026-09-18-feedback-system-design.md](docs/superpowers/specs/2026-09-18-feedback-system-design.md)

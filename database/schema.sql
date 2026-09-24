@@ -1,4 +1,4 @@
--- Pulse Feedback — canonical schema
+-- Rizurf Feedback — canonical schema
 -- Matches docs/superpowers/specs/2026-09-18-feedback-system-design.md
 --
 -- `employees` is synced from the Rizurf gateway on login (id = gateway `sub`)
