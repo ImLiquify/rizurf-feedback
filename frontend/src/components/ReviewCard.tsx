@@ -147,7 +147,7 @@ export function ReviewCard({ review, authorName, canManage, canReply, onEdit, on
             }}
           />
         ) : (
-          <button type="button" className="reply-toggle-btn" onClick={() => setReplying(true)}>
+          <button type="button" className="link-btn" onClick={() => setReplying(true)}>
             ↩ Reply
           </button>
         ))}

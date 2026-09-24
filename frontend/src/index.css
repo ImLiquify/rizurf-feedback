@@ -110,11 +110,11 @@ textarea { min-height: 80px; resize: vertical; }
 .review-meta { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
 .edited-tag { color: var(--muted); font-style: italic; }
 .reply-block { margin-top: 10px; padding: 10px 12px; background: var(--accent-light); border-radius: 8px; font-size: 13px; }
-.reply-toggle-btn {
+.link-btn {
   margin-top: 10px; background: none; border: none; color: var(--accent); font-size: 13px;
   font-weight: 600; cursor: pointer; padding: 0; display: flex; align-items: center; gap: 4px;
 }
-.reply-toggle-btn:hover { text-decoration: underline; }
+.link-btn:hover { text-decoration: underline; }
 .flag-inline { margin-top: 10px; display: flex; gap: 8px; }
 .flag-inline input { flex: 1; }
 

@@ -23,6 +23,7 @@ export function EmployeeProfilePage() {
   const [authorNames, setAuthorNames] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(true);
+  const [showReviewForm, setShowReviewForm] = useState(true);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -43,6 +44,10 @@ export function EmployeeProfilePage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    setShowReviewForm(true);
+  }, [employeeId]);
 
   async function handlePostReview(input: { rating: number; body: string; visibility: Visibility }) {
     setError(undefined);
@@ -86,7 +91,15 @@ export function EmployeeProfilePage() {
         {employee.email} · {employee.role}
       </p>
 
-      {isSelf ? <p className="panel">You cannot review yourself.</p> : <ReviewForm onSubmit={handlePostReview} error={error} />}
+      {isSelf ? (
+        <p className="panel">You cannot review yourself.</p>
+      ) : showReviewForm ? (
+        <ReviewForm onSubmit={handlePostReview} error={error} onCancel={() => setShowReviewForm(false)} />
+      ) : (
+        <button type="button" className="link-btn" onClick={() => setShowReviewForm(true)}>
+          ＋ Leave a review
+        </button>
+      )}
 
       <h2 style={{ marginTop: 28 }}>Reviews</h2>
       {reviews.length === 0 && <div className="empty-state">No reviews yet.</div>}
