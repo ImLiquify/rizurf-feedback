@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-24T00:00:00.000Z",
+  "title": "Design System: Rizurf Feedback",
+  "extensions": {
+    "colorMeta": {
+      "accent": { "role": "primary", "displayName": "Teal Accent", "canonical": "#14b8a6", "tonalRamp": ["#04211d", "#0a3a33", "#0d9488", "#14b8a6", "#3fc9ba", "#7cdbcf", "#b7ede4", "#e6fbf7"] },
+      "sidebar-bg": { "role": "neutral", "displayName": "Sidebar Ink", "canonical": "#0d1220", "tonalRamp": ["#04060c", "#0d1220", "#1a2338", "#2a3654", "#4a5578", "#6b7690", "#a5adc2", "#cbd2e1"] },
+      "text": { "role": "neutral", "displayName": "Body Text", "canonical": "#101828", "tonalRamp": ["#0a0f18", "#101828", "#1f2937", "#374151", "#667085", "#98a2b3", "#d0d5dd", "#f8fafc"] },
+      "border": { "role": "neutral", "displayName": "Hairline Border", "canonical": "#e5e7eb", "tonalRamp": ["#98a2b3", "#c1c6ce", "#e5e7eb", "#eef0f2", "#f4f5f6", "#f8fafc", "#fbfbfc", "#ffffff"] },
+      "danger": { "role": "neutral", "displayName": "Danger Red", "canonical": "#dc2626", "tonalRamp": ["#450a0a", "#7f1d1d", "#b91c1c", "#dc2626", "#ef4444", "#f87171", "#fca5a5", "#fef2f2"] },
+      "rating-star": { "role": "neutral", "displayName": "Rating Amber", "canonical": "#f5a623", "tonalRamp": ["#5c3d0a", "#8a5c10", "#b87a15", "#f5a623", "#f7b84d", "#f9ca7a", "#fbdca8", "#fdeed4"] }
+    },
+    "typographyMeta": {
+      "body": { "displayName": "Body / UI (Inter)", "purpose": "Every register in this Operate-mode tool: headings, body, labels, sidebar chrome. Confirmed intentional workhorse face, not a display face — see .impeccable/config.json ignoreValues." }
+    },
+    "shadows": [
+      { "name": "shadow-sm", "value": "0 1px 2px rgba(16, 24, 40, 0.06)", "purpose": "Resting panel elevation (forms, detail panels)." },
+      { "name": "shadow-md", "value": "0 8px 20px rgba(16, 24, 40, 0.08)", "purpose": "Review-card hover lift." },
+      { "name": "shadow-lg", "value": "0 16px 40px rgba(16, 24, 40, 0.14)", "purpose": "Floating overlays: notifications panel, dropdown menu." }
+    ],
+    "motion": [
+      { "name": "state-transition", "value": "0.12s ease (background/color), 0.06s ease (active press translateY)", "purpose": "Sidebar nav hover/active, button hover/press." },
+      { "name": "card-lift", "value": "0.15s ease (box-shadow, transform)", "purpose": "Review-card hover lift + shadow." }
+    ],
+    "breakpoints": [
+      { "name": "mobile-collapse", "value": "768px", "purpose": "Sidebar collapses to a horizontal top bar." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Sidebar Nav Item (active)",
+      "kind": "nav",
+      "refersTo": "sidebar-nav-item-active",
+      "description": "Primary nav link inside the dark sidebar; teal fill marks the active route.",
+      "html": "<nav class=\"ds-sidebar-nav\"><a class=\"ds-nav-item ds-nav-item--active\" href=\"#\">Directory</a><a class=\"ds-nav-item\" href=\"#\">Admin: Flags</a></nav>",
+      "css": ".ds-sidebar-nav { display: flex; flex-direction: column; gap: 2px; background: #0d1220; padding: 14px; } .ds-nav-item { display: flex; align-items: center; padding: 10px 14px; border-radius: 10px; color: #cbd2e1; text-decoration: none; font-weight: 600; font-size: 14px; font-family: Inter, sans-serif; transition: background 0.12s ease, color 0.12s ease; } .ds-nav-item:hover { background: rgba(20, 184, 166, 0.14); color: #fff; } .ds-nav-item--active, .ds-nav-item--active:hover { background: #14b8a6; color: #04211d; }"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Teal pill button for primary actions (submit review, save).",
+      "html": "<button class=\"ds-btn-primary\">Submit review</button>",
+      "css": ".ds-btn-primary { background: #14b8a6; color: #04211d; border: none; border-radius: 999px; padding: 10px 20px; font-size: 14px; font-weight: 700; font-family: Inter, sans-serif; cursor: pointer; transition: background 0.12s ease, transform 0.06s ease; } .ds-btn-primary:hover { background: #0d9488; color: #fff; } .ds-btn-primary:active { transform: translateY(1px); } .ds-btn-primary:focus-visible { outline: 2px solid #14b8a6; outline-offset: 2px; }"
+    },
+    {
+      "name": "Compose Bar",
+      "kind": "custom",
+      "refersTo": "compose-input",
+      "description": "Chat-style pill input + circular send button; used for review replies and flag reasons.",
+      "html": "<form class=\"ds-compose-bar\"><input class=\"ds-compose-input\" type=\"text\" placeholder=\"Write a reply\" /><button class=\"ds-compose-send\" aria-label=\"Send\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 3L3 10.5l7.5 2.5L13 20.5 21 3z\"/></svg></button></form>",
+      "css": ".ds-compose-bar { display: flex; align-items: center; gap: 10px; } .ds-compose-input { flex: 1; border: 1px solid #e5e7eb; background: #f8fafc; border-radius: 999px; padding: 12px 18px; font-size: 14px; font-family: Inter, sans-serif; } .ds-compose-input:focus-visible { outline: 2px solid #14b8a6; outline-offset: 1px; background: #fff; } .ds-compose-send { flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; border: none; background: #0d1220; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; } .ds-compose-send:hover { background: #0d9488; }"
+    },
+    {
+      "name": "Review Card",
+      "kind": "card",
+      "refersTo": "review-card",
+      "description": "Message-bubble card for a review: star rating + kebab menu header row, author/meta line, body text.",
+      "html": "<div class=\"ds-review-card\"><div class=\"ds-review-top\"><span class=\"ds-stars\">&#9733;&#9733;&#9733;&#9733;&#9734;</span></div><p class=\"ds-review-meta\">— Jordan Lee</p><p class=\"ds-review-body\">Always delivers ahead of schedule and communicates clearly.</p></div>",
+      "css": ".ds-review-card { border: 1px solid #e5e7eb; border-radius: 16px; padding: 16px 18px; background: #fff; font-family: Inter, sans-serif; transition: box-shadow 0.15s ease, transform 0.15s ease; } .ds-review-card:hover { box-shadow: 0 8px 20px rgba(16, 24, 40, 0.08); transform: translateY(-1px); } .ds-review-top { display: flex; justify-content: space-between; } .ds-stars { color: #f5a623; letter-spacing: 1px; } .ds-review-meta { font-size: 13px; color: #667085; margin: 6px 0 0; } .ds-review-body { margin: 8px 0 0; font-size: 14px; line-height: 1.5; color: #101828; }"
+    },
+    {
+      "name": "Employee Row",
+      "kind": "custom",
+      "refersTo": "review-card",
+      "description": "Directory search-result row: avatar, name/role, rating, teal hover wash.",
+      "html": "<a class=\"ds-employee-row\" href=\"#\"><span class=\"ds-avatar\">JL</span><div><div class=\"ds-employee-name\">Jordan Lee</div><div class=\"ds-employee-role\">Engineering</div></div></a>",
+      "css": ".ds-employee-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border: 1px solid #e5e7eb; border-radius: 14px; text-decoration: none; color: inherit; font-family: Inter, sans-serif; transition: background 0.12s ease, border-color 0.12s ease; } .ds-employee-row:hover { background: #e6fbf7; border-color: #14b8a6; } .ds-avatar { width: 38px; height: 38px; border-radius: 50%; background: #e6fbf7; color: #0d9488; display: flex; align-items: center; justify-content: center; font-weight: 700; margin-right: 12px; } .ds-employee-name { font-weight: 600; font-size: 14px; color: #101828; } .ds-employee-role { font-size: 12px; color: #667085; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Message Thread",
+    "overview": "Rizurf Feedback reads employee reviews as messages between coworkers, not rows in an admin table — the build explicitly refuses the generic light-corporate-dashboard default its own first pass shipped. A persistent near-black navy sidebar carries brand, primary nav, and the current identity; everything else lives on a white content canvas. Reviews, replies, and flags render as rounded cards with a compact header row (author, timestamp, actions), echoing chat bubbles rather than table rows; reply and flag inputs use a pill-shaped compose bar with a circular send button. This is an Operate-register internal tool (per PRODUCT.md), so the chat-app visual grammar is restrained rather than playful: one teal accent, no illustration, no gradients beyond the small brand mark.\n\nColor is deliberately rationed: teal (#14b8a6) is the single accent carrying active nav state, primary actions, and the anonymous-toggle's \"on\" state; nothing else competes with it. Depth is soft and functional (low, diffuse shadows on hover) rather than decorative. Inter is the workhorse UI/body face throughout — confirmed intentional for this Operate surface, not a placeholder.",
+    "keyCharacteristics": [
+      "Dark navy sidebar + white content pane, restrained one-accent palette",
+      "Reviews/replies/flags as rounded message-bubble cards, not table rows",
+      "Pill-shaped inputs and buttons; compose bar with circular send button",
+      "Authored inline-SVG icon set (18px, 1.75 stroke, round caps) — no emoji, no icon fonts",
+      "Soft, functional shadows; flat at rest, lifted on hover"
+    ],
+    "rules": [
+      { "name": "The One Accent Rule", "body": "Teal is the only color that carries interactive/active meaning (nav, primary buttons, toggle-on, focus rings). Everything else is navy, gray, or white. Don't introduce a second accent hue.", "section": "colors" },
+      { "name": "The Hover-Lift Rule", "body": "Shadows only deepen in response to state (hover) or float above content (menus, panels); nothing carries a resting drop shadow that isn't a floating overlay.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep teal (#14b8a6/#0d9488) as the only accent hue; every other interactive surface stays navy, gray, or white.",
+      "Do render review/reply/flag content as rounded cards with a compact header row, never a bare HTML table.",
+      "Do use the pill compose-bar (input + circular send button) for any new chat-style input action.",
+      "Do draw new UI chrome from the authored SVG icon set (18px, 1.75 stroke) rather than emoji or Unicode glyphs."
+    ],
+    "donts": [
+      "Don't add a second accent color; the One Accent Rule covers nav, buttons, and toggles.",
+      "Don't introduce hard-edged/sharp-corner components; every surface in this world uses pill or 12-16px rounding.",
+      "Don't reintroduce bare <table> markup for list data (admin flags, reviews) — the shipped pattern is card rows."
+    ]
+  }
+}
