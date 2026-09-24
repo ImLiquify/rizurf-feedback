@@ -18,6 +18,7 @@ export function ReviewCard({ review, authorName, canManage, canReply, onEdit, on
   const [editing, setEditing] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [flagging, setFlagging] = useState(false);
+  const [replying, setReplying] = useState(false);
   const [reason, setReason] = useState('');
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -136,7 +137,20 @@ export function ReviewCard({ review, authorName, canManage, canReply, onEdit, on
         </div>
       )}
 
-      {canReply && !review.reply && <ReplyForm onSubmit={onReply} />}
+      {canReply &&
+        !review.reply &&
+        (replying ? (
+          <ReplyForm
+            onSubmit={(body) => {
+              onReply(body);
+              setReplying(false);
+            }}
+          />
+        ) : (
+          <button type="button" className="reply-toggle-btn" onClick={() => setReplying(true)}>
+            ↩ Reply
+          </button>
+        ))}
     </div>
   );
 }
