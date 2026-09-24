@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useCurrentUser } from '../context/CurrentUserContext';
 import { searchEmployees } from '../api';
 import type { Employee } from '../types';
 import { initials } from '../utils';
@@ -12,7 +11,6 @@ function stars(n: number): string {
 }
 
 export function DirectoryPage() {
-  const { currentUser } = useCurrentUser();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +18,7 @@ export function DirectoryPage() {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    searchEmployees(currentUser.id, query)
+    searchEmployees(query)
       .then((r) => {
         if (!cancelled) {
           setResults(r);
@@ -31,7 +29,7 @@ export function DirectoryPage() {
     return () => {
       cancelled = true;
     };
-  }, [currentUser.id, query]);
+  }, [query]);
 
   return (
     <div>
@@ -63,7 +61,7 @@ export function DirectoryPage() {
                   </div>
                 </div>
                 <div className="stars">
-                  {e.avgRating !== null ? (
+                  {e.avgRating != null ? (
                     <>
                       {stars(e.avgRating)} {e.avgRating.toFixed(1)}
                     </>

@@ -29,10 +29,7 @@ export function EmployeeProfilePage() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [employees, employeeReviews] = await Promise.all([
-      searchEmployees(currentUser.id, ''),
-      getEmployeeReviews(currentUser.id, employeeId),
-    ]);
+    const [employees, employeeReviews] = await Promise.all([searchEmployees(''), getEmployeeReviews(employeeId)]);
     setEmployee(employees.find((e) => e.id === employeeId) ?? null);
     const nameMap: Record<string, string> = {};
     employees.forEach((e) => {
@@ -41,7 +38,7 @@ export function EmployeeProfilePage() {
     setAuthorNames(nameMap);
     setReviews(employeeReviews);
     setLoading(false);
-  }, [currentUser.id, employeeId]);
+  }, [employeeId]);
 
   useEffect(() => {
     load();
@@ -54,7 +51,7 @@ export function EmployeeProfilePage() {
   async function handlePostReview(input: { rating: number; body: string; visibility: Visibility }) {
     setError(undefined);
     try {
-      await postReview(currentUser.id, { receiverId: employeeId, ...input });
+      await postReview({ receiverId: employeeId, ...input });
       await load();
     } catch (e) {
       setError(e instanceof ApiError ? e.message : 'Could not post review.');
@@ -62,22 +59,22 @@ export function EmployeeProfilePage() {
   }
 
   async function handleEditReview(reviewId: string, input: { rating: number; body: string; visibility: Visibility }) {
-    await editReview(currentUser.id, reviewId, input);
+    await editReview(reviewId, input);
     await load();
   }
 
   async function handleDeleteReview(reviewId: string) {
-    await deleteReview(currentUser.id, reviewId);
+    await deleteReview(reviewId);
     await load();
   }
 
   async function handleFlag(reviewId: string, reason: string) {
-    await flagReview(currentUser.id, reviewId, reason);
+    await flagReview(reviewId, reason);
     await load();
   }
 
   async function handleReply(reviewId: string, body: string) {
-    await replyToReview(currentUser.id, reviewId, body);
+    await replyToReview(reviewId, body);
     await load();
   }
 

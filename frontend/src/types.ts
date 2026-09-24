@@ -1,12 +1,16 @@
-export type Role = 'employee' | 'admin' | 'hr' | 'supervisor';
+// Exactly the Rizurf gateway's own four roles (MICROAPP_AUTH.md) — never
+// add a fifth value here; a local role need would layer on top instead.
+export type Role = 'user' | 'admin' | 'hr' | 'supervisor';
 
 export interface Employee {
   id: string;
   email: string;
   name: string;
   role: Role;
-  avgRating: number | null;
-  reviewCount: number;
+  // Present on directory/search results; absent on the signed-in session
+  // user (GET /api/auth/session doesn't compute an aggregate).
+  avgRating?: number | null;
+  reviewCount?: number;
 }
 
 export type Visibility = 'public' | 'anonymous';

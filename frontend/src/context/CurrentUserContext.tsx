@@ -1,41 +1,66 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
-import type { Role } from '../types';
-
-export interface DevUser {
-  id: string;
-  name: string;
-  role: Role;
-}
-
-// Dev-only stand-in for gateway login: mirrors database/seed.sql. The
-// selected user's id is sent as the X-Mock-User-Id header on every API
-// call (see src/api.ts) — this whole mechanism goes away once the real
-// Rizurf gateway is wired in.
-const devUsers: DevUser[] = [
-  { id: 'emp-1', name: 'Alice Nguyen', role: 'employee' },
-  { id: 'emp-2', name: 'Bob Santos', role: 'employee' },
-  { id: 'emp-3', name: 'Carla Cruz', role: 'employee' },
-  { id: 'emp-4', name: 'Diego Reyes', role: 'supervisor' },
-  { id: 'emp-5', name: 'Erika Flores', role: 'admin' },
-];
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { exchangeCode, getSession } from '../api';
+import type { Employee } from '../types';
 
 interface CurrentUserContextValue {
-  currentUser: DevUser;
-  allUsers: DevUser[];
-  setCurrentUserId: (id: string) => void;
+  currentUser: Employee;
 }
 
 const CurrentUserContext = createContext<CurrentUserContextValue | undefined>(undefined);
 
+// MICROAPP_AUTH.md §4: no login screen, no sign-out button — the gateway
+// is the only place either happens. This provider's only job is to (a)
+// finish the sign-in code exchange if one is in progress, (b) ask our own
+// backend who's signed in, and (c) send the browser to the gateway when
+// no one is.
 export function CurrentUserProvider({ children }: { children: ReactNode }) {
-  const [currentUserId, setCurrentUserId] = useState(devUsers[0].id);
+  const [currentUser, setCurrentUser] = useState<Employee | null>(null);
+  const [redirecting, setRedirecting] = useState(false);
 
-  const value = useMemo<CurrentUserContextValue>(() => {
-    const currentUser = devUsers.find((u) => u.id === currentUserId) ?? devUsers[0];
-    return { currentUser, allUsers: devUsers, setCurrentUserId };
-  }, [currentUserId]);
+  useEffect(() => {
+    let cancelled = false;
 
-  return <CurrentUserContext.Provider value={value}>{children}</CurrentUserContext.Provider>;
+    async function init() {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+
+      if (code) {
+        try {
+          const user = await exchangeCode(code);
+          window.history.replaceState({}, '', window.location.pathname);
+          if (!cancelled) setCurrentUser(user);
+          return;
+        } catch {
+          // Fall through to the session check below.
+        }
+      }
+
+      try {
+        const user = await getSession();
+        if (!cancelled) setCurrentUser(user);
+      } catch {
+        if (!cancelled) {
+          setRedirecting(true);
+          window.location.href = '/api/auth/login';
+        }
+      }
+    }
+
+    init();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (!currentUser) {
+    return (
+      <div className="auth-loading">
+        <p className="muted">{redirecting ? 'Redirecting to sign-in…' : 'Loading…'}</p>
+      </div>
+    );
+  }
+
+  return <CurrentUserContext.Provider value={{ currentUser }}>{children}</CurrentUserContext.Provider>;
 }
 
 export function useCurrentUser(): CurrentUserContextValue {

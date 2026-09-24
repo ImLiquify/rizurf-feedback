@@ -1,6 +1,6 @@
 import type { Employee, NotificationItem, OpenFlagEntry, ReviewFlag, ReviewReply, ReviewView, Visibility } from './types';
 
-const API_BASE = 'http://127.0.0.1:4000/api';
+const API_BASE = '/api';
 
 export class ApiError extends Error {
   code: string;
@@ -21,15 +21,22 @@ interface Review {
   updatedAt: string;
 }
 
-async function request<T>(path: string, userId: string, options: RequestInit = {}): Promise<T> {
+// Session-cookie auth (MICROAPP_AUTH.md) — same-origin fetch sends it
+// automatically, nothing to attach by hand. A 401 here means the gateway
+// session ended since the page loaded; lock immediately, no error page.
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      'X-Mock-User-Id': userId,
       ...(options.headers ?? {}),
     },
   });
+
+  if (res.status === 401) {
+    window.location.href = '/api/auth/login';
+    return new Promise<T>(() => {}); // navigation is underway; never resolve
+  }
 
   if (res.status === 204) return null as T;
 
@@ -40,69 +47,83 @@ async function request<T>(path: string, userId: string, options: RequestInit = {
   return data as T;
 }
 
-export async function searchEmployees(userId: string, query: string): Promise<Employee[]> {
-  const data = await request<{ employees: Employee[] }>(`/employees?q=${encodeURIComponent(query)}`, userId);
+export async function getSession(): Promise<Employee> {
+  const data = await request<{ user: Employee }>('/auth/session');
+  return data.user;
+}
+
+export async function exchangeCode(code: string): Promise<Employee> {
+  const data = await request<{ user: Employee }>('/auth/callback', {
+    method: 'POST',
+    body: JSON.stringify({ code }),
+  });
+  return data.user;
+}
+
+export async function searchEmployees(query: string): Promise<Employee[]> {
+  const data = await request<{ employees: Employee[] }>(`/employees?q=${encodeURIComponent(query)}`);
   return data.employees;
 }
 
-export async function getEmployeeReviews(userId: string, employeeId: string): Promise<ReviewView[]> {
-  const data = await request<{ reviews: ReviewView[] }>(`/employees/${employeeId}/reviews`, userId);
+export async function getEmployeeReviews(employeeId: string): Promise<ReviewView[]> {
+  const data = await request<{ reviews: ReviewView[] }>(`/employees/${employeeId}/reviews`);
   return data.reviews;
 }
 
-export async function postReview(
-  userId: string,
-  input: { receiverId: string; rating: number; body: string; visibility: Visibility },
-): Promise<Review> {
-  const data = await request<{ review: Review }>('/reviews', userId, { method: 'POST', body: JSON.stringify(input) });
+export async function postReview(input: {
+  receiverId: string;
+  rating: number;
+  body: string;
+  visibility: Visibility;
+}): Promise<Review> {
+  const data = await request<{ review: Review }>('/reviews', { method: 'POST', body: JSON.stringify(input) });
   return data.review;
 }
 
 export async function editReview(
-  userId: string,
   reviewId: string,
   input: { rating: number; body: string; visibility: Visibility },
 ): Promise<Review> {
-  const data = await request<{ review: Review }>(`/reviews/${reviewId}`, userId, {
+  const data = await request<{ review: Review }>(`/reviews/${reviewId}`, {
     method: 'PATCH',
     body: JSON.stringify(input),
   });
   return data.review;
 }
 
-export function deleteReview(userId: string, reviewId: string): Promise<null> {
-  return request<null>(`/reviews/${reviewId}`, userId, { method: 'DELETE' });
+export function deleteReview(reviewId: string): Promise<null> {
+  return request<null>(`/reviews/${reviewId}`, { method: 'DELETE' });
 }
 
-export async function replyToReview(userId: string, reviewId: string, body: string): Promise<ReviewReply> {
-  const data = await request<{ reply: ReviewReply }>(`/reviews/${reviewId}/replies`, userId, {
+export async function replyToReview(reviewId: string, body: string): Promise<ReviewReply> {
+  const data = await request<{ reply: ReviewReply }>(`/reviews/${reviewId}/replies`, {
     method: 'POST',
     body: JSON.stringify({ body }),
   });
   return data.reply;
 }
 
-export async function flagReview(userId: string, reviewId: string, reason: string): Promise<ReviewFlag> {
-  const data = await request<{ flag: ReviewFlag }>(`/reviews/${reviewId}/flags`, userId, {
+export async function flagReview(reviewId: string, reason: string): Promise<ReviewFlag> {
+  const data = await request<{ flag: ReviewFlag }>(`/reviews/${reviewId}/flags`, {
     method: 'POST',
     body: JSON.stringify({ reason }),
   });
   return data.flag;
 }
 
-export async function listOpenFlags(userId: string): Promise<OpenFlagEntry[]> {
-  const data = await request<{ flags: OpenFlagEntry[] }>('/admin/flags', userId);
+export async function listOpenFlags(): Promise<OpenFlagEntry[]> {
+  const data = await request<{ flags: OpenFlagEntry[] }>('/admin/flags');
   return data.flags;
 }
 
-export function resolveFlag(userId: string, flagId: string, deleteReview: boolean): Promise<null> {
-  return request<null>(`/admin/flags/${flagId}`, userId, {
+export function resolveFlag(flagId: string, deleteReview: boolean): Promise<null> {
+  return request<null>(`/admin/flags/${flagId}`, {
     method: 'PATCH',
     body: JSON.stringify({ deleteReview }),
   });
 }
 
-export async function getNotifications(userId: string): Promise<NotificationItem[]> {
-  const data = await request<{ notifications: NotificationItem[] }>('/notifications', userId);
+export async function getNotifications(): Promise<NotificationItem[]> {
+  const data = await request<{ notifications: NotificationItem[] }>('/notifications');
   return data.notifications;
 }

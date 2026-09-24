@@ -20,7 +20,7 @@ Anonymous-but-accountable feedback: an anonymous review always stores its author
 
 ## Operating Context
 
-Employees use this from a browser at work, as one of several internal "Rizurf" microapps sitting behind a shared company gateway (single sign-on). Real authentication is deferred to that gateway (per `MICROAPP_AUTH.md` / `RIZURF_API_TEMPLATE.md`) and is not yet wired in; local development stands in with a dev-only user switcher instead of a login screen. The full employee roster is expected to sync from another Rizurf microservice (exact service unconfirmed) in addition to growing as people log in.
+Employees use this from a browser at work, as one of several internal "Rizurf" microapps sitting behind a shared company gateway (single sign-on). Authentication is fully wired to that gateway per `MICROAPP_AUTH.md` / `RIZURF_API_TEMPLATE.md`: no local login of any kind, a signed own-app session checked against the gateway on every request, no cache. The frontend and API deploy together as one Vercel project so the session cookie stays same-site. The full employee roster still just grows as people log in; syncing it from another Rizurf microservice remains unconfirmed/undecided.
 
 ## Capabilities and Constraints
 
@@ -32,7 +32,7 @@ Employees use this from a browser at work, as one of several internal "Rizurf" m
 - Flag a review for moderation; admin/hr resolves a flag and may delete the underlying review.
 - In-app notifications for "review received," "reply received," and "your flag was resolved" — no email/SMS.
 - The production database is owned by a separate DB Lead; `database/schema.sql` is the canonical handoff artifact, kept in sync with whatever the app actually needs. Local development runs against a XAMPP MySQL instance seeded with test-only data (`database/seed.sql`), never real company data.
-- Open/undecided: the real gateway auth integration (dev-only header stand-in is temporary) and the exact roster-sync service/endpoint.
+- Open/undecided: the exact roster-sync service/endpoint for populating the employee directory ahead of first login.
 
 ## Brand Commitments
 
@@ -46,7 +46,7 @@ None. All employees, reviews, and ratings currently in the app are local seed/mo
 
 - Feedback must be safe to give honestly — anonymity is an access-control guarantee, not a UI convention that a bug or a new screen could accidentally leak.
 - Accountability for admin/HR is preserved even when peers can never see who wrote a review.
-- Local development stays fully testable without the real gateway, and every dev-only stand-in is clearly marked so it can't drift into production.
+- There is no dev-only auth bypass to drift into production — local development authenticates through the same real gateway flow as production, just pointed at whatever `GATEWAY_URL` is configured.
 - Reuse the Rizurf ecosystem's existing conventions (gateway SSO, service template) rather than inventing a parallel identity or API system.
 - Nothing ships that the real database handoff (`database/schema.sql`) can't also support.
 

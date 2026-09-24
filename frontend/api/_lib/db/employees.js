@@ -41,3 +41,15 @@ export async function searchEmployees(query) {
   );
   return rows.map(mapRow);
 }
+
+// Synced from the gateway identity token on every successful sign-in
+// (MICROAPP_AUTH.md §4 step 6 / schema.sql's comment on `employees`) —
+// keeps name/role current without needing the roster-sync service for
+// anyone who has ever logged in.
+export async function upsertEmployeeFromGateway({ id, email, name, role }) {
+  await pool.query(
+    `INSERT INTO employees (id, email, name, role) VALUES (?, ?, ?, ?)
+     ON DUPLICATE KEY UPDATE email = VALUES(email), name = VALUES(name), role = VALUES(role)`,
+    [id, email, name, role],
+  );
+}

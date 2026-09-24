@@ -1,18 +1,16 @@
 import { useEffect, useState } from 'react';
-import { useCurrentUser } from '../context/CurrentUserContext';
 import { getNotifications } from '../api';
 import type { NotificationItem } from '../types';
 import { IconBell } from './icons';
 
 export function NotificationsList() {
-  const { currentUser } = useCurrentUser();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
 
   useEffect(() => {
     let cancelled = false;
     function load() {
-      getNotifications(currentUser.id)
+      getNotifications()
         .then((n) => {
           if (!cancelled) setNotifications(n);
         })
@@ -24,11 +22,11 @@ export function NotificationsList() {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [currentUser.id]);
+  }, []);
 
   function toggle() {
     setOpen((o) => !o);
-    getNotifications(currentUser.id)
+    getNotifications()
       .then(setNotifications)
       .catch(() => {});
   }

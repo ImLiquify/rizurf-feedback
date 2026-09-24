@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useCurrentUser } from '../context/CurrentUserContext';
 import { ApiError, listOpenFlags, resolveFlag, searchEmployees } from '../api';
 import type { OpenFlagEntry } from '../types';
 import { IconFlag, IconTrash } from '../components/icons';
 
 export function AdminFlagsPage() {
-  const { currentUser } = useCurrentUser();
   const [flags, setFlags] = useState<OpenFlagEntry[]>([]);
   const [authorNames, setAuthorNames] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | undefined>(undefined);
@@ -16,7 +14,7 @@ export function AdminFlagsPage() {
     setLoading(true);
     setBlocked(undefined);
     try {
-      const [employees, openFlags] = await Promise.all([searchEmployees(currentUser.id, ''), listOpenFlags(currentUser.id)]);
+      const [employees, openFlags] = await Promise.all([searchEmployees(''), listOpenFlags()]);
       const nameMap: Record<string, string> = {};
       employees.forEach((e) => {
         nameMap[e.id] = e.name;
@@ -27,7 +25,7 @@ export function AdminFlagsPage() {
       setBlocked(e instanceof ApiError ? e.message : 'Could not load flags.');
     }
     setLoading(false);
-  }, [currentUser.id]);
+  }, []);
 
   useEffect(() => {
     load();
@@ -36,7 +34,7 @@ export function AdminFlagsPage() {
   async function handleResolve(flagId: string, deleteReviewToo: boolean) {
     setError(undefined);
     try {
-      await resolveFlag(currentUser.id, flagId, deleteReviewToo);
+      await resolveFlag(flagId, deleteReviewToo);
       await load();
     } catch (e) {
       setError(e instanceof ApiError ? e.message : 'Could not resolve flag.');

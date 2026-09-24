@@ -1,6 +1,5 @@
 import { NavLink, Route, Routes } from 'react-router-dom';
 import { useCurrentUser } from './context/CurrentUserContext';
-import { UserSwitcher } from './components/UserSwitcher';
 import { NotificationsList } from './components/NotificationsList';
 import { DirectoryPage } from './pages/DirectoryPage';
 import { EmployeeProfilePage } from './pages/EmployeeProfilePage';
@@ -42,7 +41,6 @@ export function App() {
               <div className="sidebar-identity-role">{currentUser.role}</div>
             </div>
           </div>
-          <UserSwitcher />
         </div>
       </aside>
 

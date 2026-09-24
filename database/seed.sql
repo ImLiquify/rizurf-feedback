@@ -4,9 +4,9 @@
 USE rizurf_feedback;
 
 INSERT INTO employees (id, email, name, role) VALUES
-  ('emp-1', 'alice@rizurf.local', 'Alice Nguyen', 'employee'),
-  ('emp-2', 'bob@rizurf.local', 'Bob Santos', 'employee'),
-  ('emp-3', 'carla@rizurf.local', 'Carla Cruz', 'employee'),
+  ('emp-1', 'alice@rizurf.local', 'Alice Nguyen', 'user'),
+  ('emp-2', 'bob@rizurf.local', 'Bob Santos', 'user'),
+  ('emp-3', 'carla@rizurf.local', 'Carla Cruz', 'user'),
   ('emp-4', 'diego@rizurf.local', 'Diego Reyes', 'supervisor'),
   ('emp-5', 'erika@rizurf.local', 'Erika Flores', 'admin');
 

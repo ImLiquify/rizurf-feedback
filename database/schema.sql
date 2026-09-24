@@ -4,7 +4,8 @@
 -- `employees` is synced from the Rizurf gateway on login (id = gateway `sub`)
 -- plus a periodic sync from the company roster service — see spec section
 -- "Employee directory". Nothing here stores a password; auth is the
--- gateway's job.
+-- gateway's job. `role` mirrors the gateway's own four roles exactly
+-- (MICROAPP_AUTH.md) — never invent a fifth value here.
 
 CREATE DATABASE IF NOT EXISTS rizurf_feedback
   CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -15,7 +16,7 @@ CREATE TABLE employees (
   id         VARCHAR(64) PRIMARY KEY,      -- the gateway's `sub` claim
   email      VARCHAR(255) NOT NULL UNIQUE,
   name       VARCHAR(255) NOT NULL,
-  role       ENUM('employee', 'admin', 'hr', 'supervisor') NOT NULL DEFAULT 'employee',
+  role       ENUM('user', 'admin', 'hr', 'supervisor') NOT NULL DEFAULT 'user',
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
