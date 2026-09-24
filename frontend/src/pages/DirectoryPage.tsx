@@ -13,6 +13,11 @@ function initials(name: string): string {
     .toUpperCase();
 }
 
+function stars(n: number): string {
+  const rounded = Math.round(n);
+  return '★'.repeat(rounded) + '☆'.repeat(5 - rounded);
+}
+
 export function DirectoryPage() {
   const { currentUser } = useCurrentUser();
   const [query, setQuery] = useState('');
@@ -60,6 +65,15 @@ export function DirectoryPage() {
                     <div>{e.name}</div>
                     <div className="muted">{e.role}</div>
                   </div>
+                </div>
+                <div className="stars">
+                  {e.avgRating !== null ? (
+                    <>
+                      {stars(e.avgRating)} {e.avgRating.toFixed(1)}
+                    </>
+                  ) : (
+                    <span className="muted">No reviews yet</span>
+                  )}
                 </div>
               </Link>
             </li>

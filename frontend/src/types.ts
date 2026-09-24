@@ -5,6 +5,8 @@ export interface Employee {
   email: string;
   name: string;
   role: Role;
+  avgRating: number | null;
+  reviewCount: number;
 }
 
 export type Visibility = 'public' | 'anonymous';

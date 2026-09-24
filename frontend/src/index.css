@@ -60,8 +60,9 @@ h2 { font-size: 16px; margin: 0 0 8px; }
 }
 .employee-row:hover { border-color: var(--accent); }
 .employee-row-link {
-  display: flex; align-items: center; padding: 14px 18px; text-decoration: none; color: inherit;
+  display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; text-decoration: none; color: inherit;
 }
+.stars { color: #f5a623; letter-spacing: 1px; }
 .avatar {
   width: 36px; height: 36px; border-radius: 50%; background: var(--accent-light); color: var(--accent);
   display: flex; align-items: center; justify-content: center; font-weight: 700; margin-right: 12px; flex-shrink: 0;
