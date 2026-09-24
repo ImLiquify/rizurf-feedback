@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useCurrentUser } from '../context/CurrentUserContext';
 import { getNotifications } from '../api';
 import type { NotificationItem } from '../types';
+import { IconBell } from './icons';
 
 export function NotificationsList() {
   const { currentUser } = useCurrentUser();
@@ -35,7 +36,8 @@ export function NotificationsList() {
   return (
     <div className="notif-wrap">
       <button className="bell-btn" onClick={toggle}>
-        🔔 Notifications
+        <IconBell />
+        Notifications
         {notifications.length > 0 && <span className="badge">{notifications.length}</span>}
       </button>
       {open && (

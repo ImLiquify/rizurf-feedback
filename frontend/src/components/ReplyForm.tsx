@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { IconSend } from './icons';
 
 interface ReplyFormProps {
   onSubmit: (body: string) => void;
@@ -15,11 +16,16 @@ export function ReplyForm({ onSubmit }: ReplyFormProps) {
   }
 
   return (
-    <form className="panel" style={{ marginTop: 10 }} onSubmit={handleSubmit}>
-      <label htmlFor="reply-body">Reply</label>
-      <textarea id="reply-body" value={body} onChange={(e) => setBody(e.target.value)} />
-      <button type="submit" className="btn small">
-        Post reply
+    <form className="compose-bar" onSubmit={handleSubmit}>
+      <textarea
+        aria-label="Reply"
+        placeholder="Write a reply…"
+        value={body}
+        onChange={(e) => setBody(e.target.value)}
+        rows={1}
+      />
+      <button type="submit" className="compose-send" aria-label="Post reply">
+        <IconSend width={16} height={16} />
       </button>
     </form>
   );

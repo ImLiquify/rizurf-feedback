@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { ReviewView, Visibility } from '../types';
 import { ReviewForm } from './ReviewForm';
 import { ReplyForm } from './ReplyForm';
+import { IconDots, IconPencil, IconTrash, IconFlag } from './icons';
 
 interface ReviewCardProps {
   review: ReviewView;
@@ -71,8 +72,8 @@ export function ReviewCard({ review, authorName, canManage, canReply, onEdit, on
           {'☆'.repeat(5 - review.rating)}
         </span>
         <div className="menu-wrap" ref={menuRef}>
-          <button className="dots-btn" onClick={() => setMenuOpen((o) => !o)}>
-            ⋮
+          <button className="dots-btn" onClick={() => setMenuOpen((o) => !o)} aria-label="Review actions">
+            <IconDots />
           </button>
           {menuOpen && (
             <div className="dropdown-menu">
@@ -83,7 +84,7 @@ export function ReviewCard({ review, authorName, canManage, canReply, onEdit, on
                     setMenuOpen(false);
                   }}
                 >
-                  Edit
+                  <IconPencil width={14} height={14} /> Edit
                 </button>
               )}
               {canManage && (
@@ -94,7 +95,7 @@ export function ReviewCard({ review, authorName, canManage, canReply, onEdit, on
                     setMenuOpen(false);
                   }}
                 >
-                  Delete
+                  <IconTrash width={14} height={14} /> Delete
                 </button>
               )}
               <button
@@ -103,7 +104,7 @@ export function ReviewCard({ review, authorName, canManage, canReply, onEdit, on
                   setMenuOpen(false);
                 }}
               >
-                Flag
+                <IconFlag width={14} height={14} /> Flag
               </button>
             </div>
           )}
@@ -117,7 +118,7 @@ export function ReviewCard({ review, authorName, canManage, canReply, onEdit, on
       <p className="review-body">{review.body}</p>
 
       {flagging && (
-        <form className="flag-inline" onSubmit={submitFlag}>
+        <form className="compose-bar" onSubmit={submitFlag}>
           <input
             type="text"
             placeholder="Reason for flagging"
@@ -125,8 +126,8 @@ export function ReviewCard({ review, authorName, canManage, canReply, onEdit, on
             onChange={(e) => setReason(e.target.value)}
             required
           />
-          <button type="submit" className="btn small">
-            Submit flag
+          <button type="submit" className="compose-send" aria-label="Submit flag">
+            <IconFlag width={16} height={16} />
           </button>
         </form>
       )}
@@ -148,7 +149,7 @@ export function ReviewCard({ review, authorName, canManage, canReply, onEdit, on
           />
         ) : (
           <button type="button" className="link-btn" onClick={() => setReplying(true)}>
-            ↩ Reply
+            Reply
           </button>
         ))}
     </div>

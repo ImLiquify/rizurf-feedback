@@ -3,15 +3,8 @@ import { Link } from 'react-router-dom';
 import { useCurrentUser } from '../context/CurrentUserContext';
 import { searchEmployees } from '../api';
 import type { Employee } from '../types';
-
-function initials(name: string): string {
-  return name
-    .split(' ')
-    .map((p) => p[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
-}
+import { initials } from '../utils';
+import { IconSearch } from '../components/icons';
 
 function stars(n: number): string {
   const rounded = Math.round(n);
@@ -44,13 +37,16 @@ export function DirectoryPage() {
     <div>
       <h1>Find a coworker</h1>
       <p className="muted">Search by name or email, then leave feedback on their profile.</p>
-      <input
-        id="search-input"
-        aria-label="Search employees"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search by name or email"
-      />
+      <div className="search-field">
+        <IconSearch />
+        <input
+          id="search-input"
+          aria-label="Search employees"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search by name or email"
+        />
+      </div>
       {loading ? (
         <p className="muted">Loading…</p>
       ) : (

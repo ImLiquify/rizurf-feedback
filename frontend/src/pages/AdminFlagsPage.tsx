@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useCurrentUser } from '../context/CurrentUserContext';
 import { ApiError, listOpenFlags, resolveFlag, searchEmployees } from '../api';
 import type { OpenFlagEntry } from '../types';
+import { IconFlag, IconTrash } from '../components/icons';
 
 export function AdminFlagsPage() {
   const { currentUser } = useCurrentUser();
@@ -55,33 +56,27 @@ export function AdminFlagsPage() {
       )}
       {flags.length === 0 && <p className="empty-state">No open flags.</p>}
       {flags.length > 0 && (
-        <table className="flags-table">
-          <thead>
-            <tr>
-              <th>Reason</th>
-              <th>Review</th>
-              <th>Author</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {flags.map(({ flag, review }) => (
-              <tr key={flag.id}>
-                <td>{flag.reason}</td>
-                <td>&quot;{review.body}&quot;</td>
-                <td>{authorNames[review.authorId] ?? 'Unknown'}</td>
-                <td>
-                  <button className="btn small secondary" onClick={() => handleResolve(flag.id, false)}>
-                    Resolve
-                  </button>{' '}
-                  <button className="btn small danger" onClick={() => handleResolve(flag.id, true)}>
-                    Resolve and delete review
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <ul className="flag-list">
+          {flags.map(({ flag, review }) => (
+            <li key={flag.id} className="flag-row">
+              <span className="flag-reason">
+                <IconFlag width={14} height={14} />
+                {flag.reason}
+              </span>
+              <p className="flag-review-body">
+                &quot;{review.body}&quot; — {authorNames[review.authorId] ?? 'Unknown'}
+              </p>
+              <div className="flag-actions">
+                <button className="btn small secondary" onClick={() => handleResolve(flag.id, false)}>
+                  Resolve
+                </button>
+                <button className="btn small danger" onClick={() => handleResolve(flag.id, true)}>
+                  <IconTrash width={14} height={14} /> Resolve &amp; delete review
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );

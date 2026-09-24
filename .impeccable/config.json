@@ -1,3 +1,15 @@
 {
-  "buildPath": "code"
+  "buildPath": "code",
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "createdAt": "2026-09-24T07:20:16.520Z",
+        "reason": "Agent: Operate-mode workhorse UI/body face, not a display face — new-work.md sec.4 sanctions system/workhorse stacks for Operate & Read surfaces, only flags Inter-as-display for Persuade/Experience"
+      }
+    ]
+  }
 }

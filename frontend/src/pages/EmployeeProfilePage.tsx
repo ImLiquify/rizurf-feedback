@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useCurrentUser } from '../context/CurrentUserContext';
 import {
   ApiError,
@@ -13,6 +13,8 @@ import {
 } from '../api';
 import { ReviewForm } from '../components/ReviewForm';
 import { ReviewCard } from '../components/ReviewCard';
+import { IconChevronLeft } from '../components/icons';
+import { initials } from '../utils';
 import type { Employee, ReviewView, Visibility } from '../types';
 
 export function EmployeeProfilePage() {
@@ -86,10 +88,20 @@ export function EmployeeProfilePage() {
 
   return (
     <div>
-      <h1>{employee.name}</h1>
-      <p className="muted">
-        {employee.email} · {employee.role}
-      </p>
+      <Link to="/" className="back-link">
+        <IconChevronLeft width={16} height={16} />
+        Directory
+      </Link>
+
+      <div className="profile-header">
+        <span className="avatar profile-avatar">{initials(employee.name)}</span>
+        <div>
+          <h1>{employee.name}</h1>
+          <p className="muted">
+            {employee.email} · {employee.role}
+          </p>
+        </div>
+      </div>
 
       {isSelf ? (
         <p className="panel">You cannot review yourself.</p>
@@ -97,7 +109,7 @@ export function EmployeeProfilePage() {
         <ReviewForm onSubmit={handlePostReview} error={error} onCancel={() => setShowReviewForm(false)} />
       ) : (
         <button type="button" className="link-btn" onClick={() => setShowReviewForm(true)}>
-          ＋ Leave a review
+          Leave a review
         </button>
       )}
 
