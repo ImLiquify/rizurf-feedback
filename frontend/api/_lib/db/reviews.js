@@ -44,3 +44,18 @@ export async function updateReview(id, { rating, body, visibility }) {
 export async function deleteReview(id) {
   await pool.query('DELETE FROM reviews WHERE id = ?', [id]);
 }
+
+// Admin-only wall (routes/admin.js): every review, author/receiver names
+// joined in one query rather than N+1 per employee. Never filtered by
+// visibility — the caller is already confirmed admin/hr before this runs,
+// and seeing every author is the entire point of the wall.
+export async function findAllReviewsWithNames() {
+  const [rows] = await pool.query(
+    `SELECT r.*, a.name AS author_name, e.name AS receiver_name
+     FROM reviews r
+     JOIN employees a ON a.id = r.author_id
+     JOIN employees e ON e.id = r.receiver_id
+     ORDER BY r.created_at DESC`,
+  );
+  return rows.map((row) => ({ ...mapRow(row), authorName: row.author_name, receiverName: row.receiver_name }));
+}

@@ -3,8 +3,10 @@ import { asyncHandler } from '../asyncHandler.js';
 import { forbidden, notFound } from '../errors.js';
 import { isAdminRole } from '../visibility.js';
 import { listOpenFlagsWithReview, findFlagById, resolveFlag } from '../db/flags.js';
-import { deleteReview } from '../db/reviews.js';
+import { deleteReview, findAllReviewsWithNames } from '../db/reviews.js';
 import { insertNotification } from '../db/notifications.js';
+import { searchEmployees } from '../db/employees.js';
+import { buildWall } from '../wall.js';
 
 export const adminRouter = Router();
 
@@ -33,5 +35,18 @@ adminRouter.patch(
     await insertNotification({ userId: flag.flaggedBy, type: 'flag_resolved', message: 'Your flag was resolved.' });
 
     res.status(204).send();
+  }),
+);
+
+// The employee wall: every employee, with the reviews they gave and the
+// reviews they received, author always shown — admin/hr only. Grouped in
+// memory from one bulk query rather than one request per employee.
+adminRouter.get(
+  '/admin/wall',
+  asyncHandler(async (req, res) => {
+    requireAdmin(req);
+
+    const [employees, reviews] = await Promise.all([searchEmployees(''), findAllReviewsWithNames()]);
+    res.json({ employees: buildWall(employees, reviews) });
   }),
 );

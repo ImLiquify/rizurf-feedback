@@ -63,6 +63,26 @@ export interface OpenFlagEntry {
   };
 }
 
+// A review as shown on the admin-only employee wall: the author is always
+// present (never stripped) since only admin/hr can reach this endpoint.
+export interface WallReview {
+  id: string;
+  authorId: string;
+  authorName: string;
+  receiverId: string;
+  receiverName: string;
+  rating: number;
+  body: string;
+  visibility: Visibility;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WallEmployee extends Employee {
+  reviewsGiven: WallReview[];
+  reviewsReceived: WallReview[];
+}
+
 export type NotificationType = 'review_received' | 'reply_received' | 'flag_resolved';
 
 export interface NotificationItem {

@@ -117,6 +117,17 @@ const REVIEW_ENDPOINT_META = {
     related_endpoints: ['PATCH /api/admin/flags/{id}'],
     tags: ['admin', 'moderation', 'flags'],
   },
+  employeeWall: {
+    name: 'Employee Wall',
+    purpose: 'See every employee with the reviews they gave and received, author always shown',
+    use_when: ['Getting a full picture of feedback activity across the company'],
+    do_not_use_when: ['Caller is not admin/hr — forbidden'],
+    inputs: [],
+    outputs: ['employees[]: { id, email, name, role, avgRating, reviewCount, reviewsGiven[], reviewsReceived[] }'],
+    requires: ['Signed-in session', 'role is admin or hr'],
+    related_endpoints: ['GET /api/employees/{id}/reviews'],
+    tags: ['admin', 'overview', 'wall', 'reporting'],
+  },
   resolveFlag: {
     name: 'Resolve Flag',
     purpose: 'Close a moderation flag, optionally deleting the flagged review',
@@ -195,6 +206,14 @@ export const openapi = {
           does: ['List open flags', 'Resolve a flag, optionally deleting the review'],
           best_for: 'Admin/HR moderating reported reviews.',
           endpoints: ['GET /api/admin/flags', 'PATCH /api/admin/flags/{id}'],
+        },
+        {
+          name: 'Employee Wall',
+          icon: '📊',
+          description: 'A full overview of every employee and the feedback they gave and received.',
+          does: ['See every employee with all reviews they gave', 'See every employee with all reviews they received'],
+          best_for: 'Admin/HR getting a company-wide view of feedback activity.',
+          endpoints: ['GET /api/admin/wall'],
         },
         {
           name: 'Notifications',
@@ -296,6 +315,13 @@ export const openapi = {
         summary: 'Resolve a flag, optionally deleting the review (admin/hr only)',
         security: [{ sessionCookie: [] }],
         'x-rizurf': REVIEW_ENDPOINT_META.resolveFlag,
+      },
+    },
+    '/api/admin/wall': {
+      get: {
+        summary: 'Every employee with the reviews they gave and received (admin/hr only)',
+        security: [{ sessionCookie: [] }],
+        'x-rizurf': REVIEW_ENDPOINT_META.employeeWall,
       },
     },
     '/api/notifications': {

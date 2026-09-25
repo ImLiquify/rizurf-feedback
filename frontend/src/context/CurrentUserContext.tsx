@@ -10,12 +10,13 @@ const CurrentUserContext = createContext<CurrentUserContextValue | undefined>(un
 
 // MICROAPP_AUTH.md §4: no login screen, no sign-out button — the gateway
 // is the only place either happens. This provider's only job is to (a)
-// finish the sign-in code exchange if one is in progress, (b) ask our own
-// backend who's signed in, and (c) send the browser to the gateway when
-// no one is.
+// finish the sign-in code exchange if one is in progress, then (b) ask our
+// own backend who's signed in. A 401 from either call is handled once,
+// centrally, in api.ts's request() (redirect to the gateway) — it never
+// rejects on a 401, so the catches below only ever see other failures
+// (a bad/expired code, or this app's own API being unreachable).
 export function CurrentUserProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<Employee | null>(null);
-  const [redirecting, setRedirecting] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -31,7 +32,7 @@ export function CurrentUserProvider({ children }: { children: ReactNode }) {
           if (!cancelled) setCurrentUser(user);
           return;
         } catch {
-          // Fall through to the session check below.
+          // Fall through to a plain session check below.
         }
       }
 
@@ -39,10 +40,7 @@ export function CurrentUserProvider({ children }: { children: ReactNode }) {
         const user = await getSession();
         if (!cancelled) setCurrentUser(user);
       } catch {
-        if (!cancelled) {
-          setRedirecting(true);
-          window.location.href = '/api/auth/login';
-        }
+        // Nothing more to try; stay on the loading state.
       }
     }
 
@@ -55,7 +53,7 @@ export function CurrentUserProvider({ children }: { children: ReactNode }) {
   if (!currentUser) {
     return (
       <div className="auth-loading">
-        <p className="muted">{redirecting ? 'Redirecting to sign-in…' : 'Loading…'}</p>
+        <p className="muted">Loading…</p>
       </div>
     );
   }

@@ -4,6 +4,7 @@ import { NotificationsList } from './components/NotificationsList';
 import { DirectoryPage } from './pages/DirectoryPage';
 import { EmployeeProfilePage } from './pages/EmployeeProfilePage';
 import { AdminFlagsPage } from './pages/AdminFlagsPage';
+import { AdminWallPage } from './pages/AdminWallPage';
 import { initials } from './utils';
 
 function isAdminRole(role: string): boolean {
@@ -31,6 +32,11 @@ export function App() {
               Admin: Flags
             </NavLink>
           )}
+          {isAdminRole(currentUser.role) && (
+            <NavLink to="/admin/wall" className={({ isActive }) => 'sidebar-nav-item' + (isActive ? ' active' : '')}>
+              Employee Wall
+            </NavLink>
+          )}
         </nav>
 
         <div className="sidebar-footer">
@@ -54,6 +60,7 @@ export function App() {
             <Route path="/" element={<DirectoryPage />} />
             <Route path="/employees/:employeeId" element={<EmployeeProfilePage />} />
             <Route path="/admin/flags" element={<AdminFlagsPage />} />
+            <Route path="/admin/wall" element={<AdminWallPage />} />
           </Routes>
         </main>
       </div>

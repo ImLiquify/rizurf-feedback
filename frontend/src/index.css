@@ -112,7 +112,7 @@ body {
 }
 .content-topbar-spacer { flex: 1; }
 
-main { max-width: 880px; padding: 32px; width: 100%; }
+main { max-width: 1040px; padding: 32px; width: 100%; }
 h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: -0.01em; }
 h2 { font-size: 15px; margin: 0 0 8px; }
 .muted { color: var(--muted); font-size: 14px; }
@@ -296,6 +296,30 @@ textarea { min-height: 80px; resize: vertical; }
 
 .empty-state { color: var(--muted); font-size: 14px; padding: 24px 0; text-align: center; }
 
+/* ---------- Employee wall (admin/hr only) ---------- */
+.wall-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-top: 20px;
+}
+.wall-tile { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 18px; box-shadow: var(--shadow-sm); }
+.wall-tile-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+.wall-tile-identity { flex: 1; min-width: 0; }
+.wall-tile-name { font-weight: 700; font-size: 15px; }
+.wall-tile-rating { font-size: 13px; white-space: nowrap; }
+
+.wall-section + .wall-section { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+.wall-section h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin: 0 0 8px; }
+.muted.small { font-size: 12px; }
+
+.wall-review-list { list-style: none; margin: 0; padding: 0; max-height: 220px; overflow-y: auto; display: grid; gap: 8px; }
+.wall-review-line { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; background: var(--bg); border-radius: 10px; }
+.wall-review-line .stars.small { font-size: 12px; }
+.wall-review-body { font-size: 13px; color: var(--text); }
+.wall-review-meta { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.wall-anon-badge {
+  background: var(--accent-light); color: var(--accent-strong); border-radius: 999px; padding: 1px 8px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
+}
+
 /* ---------- Responsive: sidebar becomes a top bar below tablet width ---------- */
 @media (max-width: 768px) {
   .app-shell { flex-direction: column; }
@@ -305,8 +329,10 @@ textarea { min-height: 80px; resize: vertical; }
   }
   .sidebar-brand { padding: 0; }
   .sidebar-section-label { display: none; }
-  .sidebar-nav { flex-direction: row; flex: 1 1 100%; order: 3; gap: 6px; }
+  .sidebar-nav { flex-direction: row; flex-wrap: wrap; flex: 1 1 100%; order: 3; gap: 6px; }
   .sidebar-nav-item { padding: 8px 12px; }
+  .wall-tile-header { flex-wrap: wrap; }
+  .wall-tile-rating { flex-basis: 100%; }
   .sidebar-footer {
     flex-direction: row; align-items: center; justify-content: flex-end; flex: 1 1 auto;
     order: 2; margin-top: 0; border-top: none; padding-top: 0; gap: 10px;

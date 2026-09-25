@@ -1,4 +1,13 @@
-import type { Employee, NotificationItem, OpenFlagEntry, ReviewFlag, ReviewReply, ReviewView, Visibility } from './types';
+import type {
+  Employee,
+  NotificationItem,
+  OpenFlagEntry,
+  ReviewFlag,
+  ReviewReply,
+  ReviewView,
+  Visibility,
+  WallEmployee,
+} from './types';
 
 const API_BASE = '/api';
 
@@ -114,6 +123,11 @@ export async function flagReview(reviewId: string, reason: string): Promise<Revi
 export async function listOpenFlags(): Promise<OpenFlagEntry[]> {
   const data = await request<{ flags: OpenFlagEntry[] }>('/admin/flags');
   return data.flags;
+}
+
+export async function getEmployeeWall(): Promise<WallEmployee[]> {
+  const data = await request<{ employees: WallEmployee[] }>('/admin/wall');
+  return data.employees;
 }
 
 export function resolveFlag(flagId: string, deleteReview: boolean): Promise<null> {
