@@ -27,18 +27,30 @@ export function EmployeeProfilePage() {
   const [loading, setLoading] = useState(true);
   const [showReviewForm, setShowReviewForm] = useState(true);
 
-  const load = useCallback(async () => {
+  // First visit: the directory (for names/photos) and the reviews together.
+  useEffect(() => {
+    let cancelled = false;
     setLoading(true);
-    const [employees, employeeReviews] = await Promise.all([searchEmployees(''), getEmployeeReviews(employeeId)]);
-    setEmployee(employees.find((e) => e.id === employeeId) ?? null);
-    setPeople(Object.fromEntries(employees.map((e) => [e.id, e])));
-    setReviews(employeeReviews);
-    setLoading(false);
+    Promise.all([searchEmployees(''), getEmployeeReviews(employeeId)])
+      .then(([employees, employeeReviews]) => {
+        if (cancelled) return;
+        setEmployee(employees.find((e) => e.id === employeeId) ?? null);
+        setPeople(Object.fromEntries(employees.map((e) => [e.id, e])));
+        setReviews(employeeReviews);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [employeeId]);
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  // After posting, editing, replying etc. only the reviews can have changed.
+  const load = useCallback(async () => {
+    setReviews(await getEmployeeReviews(employeeId));
+  }, [employeeId]);
 
   useEffect(() => {
     setShowReviewForm(true);

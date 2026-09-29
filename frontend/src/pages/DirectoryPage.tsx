@@ -16,18 +16,22 @@ export function DirectoryPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Wait for a pause in typing instead of one request per keystroke. A
+    // failed search keeps the previous results on screen.
     let cancelled = false;
-    setLoading(true);
-    searchEmployees(query)
-      .then((r) => {
-        if (!cancelled) {
-          setResults(r);
-          setLoading(false);
-        }
-      })
-      .catch(() => setLoading(false));
+    const timer = setTimeout(() => {
+      searchEmployees(query)
+        .then((r) => {
+          if (!cancelled) setResults(r);
+        })
+        .catch(() => {})
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
+    }, query ? 250 : 0);
     return () => {
       cancelled = true;
+      clearTimeout(timer);
     };
   }, [query]);
 

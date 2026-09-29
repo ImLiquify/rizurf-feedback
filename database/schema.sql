@@ -74,3 +74,10 @@ CREATE TABLE notifications (
   CONSTRAINT fk_notifications_user FOREIGN KEY (user_id) REFERENCES employees(id) ON DELETE CASCADE,
   INDEX idx_notifications_user (user_id, created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Small key/timestamp store, e.g. when the intern roster was last synced
+-- (roster.js), kept in MySQL's clock so it survives serverless cold starts.
+CREATE TABLE app_state (
+  name       VARCHAR(64) PRIMARY KEY,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

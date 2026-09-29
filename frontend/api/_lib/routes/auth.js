@@ -67,14 +67,14 @@ authRouter.get(
     const session = readSessionCookie(req);
     if (!session) throw unauthorized('No session. Sign in through the gateway.');
 
-    const live = await gatewaySessionIsLive(session);
+    // Both at once; the employee row is discarded if the session is dead.
+    const uid = session.uid ?? session.sub;
+    const [live, employee] = await Promise.all([gatewaySessionIsLive(session), findEmployeeById(uid)]);
     if (!live) {
       clearSessionCookie(res);
       throw unauthorized('Session ended at the gateway.');
     }
 
-    const uid = session.uid ?? session.sub;
-    const employee = await findEmployeeById(uid);
     res.json({
       user: employee ?? { id: uid, email: session.email, name: session.name, role: session.role },
     });

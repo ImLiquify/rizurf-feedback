@@ -8,5 +8,5 @@ export const pool = mysql.createPool({
   password: config.db.password,
   database: config.db.database,
   waitForConnections: true,
-  connectionLimit: 10,
+  connectionLimit: 3, // small per instance: many serverless instances x a big pool exhausts MySQL
 });

@@ -9,7 +9,10 @@ export function NotificationsList() {
 
   useEffect(() => {
     let cancelled = false;
+    // Every request pays the gateway session check, so poll gently and only
+    // while the tab is visible (RIZURF_PERFORMANCE_CHANGES.md §7).
     function load() {
+      if (document.visibilityState !== 'visible') return;
       getNotifications()
         .then((n) => {
           if (!cancelled) setNotifications(n);
@@ -17,10 +20,12 @@ export function NotificationsList() {
         .catch(() => {});
     }
     load();
-    const interval = setInterval(load, 8000);
+    const interval = setInterval(load, 45000);
+    document.addEventListener('visibilitychange', load);
     return () => {
       cancelled = true;
       clearInterval(interval);
+      document.removeEventListener('visibilitychange', load);
     };
   }, []);
 

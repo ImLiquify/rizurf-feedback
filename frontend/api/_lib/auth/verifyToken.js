@@ -15,7 +15,7 @@ function base64UrlDecode(segment) {
 
 async function getGatewayPublicKey(kid) {
   if (!jwksCache) {
-    const response = await fetch(`${config.gatewayUrl}/.well-known/jwks.json`);
+    const response = await fetch(`${config.gatewayUrl}/.well-known/jwks.json`, { signal: AbortSignal.timeout(5000) });
     if (!response.ok) throw new Error(`JWKS fetch failed: ${response.status}`);
     jwksCache = await response.json();
   }

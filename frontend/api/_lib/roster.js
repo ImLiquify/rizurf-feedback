@@ -3,10 +3,13 @@
 // our own client_credentials token, never the signed-in user's.
 import { config } from './config.js';
 import { upsertRosterEmployees } from './db/employees.js';
+import { claimRosterSync, releaseRosterSync } from './db/appState.js';
 
-const SYNC_EVERY_MS = 10 * 60 * 1000;
+const SYNC_EVERY_S = 10 * 60;
+const RECHECK_MS = 60 * 1000; // how often a warm instance asks the DB whether a sync is due
 const PAGE = 200; // the Intern API's max page size
-let lastSync = 0;
+let lastCheck = 0;
+let inFlight = null;
 
 // Former interns are left out; everyone else with an email is listed.
 export function internsToEmployeeRows(interns) {
@@ -36,12 +39,33 @@ async function getAccessToken() {
   return (await res.json()).access_token;
 }
 
-// ponytail: syncs at most every 10 min per warm server instance, on demand
-// from search; move to a scheduled job if the roster grows into the thousands.
-export async function syncInternRoster() {
-  if (!config.clientSecret || Date.now() - lastSync < SYNC_EVERY_MS) return;
-  lastSync = Date.now(); // set up front so a failing sync doesn't retry on every search
+// At most one sync per 10 min across ALL instances: freshness lives in the
+// database (its own clock, survives cold starts). A warm instance only asks
+// once a minute, and concurrent requests share one in-flight sync.
+export function syncInternRoster() {
+  if (!config.clientSecret) return Promise.resolve();
+  if (inFlight) return inFlight;
+  if (Date.now() - lastCheck < RECHECK_MS) return Promise.resolve();
+  lastCheck = Date.now();
+  inFlight = runSync().finally(() => {
+    inFlight = null;
+  });
+  return inFlight;
+}
 
+async function runSync() {
+  // Claim first so parallel instances don't all sync; release on failure so a
+  // fixed credential is picked up within a minute, not ten.
+  if (!(await claimRosterSync(SYNC_EVERY_S))) return;
+  try {
+    await fetchAndStoreRoster();
+  } catch (err) {
+    await releaseRosterSync();
+    throw err;
+  }
+}
+
+async function fetchAndStoreRoster() {
   const token = await getAccessToken();
   const interns = [];
   for (let offset = 0; ; offset += PAGE) {
