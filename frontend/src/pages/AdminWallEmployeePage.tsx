@@ -5,7 +5,7 @@ import { Avatar } from '../components/Avatar';
 import { ReviewToolbar } from '../components/ReviewToolbar';
 import { IconChevronLeft } from '../components/icons';
 import { filterReviews, NO_FILTER } from '../reviewFilters';
-import { roleLabel } from '../utils';
+import { fullDate, roleLabel, timeAgo } from '../utils';
 import type { WallEmployee, WallReview } from '../types';
 
 type Tab = 'received' | 'given';
@@ -98,8 +98,8 @@ export function AdminWallEmployeePage() {
                     <Link to={`/admin/wall/${other(r)}`}>{otherName(r)}</Link>
                   </span>
                   {r.visibility === 'anonymous' && <span className="wall-anon-badge">anonymous</span>}
-                  <time className="wall-detail-date" dateTime={r.createdAt}>
-                    {new Date(r.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                  <time className="wall-detail-date" dateTime={r.createdAt} title={fullDate(r.createdAt)}>
+                    {timeAgo(r.createdAt)}
                   </time>
                 </div>
                 <span className="stars">

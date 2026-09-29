@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { getNotifications, markNotificationsRead } from '../api';
 import type { NotificationItem } from '../types';
 import { IconBell } from './icons';
+import { timeAgo } from '../utils';
 
 export function NotificationsList() {
   const [open, setOpen] = useState(false);
@@ -43,13 +44,6 @@ export function NotificationsList() {
     if (unread > 0) markNotificationsRead().catch(() => {});
   }
 
-  function when(iso: string): string {
-    const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
-    if (mins < 1) return 'just now';
-    if (mins < 60) return `${mins} min ago`;
-    if (mins < 1440) return `${Math.round(mins / 60)} h ago`;
-    return new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
-  }
 
   return (
     <div className="notif-wrap">
@@ -67,7 +61,7 @@ export function NotificationsList() {
               <div key={n.id} className={'notif-item' + (n.read ? '' : ' unread')}>
                 <span>{n.message}</span>
                 <time className="notif-time" dateTime={n.createdAt}>
-                  {when(n.createdAt)}
+                  {timeAgo(n.createdAt)}
                 </time>
               </div>
             ))

@@ -4,6 +4,7 @@ import { ReviewForm } from './ReviewForm';
 import { ReplyForm } from './ReplyForm';
 import { IconDots, IconPencil, IconTrash, IconFlag } from './icons';
 import { Avatar } from './Avatar';
+import { fullDate, timeAgo } from '../utils';
 
 interface ReviewCardProps {
   review: ReviewView;
@@ -71,9 +72,14 @@ export function ReviewCard({ review, authorName, authorPhotoUrl, metaLabel, canM
   return (
     <div className="review-card">
       <div className="review-top">
-        <span className="stars">
-          {'★'.repeat(review.rating)}
-          {'☆'.repeat(5 - review.rating)}
+        <span className="review-rating-line">
+          <span className="stars">
+            {'★'.repeat(review.rating)}
+            {'☆'.repeat(5 - review.rating)}
+          </span>
+          <time className="review-date" dateTime={review.createdAt} title={fullDate(review.createdAt)}>
+            {timeAgo(review.createdAt)}
+          </time>
         </span>
         <div className="menu-wrap" ref={menuRef}>
           <button className="dots-btn" onClick={() => setMenuOpen((o) => !o)} aria-label="Review actions">

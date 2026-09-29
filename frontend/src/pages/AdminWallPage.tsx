@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ApiError, getEmployeeWall } from '../api';
 import { Avatar } from '../components/Avatar';
-import { roleLabel } from '../utils';
+import { fullDate, roleLabel, timeAgo } from '../utils';
 import { IconSearch } from '../components/icons';
 import type { WallEmployee, WallReview } from '../types';
 
@@ -32,6 +32,10 @@ function ReviewLine({
       <span className="wall-review-body">{truncate(review.body)}</span>
       <span className="wall-review-meta">
         {counterpartLabel} {counterpartName}
+        <span aria-hidden="true">·</span>
+        <time dateTime={review.createdAt} title={fullDate(review.createdAt)}>
+          {timeAgo(review.createdAt)}
+        </time>
         {review.visibility === 'anonymous' && <span className="wall-anon-badge">anonymous</span>}
       </span>
     </li>
