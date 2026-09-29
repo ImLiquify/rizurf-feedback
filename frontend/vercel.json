@@ -5,6 +5,7 @@
     { "source": "/openapi.json", "destination": "/api/index" },
     { "source": "/api/(.*)", "destination": "/api/index" },
     { "source": "/", "destination": "/index.html" },
+    { "source": "/me", "destination": "/index.html" },
     { "source": "/employees/(.*)", "destination": "/index.html" },
     { "source": "/admin/(.*)", "destination": "/index.html" },
     { "source": "/(.*)", "destination": "/api/index" }
