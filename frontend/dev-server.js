@@ -1,11 +1,11 @@
-// Local dev only — not deployed. Vercel calls api/index.js's default export
+// Local dev only — kept outside api/ so Vercel never deploys it as a function. Vercel calls api/index.js's default export
 // directly; this just gives the same Express app a port to listen on so
 // Vite's dev-server proxy (vite.config.ts) has something to forward /api/*
 // requests to.
 import express from 'express';
-import { app } from './_lib/app.js';
-import { setSessionCookie } from './_lib/auth/session.js';
-import { findEmployeeById } from './_lib/db/employees.js';
+import { app } from './api/_lib/app.js';
+import { setSessionCookie } from './api/_lib/auth/session.js';
+import { findEmployeeById } from './api/_lib/db/employees.js';
 
 // There's no gateway locally, so sign-in skips it: /api/auth/login signs you
 // in as a seed user straight away. Switch users with ?as=emp-1 (default: the
