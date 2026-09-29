@@ -7,6 +7,7 @@ import { deleteReview, findAllReviewsWithNames } from '../db/reviews.js';
 import { insertNotification } from '../db/notifications.js';
 import { searchEmployees } from '../db/employees.js';
 import { buildWall } from '../wall.js';
+import { syncInternRoster } from '../roster.js';
 
 export const adminRouter = Router();
 
@@ -45,6 +46,7 @@ adminRouter.get(
   '/admin/wall',
   asyncHandler(async (req, res) => {
     requireAdmin(req);
+    await syncInternRoster().catch((err) => console.error('Intern roster sync failed:', err.message));
 
     const [employees, reviews] = await Promise.all([searchEmployees(''), findAllReviewsWithNames()]);
     res.json({ employees: buildWall(employees, reviews) });
