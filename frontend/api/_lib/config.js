@@ -8,7 +8,6 @@ const required = [
   'DB_USER',
   'DB_NAME',
   'GATEWAY_URL',
-  'SERVICE_ID',
   'SESSION_SECRET',
 ];
 
@@ -25,6 +24,10 @@ const publicUrl =
   (process.env.VERCEL_PROJECT_PRODUCTION_URL && `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`);
 if (!publicUrl) throw new Error('Missing required environment variable: PUBLIC_URL');
 
+// The gateway's client_id doubles as this service's id (the token `aud`).
+const serviceId = process.env.SERVICE_ID || process.env.CLIENT_ID;
+if (!serviceId) throw new Error('Missing required environment variable: CLIENT_ID (or SERVICE_ID)');
+
 export const config = {
   db: {
     host: process.env.DB_HOST,
@@ -35,10 +38,10 @@ export const config = {
   },
   gatewayUrl: process.env.GATEWAY_URL.replace(/\/+$/, ''),
   publicUrl: publicUrl.replace(/\/+$/, ''),
-  serviceId: process.env.SERVICE_ID,
+  serviceId,
   sessionSecret: process.env.SESSION_SECRET,
   // Intern roster sync (roster.js) — skipped entirely if no CLIENT_SECRET.
-  clientId: process.env.CLIENT_ID || process.env.SERVICE_ID,
+  clientId: process.env.CLIENT_ID || serviceId,
   clientSecret: process.env.CLIENT_SECRET,
   internApiUrl: (process.env.INTERN_API_URL || 'https://intern-database.vercel.app').replace(/\/+$/, ''),
 };
