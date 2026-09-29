@@ -108,7 +108,9 @@ export function EmployeeProfilePage() {
       <div className="profile-header">
         <Avatar name={employee.name} photoUrl={employee.photoUrl} size={56} />
         <div>
-          <h1>{employee.name}</h1>
+          <h1 className="name-line">
+            {employee.name} {employee.department && <span className="dept-tag">{employee.department}</span>}
+          </h1>
           <p className="muted">
             {employee.email} · {roleLabel(employee)}
           </p>

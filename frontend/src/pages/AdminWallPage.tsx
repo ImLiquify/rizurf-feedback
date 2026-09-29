@@ -70,7 +70,7 @@ export function AdminWallPage() {
   if (blocked) return <p>{blocked}</p>;
 
   const q = query.trim().toLowerCase();
-  const shown = q ? employees.filter((e) => `${e.name} ${e.email}`.toLowerCase().includes(q)) : employees;
+  const shown = q ? employees.filter((e) => `${e.name} ${e.email} ${e.department ?? ''}`.toLowerCase().includes(q)) : employees;
 
   return (
     <div>
@@ -96,7 +96,9 @@ export function AdminWallPage() {
             <div className="wall-tile-header">
               <Avatar name={employee.name} photoUrl={employee.photoUrl} />
               <div className="wall-tile-identity">
-                <div className="wall-tile-name">{employee.name}</div>
+                <div className="wall-tile-name name-line">
+                  {employee.name} {employee.department && <span className="dept-tag">{employee.department}</span>}
+                </div>
                 <div className="muted">{roleLabel(employee)}</div>
               </div>
               {employee.avgRating != null && (

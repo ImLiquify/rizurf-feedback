@@ -7,10 +7,12 @@ export function initials(name: string): string {
     .toUpperCase();
 }
 
-// What to call someone: their Intern API title when we have it, otherwise
-// the gateway role. Display only; permissions always use `role`.
+// What to call someone. A real access role from the gateway (admin, hr,
+// supervisor) wins, since it's the one that matters here; otherwise their
+// Intern API title, otherwise "user". Display only; permissions use `role`.
+const ROLE_NAMES: Record<string, string> = { admin: 'Admin', hr: 'HR', supervisor: 'Supervisor' };
 export function roleLabel(e: { role: string; title?: string | null }): string {
-  return e.title || e.role;
+  return ROLE_NAMES[e.role] ?? (e.title || 'User');
 }
 
 // "just now", "5 min ago", "3 h ago", "2 days ago", then a date: 12 Mar 2026

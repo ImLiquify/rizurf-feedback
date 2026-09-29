@@ -62,7 +62,9 @@ export function DirectoryPage() {
                 <div className="employee-main">
                   <Avatar name={e.name} photoUrl={e.photoUrl} />
                   <div>
-                    <div>{e.name}</div>
+                    <div className="name-line">
+                      {e.name} {e.department && <span className="dept-tag">{e.department}</span>}
+                    </div>
                     <div className="muted">{roleLabel(e)}</div>
                   </div>
                 </div>

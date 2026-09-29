@@ -14,7 +14,7 @@ let inFlight = null;
 // Former interns are left out; everyone else with an email is listed. Their
 // Intern API role name becomes a display title only: access (admin/hr) is
 // never taken from here, only from the gateway at sign-in.
-export function internsToEmployeeRows(interns, roleNames = new Map()) {
+export function internsToEmployeeRows(interns, roleNames = new Map(), departmentNames = new Map()) {
   return interns
     .filter((i) => i.email_address && i.status !== 'Former')
     .map((i) => [
@@ -23,19 +23,21 @@ export function internsToEmployeeRows(interns, roleNames = new Map()) {
       `${i.first_name ?? ''} ${i.last_name ?? ''}`.trim() || i.email_address,
       i.photo_url ?? null,
       roleNames.get(i.role_id) ?? null,
+      departmentNames.get(i.department_id) ?? null,
     ]);
 }
 
-async function getJson(path, token) {
-  const res = await fetch(`${config.internApiUrl}${path}`, {
+async function getJson(url, token) {
+  const res = await fetch(url, {
     headers: { authorization: `Bearer ${token}` },
     signal: AbortSignal.timeout(5000),
   });
-  if (!res.ok) throw new Error(`Intern API ${path} failed (HTTP ${res.status}): ${await res.text()}`);
+  if (!res.ok) throw new Error(`${url} failed (HTTP ${res.status}): ${await res.text()}`);
   return res.json();
 }
 
-async function getAccessToken() {
+// One token per target service (the gateway scopes each to its audience).
+async function getAccessToken(audience) {
   const res = await fetch(`${config.gatewayUrl}/oauth/token`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -43,11 +45,11 @@ async function getAccessToken() {
       grant_type: 'client_credentials',
       client_id: config.clientId,
       client_secret: config.clientSecret,
-      audience: 'intern-database',
+      audience,
     }),
     signal: AbortSignal.timeout(5000),
   });
-  if (!res.ok) throw new Error(`Intern API token request failed (HTTP ${res.status}): ${await res.text()}`);
+  if (!res.ok) throw new Error(`${audience} token request failed (HTTP ${res.status}): ${await res.text()}`);
   return (await res.json()).access_token;
 }
 
@@ -77,17 +79,35 @@ async function runSync() {
   }
 }
 
+// The department service's list may come bare or wrapped; take either.
+const listOf = (body) => (Array.isArray(body) ? body : body?.data ?? body?.departments ?? []);
+
+// Names are nice-to-haves: if roles or departments fail (e.g. the API client
+// has no department-api grant yet), log it and still store the roster.
+function optional(label, promise) {
+  return promise.catch((err) => {
+    console.warn(`Roster sync: skipped ${label}: ${err.message}`);
+    return [];
+  });
+}
+
 async function fetchAndStoreRoster() {
-  const token = await getAccessToken();
-  // Role names are a nice-to-have; failing to get them must not block the roster.
-  const rolesPromise = getJson('/api/roles', token).catch(() => ({ data: [] }));
+  const token = await getAccessToken('intern-database');
+  const rolesPromise = optional('intern roles', getJson(`${config.internApiUrl}/api/roles`, token).then(listOf));
+  const departmentsPromise = optional(
+    'departments',
+    getAccessToken('department-api').then((t) => getJson(`${config.departmentApiUrl}/api/departments`, t)).then(listOf),
+  );
+
   const interns = [];
   for (let offset = 0; ; offset += PAGE) {
-    const { data, pagination } = await getJson(`/api/interns?limit=${PAGE}&offset=${offset}`, token);
+    const { data, pagination } = await getJson(`${config.internApiUrl}/api/interns?limit=${PAGE}&offset=${offset}`, token);
     interns.push(...data);
     if (!data.length || offset + PAGE >= pagination.total) break;
   }
 
-  const roleNames = new Map(((await rolesPromise).data ?? []).map((role) => [role.id, role.name]));
-  await upsertRosterEmployees(internsToEmployeeRows(interns, roleNames));
+  const [roles, departments] = await Promise.all([rolesPromise, departmentsPromise]);
+  const roleNames = new Map(roles.map((role) => [role.id, role.name]));
+  const departmentNames = new Map(departments.map((d) => [d.id, d.name]));
+  await upsertRosterEmployees(internsToEmployeeRows(interns, roleNames, departmentNames));
 }

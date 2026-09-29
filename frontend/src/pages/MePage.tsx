@@ -63,7 +63,9 @@ export function MePage() {
       <div className="profile-header">
         <Avatar name={currentUser.name} photoUrl={currentUser.photoUrl} size={56} />
         <div>
-          <h1>{currentUser.name}</h1>
+          <h1 className="name-line">
+            {currentUser.name} {currentUser.department && <span className="dept-tag">{currentUser.department}</span>}
+          </h1>
           <p className="muted">
             {currentUser.email} · {roleLabel(currentUser)}
           </p>
