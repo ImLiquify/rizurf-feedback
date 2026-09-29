@@ -18,10 +18,18 @@ export function ReplyForm({ onSubmit }: ReplyFormProps) {
   return (
     <form className="compose-bar" onSubmit={handleSubmit}>
       <textarea
+        autoFocus
         aria-label="Reply"
         placeholder="Write a reply…"
         value={body}
         onChange={(e) => setBody(e.target.value)}
+        onKeyDown={(e) => {
+          // Enter sends, Shift+Enter adds a line.
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            e.currentTarget.form?.requestSubmit();
+          }
+        }}
         rows={1}
       />
       <button type="submit" className="compose-send" aria-label="Post reply">

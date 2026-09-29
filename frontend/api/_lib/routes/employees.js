@@ -5,6 +5,7 @@ import { findReviewsByReceiver } from '../db/reviews.js';
 import { findRepliesForReviews } from '../db/replies.js';
 import { viewReviewsFor } from '../visibility.js';
 import { syncInternRoster } from '../roster.js';
+import { ratingSummary } from '../ratingSummary.js';
 
 export const employeesRouter = Router();
 
@@ -25,6 +26,9 @@ employeesRouter.get(
     const visible = viewReviewsFor(reviews, req.user);
     const replies = await findRepliesForReviews(visible.map((r) => r.id));
     const repliesByReview = new Map(replies.map((reply) => [reply.reviewId, reply]));
-    res.json({ reviews: visible.map((review) => ({ ...review, reply: repliesByReview.get(review.id) ?? null })) });
+    res.json({
+      summary: ratingSummary(reviews),
+      reviews: visible.map((review) => ({ ...review, reply: repliesByReview.get(review.id) ?? null })),
+    });
   }),
 );

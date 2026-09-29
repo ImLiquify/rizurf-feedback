@@ -1,7 +1,7 @@
 import { pool } from './db/pool.js';
 import { config } from './config.js';
 
-const VERSION = '1.0.0';
+const VERSION = '1.1.0';
 const started = Date.now();
 
 // MICROAPP_PERFORMANCE.md §3 — time-box every check so one hanging
@@ -189,7 +189,7 @@ export const openapi = {
           description: 'Leave, edit, or delete a rating and review for a coworker.',
           does: ['Post a public or anonymous review', 'Edit your own review', 'Delete your own review'],
           best_for: 'Employees giving peer feedback, publicly or anonymously.',
-          endpoints: ['POST /api/reviews', 'PATCH /api/reviews/{id}', 'DELETE /api/reviews/{id}'],
+          endpoints: ['POST /api/reviews', 'PATCH /api/reviews/{id}', 'DELETE /api/reviews/{id}', 'GET /api/me/reviews-given'],
         },
         {
           name: 'Reply & Flag',
@@ -369,6 +369,23 @@ export const openapi = {
         summary: 'Every employee with the reviews they gave and received (admin/hr only)',
         security: [{ sessionCookie: [] }],
         'x-rizurf': REVIEW_ENDPOINT_META.employeeWall,
+      },
+    },
+    '/api/me/reviews-given': {
+      get: {
+        summary: 'List the reviews the signed-in employee has written, with who each was about',
+        security: [{ sessionCookie: [] }],
+        'x-rizurf': {
+          name: 'My Given Reviews',
+          purpose: 'See the feedback you have given to coworkers',
+          use_when: ['Reviewing or editing feedback you wrote earlier'],
+          do_not_use_when: ['Looking for reviews written about you — use the employee reviews endpoint with your own id'],
+          inputs: [],
+          outputs: ['id', 'receiverId', 'receiverName', 'rating', 'body', 'visibility', 'reply'],
+          requires: ['Signed-in session'],
+          related_endpoints: ['PATCH /api/reviews/{id}', 'DELETE /api/reviews/{id}'],
+          tags: ['my reviews', 'given', 'sent', 'written', 'feedback history'],
+        },
       },
     },
     '/api/notifications': {

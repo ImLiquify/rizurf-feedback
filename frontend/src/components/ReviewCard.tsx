@@ -9,6 +9,7 @@ interface ReviewCardProps {
   review: ReviewView;
   authorName: string | null;
   authorPhotoUrl?: string | null;
+  metaLabel?: string; // replaces the author line, e.g. on your own given reviews
   canManage: boolean;
   canReply: boolean;
   onEdit: (input: { rating: number; body: string; visibility: Visibility }) => void;
@@ -17,7 +18,7 @@ interface ReviewCardProps {
   onReply: (body: string) => void;
 }
 
-export function ReviewCard({ review, authorName, authorPhotoUrl, canManage, canReply, onEdit, onDelete, onFlag, onReply }: ReviewCardProps) {
+export function ReviewCard({ review, authorName, authorPhotoUrl, metaLabel, canManage, canReply, onEdit, onDelete, onFlag, onReply }: ReviewCardProps) {
   const [editing, setEditing] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [flagging, setFlagging] = useState(false);
@@ -35,11 +36,12 @@ export function ReviewCard({ review, authorName, authorPhotoUrl, canManage, canR
   }, [menuOpen]);
 
   const authorLabel =
-    review.visibility === 'anonymous'
+    metaLabel ??
+    (review.visibility === 'anonymous'
       ? authorName
         ? `Anonymous (author visible to you: ${authorName})`
         : 'Anonymous'
-      : `— ${authorName ?? 'Unknown'}`;
+      : `— ${authorName ?? 'Unknown'}`);
   const edited = review.updatedAt !== review.createdAt;
 
   if (editing) {
@@ -114,7 +116,7 @@ export function ReviewCard({ review, authorName, authorPhotoUrl, canManage, canR
       </div>
 
       <p className="review-meta">
-        {authorName && <Avatar name={authorName} photoUrl={authorPhotoUrl} size={30} />}
+        {!metaLabel && authorName && <Avatar name={authorName} photoUrl={authorPhotoUrl} size={30} />}
         {authorLabel}
         {edited && <span className="edited-tag"> - Edited</span>}
       </p>

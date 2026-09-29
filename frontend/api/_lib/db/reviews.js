@@ -24,6 +24,16 @@ export async function findReviewsByReceiver(receiverId) {
   return rows.map(mapRow);
 }
 
+export async function findReviewsByAuthor(authorId) {
+  const [rows] = await pool.query(
+    `SELECT r.*, e.name AS receiver_name, e.photo_url AS receiver_photo_url
+     FROM reviews r JOIN employees e ON e.id = r.receiver_id
+     WHERE r.author_id = ? ORDER BY r.created_at DESC`,
+    [authorId],
+  );
+  return rows.map((row) => ({ ...mapRow(row), receiverName: row.receiver_name, receiverPhotoUrl: row.receiver_photo_url }));
+}
+
 export async function insertReview({ authorId, receiverId, rating, body, visibility }) {
   const id = randomUUID();
   await pool.query(

@@ -38,9 +38,9 @@ export function NotificationsList() {
 
   return (
     <div className="notif-wrap">
-      <button className="bell-btn" onClick={toggle}>
+      <button className="bell-btn" onClick={toggle} aria-label="Notifications">
         <IconBell />
-        Notifications
+        <span className="bell-label">Notifications</span>
         {notifications.length > 0 && <span className="badge">{notifications.length}</span>}
       </button>
       {open && (

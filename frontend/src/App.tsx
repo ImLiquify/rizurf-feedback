@@ -8,6 +8,8 @@ import { DirectoryPage } from './pages/DirectoryPage';
 import { EmployeeProfilePage } from './pages/EmployeeProfilePage';
 import { AdminFlagsPage } from './pages/AdminFlagsPage';
 import { AdminWallPage } from './pages/AdminWallPage';
+import { MePage } from './pages/MePage';
+import { QuickSearch } from './components/QuickSearch';
 
 const GATEWAY = 'https://web-omega-two-47.vercel.app';
 
@@ -16,6 +18,7 @@ function isAdminRole(role: string): boolean {
 }
 
 function pageTitle(pathname: string): string {
+  if (pathname.startsWith('/me')) return 'Me';
   if (pathname.startsWith('/employees/')) return 'Profile';
   if (pathname.startsWith('/admin/flags')) return 'Flags';
   if (pathname.startsWith('/admin/wall')) return 'Employee Wall';
@@ -43,6 +46,10 @@ export function App() {
             <img className="brand-full" src={`${GATEWAY}/logo.png`} alt="Rizurf Realty" />
           </div>
           <nav className="nav">
+            <NavLink to="/me" className={navClass} onClick={close}>
+              <span className="nav-icon"><Avatar name={currentUser.name} photoUrl={currentUser.photoUrl} size={24} /></span>
+              <span className="nav-label">Me</span>
+            </NavLink>
             <NavLink to="/" end className={navClass} onClick={close}>
               <span className="nav-icon"><IconUsers width={22} height={22} strokeWidth={2.2} /></span>
               <span className="nav-label">Directory</span>
@@ -80,12 +87,14 @@ export function App() {
               <b>{pageTitle(pathname)}</b>
             </span>
             <div className="topbar-right">
+              <QuickSearch />
               <NotificationsList />
             </div>
           </header>
           <main className="content">
             <Routes>
               <Route path="/" element={<DirectoryPage />} />
+              <Route path="/me" element={<MePage />} />
               <Route path="/employees/:employeeId" element={<EmployeeProfilePage />} />
               <Route path="/admin/flags" element={<AdminFlagsPage />} />
               <Route path="/admin/wall" element={<AdminWallPage />} />

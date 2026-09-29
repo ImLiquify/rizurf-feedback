@@ -10,15 +10,19 @@ interface ReviewFormProps {
 }
 
 export function ReviewForm({ onSubmit, error, initial, submitLabel = 'Post review', onCancel }: ReviewFormProps) {
-  const [rating, setRating] = useState(initial?.rating ?? 5);
+  const [rating, setRating] = useState(initial?.rating ?? 0); // starts empty: no rating until you pick one
   const [body, setBody] = useState(initial?.body ?? '');
   const [visibility, setVisibility] = useState<Visibility>(initial?.visibility ?? 'public');
   const isAnon = visibility === 'anonymous';
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    if (!rating) return;
     onSubmit({ rating, body, visibility });
-    if (!initial) setBody('');
+    if (!initial) {
+      setBody('');
+      setRating(0);
+    }
   }
 
   return (
@@ -34,10 +38,12 @@ export function ReviewForm({ onSubmit, error, initial, submitLabel = 'Post revie
             className={'star-btn' + (n <= rating ? ' filled' : '')}
             onClick={() => setRating(n)}
             aria-label={`${n} star${n === 1 ? '' : 's'}`}
+            aria-pressed={n === rating}
           >
             ★
           </button>
         ))}
+        <span className="star-hint">{rating ? `${rating} of 5` : 'Pick a rating'}</span>
       </div>
 
       <label htmlFor="review-body">Review</label>
@@ -68,7 +74,7 @@ export function ReviewForm({ onSubmit, error, initial, submitLabel = 'Post revie
           {error}
         </p>
       )}
-      <button type="submit" className="btn">
+      <button type="submit" className="btn" disabled={!rating || !body.trim()}>
         {submitLabel}
       </button>
       {onCancel && (

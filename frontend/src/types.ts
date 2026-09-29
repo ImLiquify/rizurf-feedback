@@ -94,3 +94,17 @@ export interface NotificationItem {
   read: boolean;
   createdAt: string;
 }
+
+// Built by the API from every review of one employee (anonymous included):
+// numbers only, no authors or text.
+export interface RatingSummary {
+  average: number | null;
+  count: number;
+  counts: Record<1 | 2 | 3 | 4 | 5, number>;
+}
+
+export interface GivenReview extends ReviewView {
+  authorId: string;
+  receiverName: string;
+  receiverPhotoUrl: string | null;
+}

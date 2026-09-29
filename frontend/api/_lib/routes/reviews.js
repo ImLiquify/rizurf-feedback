@@ -1,13 +1,25 @@
 import { Router } from 'express';
 import { asyncHandler } from '../asyncHandler.js';
 import { validationError, forbidden, notFound } from '../errors.js';
-import { findReviewById, insertReview, updateReview, deleteReview } from '../db/reviews.js';
-import { insertReply, findReplyForReview } from '../db/replies.js';
+import { findReviewById, findReviewsByAuthor, insertReview, updateReview, deleteReview } from '../db/reviews.js';
+import { insertReply, findReplyForReview, findRepliesForReviews } from '../db/replies.js';
 import { insertFlag } from '../db/flags.js';
 import { insertNotification } from '../db/notifications.js';
 import { findEmployeeById } from '../db/employees.js';
 
 export const reviewsRouter = Router();
+
+// The "Me" page's second half: everything the signed-in person has written,
+// with who it was about. Always their own reviews, so no visibility filter.
+reviewsRouter.get(
+  '/me/reviews-given',
+  asyncHandler(async (req, res) => {
+    const reviews = await findReviewsByAuthor(req.user.id);
+    const replies = await findRepliesForReviews(reviews.map((r) => r.id));
+    const byReview = new Map(replies.map((reply) => [reply.reviewId, reply]));
+    res.json({ reviews: reviews.map((r) => ({ ...r, reply: byReview.get(r.id) ?? null })) });
+  }),
+);
 
 function assertRating(rating) {
   if (rating !== undefined && (typeof rating !== 'number' || rating < 1 || rating > 5)) {
@@ -20,6 +32,7 @@ reviewsRouter.post(
   asyncHandler(async (req, res) => {
     const { receiverId, rating, body, visibility } = req.body ?? {};
     if (receiverId === req.user.id) throw validationError('You cannot review yourself.');
+    if (rating === undefined) throw validationError('Pick a star rating.');
     assertRating(rating);
     if (!body || !String(body).trim()) throw validationError('Review text is required.');
     if (visibility !== 'public' && visibility !== 'anonymous') throw validationError('Visibility must be "public" or "anonymous".');

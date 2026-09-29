@@ -1,6 +1,8 @@
 import type {
   Employee,
+  GivenReview,
   NotificationItem,
+  RatingSummary,
   OpenFlagEntry,
   ReviewFlag,
   ReviewReply,
@@ -74,8 +76,12 @@ export async function searchEmployees(query: string): Promise<Employee[]> {
   return data.employees;
 }
 
-export async function getEmployeeReviews(employeeId: string): Promise<ReviewView[]> {
-  const data = await request<{ reviews: ReviewView[] }>(`/employees/${employeeId}/reviews`);
+export function getEmployeeReviews(employeeId: string): Promise<{ summary: RatingSummary; reviews: ReviewView[] }> {
+  return request(`/employees/${employeeId}/reviews`);
+}
+
+export async function getMyGivenReviews(): Promise<GivenReview[]> {
+  const data = await request<{ reviews: GivenReview[] }>('/me/reviews-given');
   return data.reviews;
 }
 

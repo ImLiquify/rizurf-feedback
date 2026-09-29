@@ -15,13 +15,15 @@ import { ReviewForm } from '../components/ReviewForm';
 import { ReviewCard } from '../components/ReviewCard';
 import { IconChevronLeft } from '../components/icons';
 import { Avatar } from '../components/Avatar';
-import type { Employee, ReviewView, Visibility } from '../types';
+import { RatingSummaryCard } from '../components/RatingSummaryCard';
+import type { Employee, RatingSummary, ReviewView, Visibility } from '../types';
 
 export function EmployeeProfilePage() {
   const { employeeId = '' } = useParams();
   const { currentUser } = useCurrentUser();
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [reviews, setReviews] = useState<ReviewView[]>([]);
+  const [summary, setSummary] = useState<RatingSummary | null>(null);
   const [people, setPeople] = useState<Record<string, Employee>>({});
   const [error, setError] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(true);
@@ -32,11 +34,12 @@ export function EmployeeProfilePage() {
     let cancelled = false;
     setLoading(true);
     Promise.all([searchEmployees(''), getEmployeeReviews(employeeId)])
-      .then(([employees, employeeReviews]) => {
+      .then(([employees, data]) => {
         if (cancelled) return;
         setEmployee(employees.find((e) => e.id === employeeId) ?? null);
         setPeople(Object.fromEntries(employees.map((e) => [e.id, e])));
-        setReviews(employeeReviews);
+        setReviews(data.reviews);
+        setSummary(data.summary);
       })
       .catch(() => {})
       .finally(() => {
@@ -49,7 +52,9 @@ export function EmployeeProfilePage() {
 
   // After posting, editing, replying etc. only the reviews can have changed.
   const load = useCallback(async () => {
-    setReviews(await getEmployeeReviews(employeeId));
+    const data = await getEmployeeReviews(employeeId);
+    setReviews(data.reviews);
+    setSummary(data.summary);
   }, [employeeId]);
 
   useEffect(() => {
@@ -107,6 +112,8 @@ export function EmployeeProfilePage() {
           </p>
         </div>
       </div>
+
+      {summary && <RatingSummaryCard summary={summary} />}
 
       {isSelf ? (
         <p className="panel">You cannot review yourself.</p>
