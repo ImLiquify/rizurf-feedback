@@ -8,7 +8,6 @@ const required = [
   'DB_USER',
   'DB_NAME',
   'GATEWAY_URL',
-  'PUBLIC_URL',
   'SERVICE_ID',
   'SESSION_SECRET',
 ];
@@ -19,6 +18,13 @@ for (const key of required) {
   }
 }
 
+// PUBLIC_URL, else Vercel's own production domain (a system env var, not
+// anything from the request).
+const publicUrl =
+  process.env.PUBLIC_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL && `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`);
+if (!publicUrl) throw new Error('Missing required environment variable: PUBLIC_URL');
+
 export const config = {
   db: {
     host: process.env.DB_HOST,
@@ -28,7 +34,7 @@ export const config = {
     database: process.env.DB_NAME,
   },
   gatewayUrl: process.env.GATEWAY_URL.replace(/\/+$/, ''),
-  publicUrl: process.env.PUBLIC_URL.replace(/\/+$/, ''),
+  publicUrl: publicUrl.replace(/\/+$/, ''),
   serviceId: process.env.SERVICE_ID,
   sessionSecret: process.env.SESSION_SECRET,
 };
