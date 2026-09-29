@@ -46,12 +46,14 @@ export function ReviewToolbar({ reviews, filter, onChange, shown }: Props) {
       </div>
 
       {topics.length > 0 && (
-        <div className="topic-chips" role="group" aria-label="Filter by topic">
-          {topics.map(({ topic, count }) => (
+        <div className="topic-chips" role="group" aria-label="Filter by what people mention">
+          <span className="topic-chips-label">People often mention</span>
+          {topics.map(({ topic, count, average }) => (
             <button
               key={topic}
               type="button"
-              className="topic-chip"
+              className={'topic-chip' + (average >= 4 ? ' good' : average <= 2 ? ' bad' : '')}
+              title={`${count} review${count === 1 ? '' : 's'}, averaging ${average.toFixed(1)} stars`}
               aria-pressed={filter.topic === topic}
               onClick={() => set({ topic: filter.topic === topic ? null : topic })}
             >

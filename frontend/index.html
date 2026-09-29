@@ -11,6 +11,14 @@
       rel="stylesheet"
     />
     <title>Rizurf Feedback</title>
+    <!-- Theme before first paint (no light flash): saved choice, else the OS setting. -->
+    <script>
+      try {
+        var t = localStorage.getItem('theme');
+        if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
     <!-- SS-28: back-to-gateway button, served by the gateway (MICROAPP_GATEWAY_BUTTON.md) -->
     <script src="https://web-omega-two-47.vercel.app/widget/gateway-button.js" defer></script>
   </head>

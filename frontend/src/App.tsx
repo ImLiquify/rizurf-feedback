@@ -3,7 +3,7 @@ import { NavLink, Route, Routes, useLocation } from 'react-router-dom';
 import { useCurrentUser } from './context/CurrentUserContext';
 import { NotificationsList } from './components/NotificationsList';
 import { Avatar } from './components/Avatar';
-import { roleLabel } from './utils';
+import { ProfileMenu } from './components/ProfileMenu';
 import { IconFlag, IconGrid, IconMenu, IconUsers } from './components/icons';
 import { DirectoryPage } from './pages/DirectoryPage';
 import { EmployeeProfilePage } from './pages/EmployeeProfilePage';
@@ -69,13 +69,7 @@ export function App() {
               </>
             )}
           </nav>
-          <div className="sidebar-user">
-            <Avatar name={currentUser.name} photoUrl={currentUser.photoUrl} size={38} />
-            <div className="sidebar-user-info">
-              <div className="sidebar-user-name">{currentUser.name}</div>
-              <div className="sidebar-user-role">{roleLabel(currentUser)}</div>
-            </div>
-          </div>
+          <ProfileMenu user={currentUser} />
         </aside>
 
         <div className="main">
