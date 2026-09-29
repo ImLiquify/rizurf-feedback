@@ -51,7 +51,7 @@ export function MePage() {
   if (loading) return <Skeleton variant="profile" />;
 
   const awaitingReply = received.filter((r) => !r.reply).length;
-  const shownReceived = filterReviews(received, filter, (r) => (r.authorId ? people[r.authorId]?.name ?? '' : ''));
+  const shownReceived = filterReviews(received, filter, (r) => (r.authorId ? (people[r.authorId]?.name ?? '') : ''));
   const shownGiven = filterReviews(given, filter, (r) => r.receiverName);
   const switchTab = (t: Tab) => {
     setTab(t);
@@ -77,7 +77,11 @@ export function MePage() {
       <div className="tabs" role="tablist" aria-label="Your reviews">
         <button role="tab" aria-selected={tab === 'received'} className="tab" onClick={() => switchTab('received')}>
           About me <span className="tab-count">{received.length}</span>
-          {awaitingReply > 0 && <span className="badge" title="Waiting for your reply">{awaitingReply}</span>}
+          {awaitingReply > 0 && (
+            <span className="badge" title="Waiting for your reply">
+              {awaitingReply}
+            </span>
+          )}
         </button>
         <button role="tab" aria-selected={tab === 'given'} className="tab" onClick={() => switchTab('given')}>
           I've given <span className="tab-count">{given.length}</span>
@@ -87,57 +91,65 @@ export function MePage() {
       {tab === 'received' ? (
         <div role="tabpanel">
           <ReviewToolbar reviews={received} filter={filter} onChange={setFilter} shown={shownReceived.length} />
-          {received.length > 0 && shownReceived.length === 0 && <div className="empty-state">No reviews match these filters.</div>}
+          {received.length > 0 && shownReceived.length === 0 && (
+            <div className="empty-state">No reviews match these filters.</div>
+          )}
           {received.length === 0 && (
             <div className="empty-state">No one has reviewed you yet. Reviews written about you will show up here.</div>
           )}
-          {shownReceived.map((review) => (
-            <ReviewCard
-              key={review.id}
-              review={review}
-              authorName={review.authorId ? people[review.authorId]?.name ?? 'Unknown' : null}
-              authorPhotoUrl={review.authorId ? people[review.authorId]?.photoUrl : null}
-              canManage={false}
-              canReply={!review.reply}
-              onEdit={() => {}}
-              onDelete={() => {}}
-              onFlag={(reason) => flagReview(review.id, reason).then(loadReceived)}
-              onReply={(body) => replyToReview(review.id, body).then(loadReceived)}
-            />
-          ))}
+          <div className="review-grid">
+            {shownReceived.map((review) => (
+              <ReviewCard
+                key={review.id}
+                review={review}
+                authorName={review.authorId ? (people[review.authorId]?.name ?? 'Unknown') : null}
+                authorPhotoUrl={review.authorId ? people[review.authorId]?.photoUrl : null}
+                canManage={false}
+                canReply={!review.reply}
+                onEdit={() => {}}
+                onDelete={() => {}}
+                onFlag={(reason) => flagReview(review.id, reason).then(loadReceived)}
+                onReply={(body) => replyToReview(review.id, body).then(loadReceived)}
+              />
+            ))}
+          </div>
         </div>
       ) : (
         <div role="tabpanel">
           <ReviewToolbar reviews={given} filter={filter} onChange={setFilter} shown={shownGiven.length} />
-          {given.length > 0 && shownGiven.length === 0 && <div className="empty-state">No reviews match these filters.</div>}
+          {given.length > 0 && shownGiven.length === 0 && (
+            <div className="empty-state">No reviews match these filters.</div>
+          )}
           {given.length === 0 && (
             <div className="empty-state">
               You haven't reviewed anyone yet. <Link to="/directory">Find a coworker</Link> to leave feedback.
             </div>
           )}
-          {shownGiven.map((review) => (
-            <div key={review.id} className="given-item">
-              <Link to={`/employees/${review.receiverId}`} className="given-to">
-                <Avatar name={review.receiverName} photoUrl={review.receiverPhotoUrl} size={26} />
-                <span>
-                  To <b>{review.receiverName}</b>
-                </span>
-              </Link>
-              <ReviewCard
-                review={review}
-                authorName={null}
-                metaLabel={review.visibility === 'anonymous' ? 'Posted anonymously' : 'Posted with your name'}
-                canManage
-                canReply={false}
-                onEdit={(input: { rating: number; body: string; visibility: Visibility }) =>
-                  editReview(review.id, input).then(loadGiven)
-                }
-                onDelete={() => deleteReview(review.id).then(loadGiven)}
-                onFlag={(reason) => flagReview(review.id, reason).then(loadGiven)}
-                onReply={() => {}}
-              />
-            </div>
-          ))}
+          <div className="review-grid">
+            {shownGiven.map((review) => (
+              <div key={review.id} className="given-item">
+                <Link to={`/employees/${review.receiverId}`} className="given-to">
+                  <Avatar name={review.receiverName} photoUrl={review.receiverPhotoUrl} size={26} />
+                  <span>
+                    To <b>{review.receiverName}</b>
+                  </span>
+                </Link>
+                <ReviewCard
+                  review={review}
+                  authorName={null}
+                  metaLabel={review.visibility === 'anonymous' ? 'Posted anonymously' : 'Posted with your name'}
+                  canManage
+                  canReply={false}
+                  onEdit={(input: { rating: number; body: string; visibility: Visibility }) =>
+                    editReview(review.id, input).then(loadGiven)
+                  }
+                  onDelete={() => deleteReview(review.id).then(loadGiven)}
+                  onFlag={(reason) => flagReview(review.id, reason).then(loadGiven)}
+                  onReply={() => {}}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

@@ -172,7 +172,8 @@ button { white-space: nowrap; }
 .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
 
 /* Bottom padding keeps the last item clear of the gateway button (UI standard §3). */
-.content { width: 100%; max-width: 1080px; padding: 32px 32px 96px; }
+/* Every page fills the screen: a wider screen gets more room (more columns), not empty margin. */
+.content { width: 100%; padding: 32px 32px 96px; }
 .backdrop { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -289,7 +290,7 @@ label { display: block; font-size: 12px; margin: 10px 0 4px; font-weight: 650; c
 .search-field svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); }
 #search-input { padding-left: 40px; height: 40px; }
 
-.employee-list { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 8px; }
+.employee-list { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); }
 .employee-row {
   background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--radius-md);
   overflow: hidden; transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
@@ -371,6 +372,9 @@ label { display: block; font-size: 12px; margin: 10px 0 4px; font-weight: 650; c
 
 /* ---------- Review cards ---------- */
 .review-card { border: 1.5px solid var(--line); border-radius: var(--radius-md); padding: 16px 18px; margin-top: 12px; background: var(--surface); }
+/* Reviews flow into as many columns as the screen fits (one on a phone). */
+.review-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 12px; align-items: start; margin-top: 12px; }
+.review-grid > .review-card, .review-grid > .given-item { margin-top: 0; }
 .review-top { display: flex; justify-content: space-between; align-items: flex-start; }
 .review-rating-line { display: inline-flex; align-items: baseline; gap: 10px; }
 .review-date { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
@@ -431,8 +435,6 @@ label { display: block; font-size: 12px; margin: 10px 0 4px; font-weight: 650; c
 .empty-state { color: var(--muted); font-size: 14px; padding: 24px 0; text-align: center; }
 
 /* ---------- Employee wall (admin/hr only) ---------- */
-/* The wall uses the full width: a wider screen gets more columns, not more margin. */
-.content:has(.wall-grid) { max-width: none; }
 .wall-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-top: 20px; }
 .wall-tile { background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--radius-md); padding: 18px; }
 .wall-tile-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }

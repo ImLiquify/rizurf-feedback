@@ -95,7 +95,7 @@ export function EmployeeProfilePage() {
   if (!employee) return <p>No employee with id {employeeId}.</p>;
 
   const isSelf = employee.id === currentUser.id;
-  const authorOf = (r: ReviewView) => (r.authorId ? people[r.authorId]?.name ?? '' : '');
+  const authorOf = (r: ReviewView) => (r.authorId ? (people[r.authorId]?.name ?? '') : '');
   const shown = filterReviews(reviews, filter, authorOf);
 
   return (
@@ -129,20 +129,22 @@ export function EmployeeProfilePage() {
       <ReviewToolbar reviews={reviews} filter={filter} onChange={setFilter} shown={shown.length} />
       {reviews.length === 0 && <div className="empty-state">No reviews yet.</div>}
       {reviews.length > 0 && shown.length === 0 && <div className="empty-state">No reviews match these filters.</div>}
-      {shown.map((review) => (
-        <ReviewCard
-          key={review.id}
-          review={review}
-          authorName={review.authorId ? people[review.authorId]?.name ?? 'Unknown' : null}
-          authorPhotoUrl={review.authorId ? people[review.authorId]?.photoUrl : null}
-          canManage={review.authorId === currentUser.id}
-          canReply={review.receiverId === currentUser.id && !review.reply}
-          onEdit={(input) => handleEditReview(review.id, input)}
-          onDelete={() => handleDeleteReview(review.id)}
-          onFlag={(reason) => handleFlag(review.id, reason)}
-          onReply={(body) => handleReply(review.id, body)}
-        />
-      ))}
+      <div className="review-grid">
+        {shown.map((review) => (
+          <ReviewCard
+            key={review.id}
+            review={review}
+            authorName={review.authorId ? (people[review.authorId]?.name ?? 'Unknown') : null}
+            authorPhotoUrl={review.authorId ? people[review.authorId]?.photoUrl : null}
+            canManage={review.authorId === currentUser.id}
+            canReply={review.receiverId === currentUser.id && !review.reply}
+            onEdit={(input) => handleEditReview(review.id, input)}
+            onDelete={() => handleDeleteReview(review.id)}
+            onFlag={(reason) => handleFlag(review.id, reason)}
+            onReply={(body) => handleReply(review.id, body)}
+          />
+        ))}
+      </div>
     </div>
   );
 }
