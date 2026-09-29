@@ -31,7 +31,6 @@ export function EmployeeProfilePage() {
   const [people, setPeople] = useState<Record<string, Employee>>({});
   const [error, setError] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(true);
-  const [showReviewForm, setShowReviewForm] = useState(true);
 
   // First visit: the directory (for names/photos) and the reviews together.
   useEffect(() => {
@@ -59,10 +58,6 @@ export function EmployeeProfilePage() {
     const data = await getEmployeeReviews(employeeId);
     setReviews(data.reviews);
     setSummary(data.summary);
-  }, [employeeId]);
-
-  useEffect(() => {
-    setShowReviewForm(true);
   }, [employeeId]);
 
   async function handlePostReview(input: { rating: number; body: string; visibility: Visibility }) {
@@ -123,12 +118,8 @@ export function EmployeeProfilePage() {
 
       {isSelf ? (
         <p className="panel">You cannot review yourself.</p>
-      ) : showReviewForm ? (
-        <ReviewForm onSubmit={handlePostReview} error={error} onCancel={() => setShowReviewForm(false)} />
       ) : (
-        <button type="button" className="link-btn" onClick={() => setShowReviewForm(true)}>
-          Leave a review
-        </button>
+        <ReviewForm key={employeeId} onSubmit={handlePostReview} error={error} me={currentUser} />
       )}
 
       <h2 style={{ marginTop: 28 }}>Reviews</h2>

@@ -13,6 +13,15 @@ export function RatingSummaryCard({ summary, title }: { summary: RatingSummary; 
   const { average, count, counts } = summary;
   const v = average != null ? verdict(average) : null;
 
+  if (count === 0) {
+    return (
+      <section className="rating-summary rating-summary-empty" aria-label="Rating summary">
+        {title && <h2 className="rating-summary-title">{title}</h2>}
+        <p className="muted">No reviews yet.</p>
+      </section>
+    );
+  }
+
   return (
     <section className="rating-summary" aria-label="Rating summary">
       <div className="rating-summary-head">

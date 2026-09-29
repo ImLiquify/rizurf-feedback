@@ -191,9 +191,26 @@ label { display: block; font-size: 12px; margin: 10px 0 4px; font-weight: 650; c
 .panel { background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--radius-md); padding: 20px; margin-top: 20px; }
 
 .rating-field, .star-picker { display: flex; align-items: center; gap: 4px; }
-.star-btn { background: none; border: none; cursor: pointer; font-size: 26px; line-height: 1; color: #d0d5dd; padding: 0; }
-.star-btn.filled { color: var(--star); }
-.star-btn:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: var(--radius-sm); }
+.star-btn { background: none; border: none; cursor: pointer; padding: 2px; line-height: 0; border-radius: var(--radius-sm); }
+.star-btn svg { width: 34px; height: 34px; fill: none; stroke: #9aa7b8; stroke-width: 1.5; stroke-linejoin: round;
+  transition: fill var(--transition-fast), stroke var(--transition-fast), transform 180ms cubic-bezier(0.16, 1, 0.3, 1); }
+.star-btn.filled svg { fill: var(--star); stroke: var(--star); }
+.star-btn:hover svg { transform: scale(1.12); }
+.star-btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+/* Review form, Google-Maps style: stars first, details after a rating */
+.review-form-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.review-form-head h2 { margin: 0; }
+.review-form-head .muted { margin: 2px 0 0; }
+.review-form .star-picker { gap: 2px; }
+.review-form .star-hint { margin-left: 12px; font-size: 14px; font-weight: 650; color: var(--navy-700); min-width: 72px; }
+.review-form-more { margin-top: 14px; display: grid; gap: 12px; animation: review-open 260ms cubic-bezier(0.16, 1, 0.3, 1); }
+.review-form-more textarea { min-height: 110px; }
+.review-form-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.review-form-actions .btn { margin-top: 0; }
+@keyframes review-open { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .review-form-more { animation: none; } .star-btn svg { transition: none; } }
+.visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 .visibility-field { display: flex; align-items: center; gap: 10px; }
 .visibility-label { font-size: 13px; color: var(--muted); }
