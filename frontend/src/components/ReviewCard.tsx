@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import type { ReviewView, Visibility } from '../types';
 import { ReviewForm } from './ReviewForm';
 import { ReplyForm } from './ReplyForm';
@@ -26,6 +27,13 @@ export function ReviewCard({ review, authorName, authorPhotoUrl, metaLabel, canM
   const [replying, setReplying] = useState(false);
   const [reason, setReason] = useState('');
   const menuRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  // A notification links here as #review-<id>: bring that card into view.
+  const targeted = useLocation().hash === `#review-${review.id}`;
+
+  useEffect(() => {
+    if (targeted) cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [targeted]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -70,7 +78,7 @@ export function ReviewCard({ review, authorName, authorPhotoUrl, metaLabel, canM
   }
 
   return (
-    <div className="review-card">
+    <div className={'review-card' + (targeted ? ' targeted' : '')} id={`review-${review.id}`} ref={cardRef}>
       <div className="review-top">
         <span className="review-rating-line">
           <span className="stars">

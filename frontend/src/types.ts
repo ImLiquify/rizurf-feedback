@@ -93,6 +93,7 @@ export interface NotificationItem {
   userId: string;
   type: NotificationType;
   message: string;
+  link: string | null; // in-app path it opens, e.g. /me#review-<id>
   read: boolean;
   createdAt: string;
 }

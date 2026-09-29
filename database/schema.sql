@@ -71,6 +71,7 @@ CREATE TABLE notifications (
   user_id    VARCHAR(64) NOT NULL,         -- recipient
   type       ENUM('review_received', 'reply_received', 'flag_resolved') NOT NULL,
   message    VARCHAR(255) NOT NULL,
+  link       VARCHAR(255) NULL,            -- in-app path it opens, e.g. /me#review-<id>
   is_read    BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_notifications_user FOREIGN KEY (user_id) REFERENCES employees(id) ON DELETE CASCADE,

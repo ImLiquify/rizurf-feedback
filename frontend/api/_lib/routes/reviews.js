@@ -42,7 +42,7 @@ reviewsRouter.post(
     if (!receiver) throw notFound(`No employee with id ${receiverId}.`);
 
     const review = await insertReview({ authorId: req.user.id, receiverId, rating, body: String(body).trim(), visibility });
-    await insertNotification({ userId: receiverId, type: 'review_received', message: newReviewNotice(req.user.name, visibility) });
+    await insertNotification({ userId: receiverId, type: 'review_received', message: newReviewNotice(req.user.name, visibility), link: `/me#review-${review.id}` });
     res.status(201).json({ review });
   }),
 );
@@ -95,7 +95,7 @@ reviewsRouter.post(
     if (!body || !String(body).trim()) throw validationError('Reply text is required.');
 
     const reply = await insertReply({ reviewId: req.params.id, authorId: req.user.id, body: String(body).trim() });
-    await insertNotification({ userId: review.authorId, type: 'reply_received', message: `${req.user.name} replied to your review.` });
+    await insertNotification({ userId: review.authorId, type: 'reply_received', message: `${req.user.name} replied to your review.`, link: `/employees/${review.receiverId}#review-${review.id}` });
     res.status(201).json({ reply });
   }),
 );

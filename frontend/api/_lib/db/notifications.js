@@ -7,18 +7,21 @@ function mapRow(row) {
     userId: row.user_id,
     type: row.type,
     message: row.message,
+    link: row.link ?? null,
     read: Boolean(row.is_read),
     createdAt: row.created_at,
   };
 }
 
-export async function insertNotification({ userId, type, message }) {
+// `link` is the in-app path the notification opens (null: nothing to open).
+export async function insertNotification({ userId, type, message, link = null }) {
   const id = randomUUID();
-  await pool.query('INSERT INTO notifications (id, user_id, type, message) VALUES (?, ?, ?, ?)', [
+  await pool.query('INSERT INTO notifications (id, user_id, type, message, link) VALUES (?, ?, ?, ?, ?)', [
     id,
     userId,
     type,
     message,
+    link,
   ]);
 }
 
@@ -29,6 +32,11 @@ export async function findNotificationsForUser(userId) {
 
 export async function markNotificationsRead(userId) {
   await pool.query('UPDATE notifications SET is_read = TRUE WHERE user_id = ? AND is_read = FALSE', [userId]);
+}
+
+// Scoped to the owner, so someone else's notification id is a no-op.
+export async function markNotificationRead(userId, id) {
+  await pool.query('UPDATE notifications SET is_read = TRUE WHERE id = ? AND user_id = ?', [id, userId]);
 }
 
 // For the gateway's app-icon badge (MICROAPP_BADGES.md): one set-based

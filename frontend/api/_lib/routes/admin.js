@@ -3,7 +3,7 @@ import { asyncHandler } from '../asyncHandler.js';
 import { forbidden, notFound } from '../errors.js';
 import { isAdminRole } from '../visibility.js';
 import { listOpenFlagsWithReview, findFlagById, resolveFlag } from '../db/flags.js';
-import { deleteReview, findAllReviewsWithNames } from '../db/reviews.js';
+import { deleteReview, findAllReviewsWithNames, findReviewById } from '../db/reviews.js';
 import { insertNotification } from '../db/notifications.js';
 import { searchEmployees } from '../db/employees.js';
 import { buildWall } from '../wall.js';
@@ -33,7 +33,13 @@ adminRouter.patch(
 
     await resolveFlag(req.params.id);
     if (req.body?.deleteReview) await deleteReview(flag.reviewId);
-    await insertNotification({ userId: flag.flaggedBy, type: 'flag_resolved', message: 'Your flag was resolved.' });
+    const review = req.body?.deleteReview ? null : await findReviewById(flag.reviewId);
+    await insertNotification({
+      userId: flag.flaggedBy,
+      type: 'flag_resolved',
+      message: 'Your flag was resolved.',
+      link: review && `/employees/${review.receiverId}#review-${review.id}`,
+    });
 
     res.status(204).send();
   }),

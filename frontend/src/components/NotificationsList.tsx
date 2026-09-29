@@ -1,12 +1,22 @@
-import { useEffect, useState } from 'react';
-import { getNotifications, markNotificationsRead } from '../api';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getNotifications, markNotificationRead } from '../api';
 import type { NotificationItem } from '../types';
-import { IconBell } from './icons';
+import { IconBell, IconClose } from './icons';
 import { timeAgo } from '../utils';
 
+const TOAST_MS = 5000;
+
 export function NotificationsList() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [unread, setUnread] = useState<NotificationItem[]>([]);
+  const [toasts, setToasts] = useState<NotificationItem[]>([]);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  // Ids already on screen once; null until the first load, whose unread
+  // backlog shows on the badge rather than as a burst of banners.
+  const seen = useRef<Set<string> | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -15,8 +25,15 @@ export function NotificationsList() {
     function load() {
       if (document.visibilityState !== 'visible') return;
       getNotifications()
-        .then((n) => {
-          if (!cancelled) setNotifications(n);
+        .then((all) => {
+          if (cancelled) return;
+          const fresh = all.filter((n) => !n.read);
+          if (seen.current) {
+            const arrived = fresh.filter((n) => !seen.current!.has(n.id));
+            if (arrived.length) setToasts((t) => [...arrived, ...t].slice(0, 3));
+          }
+          seen.current = new Set(all.map((n) => n.id));
+          setUnread(fresh);
         })
         .catch(() => {});
     }
@@ -30,44 +47,102 @@ export function NotificationsList() {
     };
   }, []);
 
-  const unread = notifications.filter((n) => !n.read).length;
-
-  // Opening the panel marks everything read (here and on the gateway's app
-  // icon); the new ones stay highlighted until the panel closes.
-  function toggle() {
-    if (open) {
-      setOpen(false);
-      setNotifications((list) => list.map((n) => ({ ...n, read: true })));
-      return;
+  // Close on a press anywhere outside the bell and its panel, or on Escape.
+  useEffect(() => {
+    if (!open) return;
+    function onPointerDown(e: PointerEvent) {
+      if (!wrapRef.current?.contains(e.target as Node)) setOpen(false);
     }
-    setOpen(true);
-    if (unread > 0) markNotificationsRead().catch(() => {});
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== 'Escape') return;
+      setOpen(false);
+      buttonRef.current?.focus();
+    }
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  const dismissToast = useCallback((id: string) => setToasts((t) => t.filter((n) => n.id !== id)), []);
+
+  // Opening a notification marks it read (here and on the gateway's app
+  // icon) and takes you to the review it is about.
+  function openNotification(n: NotificationItem) {
+    setOpen(false);
+    dismissToast(n.id);
+    setUnread((list) => list.filter((x) => x.id !== n.id));
+    markNotificationRead(n.id).catch(() => {});
+    if (n.link) navigate(n.link);
   }
 
+  const count = unread.length;
 
   return (
-    <div className="notif-wrap">
-      <button className="bell-btn" onClick={toggle} aria-label={unread ? `Notifications, ${unread} unread` : 'Notifications'} aria-expanded={open}>
-        <IconBell />
-        <span className="bell-label">Notifications</span>
-        {unread > 0 && <span className="badge">{unread}</span>}
+    <div className="notif-wrap" ref={wrapRef}>
+      <button
+        ref={buttonRef}
+        className="bell-btn"
+        onClick={() => setOpen((o) => !o)}
+        aria-label={count ? `Notifications, ${count} unread` : 'Notifications'}
+        aria-expanded={open}
+        aria-haspopup="true"
+      >
+        <IconBell width={20} height={20} />
+        {count > 0 && <span className="badge">{count > 99 ? '99+' : count}</span>}
       </button>
       {open && (
-        <div className="notif-panel">
-          {notifications.length === 0 ? (
-            <div className="notif-item muted">No notifications yet.</div>
+        <div className="notif-panel" role="dialog" aria-label="Unread notifications">
+          <div className="notif-head">Notifications</div>
+          {count === 0 ? (
+            <div className="notif-empty">You're all caught up.</div>
           ) : (
-            notifications.map((n) => (
-              <div key={n.id} className={'notif-item' + (n.read ? '' : ' unread')}>
+            unread.map((n) => (
+              <button key={n.id} className="notif-item" onClick={() => openNotification(n)}>
                 <span>{n.message}</span>
                 <time className="notif-time" dateTime={n.createdAt}>
                   {timeAgo(n.createdAt)}
                 </time>
-              </div>
+              </button>
             ))
           )}
         </div>
       )}
+      <div className="toast-stack" aria-live="polite">
+        {toasts.map((n) => (
+          <Toast key={n.id} item={n} onOpen={() => openNotification(n)} onDismiss={dismissToast} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+interface ToastProps {
+  item: NotificationItem;
+  onOpen: () => void;
+  onDismiss: (id: string) => void;
+}
+
+function Toast({ item, onOpen, onDismiss }: ToastProps) {
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    if (paused) return;
+    const timer = setTimeout(() => onDismiss(item.id), TOAST_MS);
+    return () => clearTimeout(timer);
+  }, [paused, onDismiss, item.id]);
+
+  return (
+    <div className="toast" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+      <button className="toast-body" onClick={onOpen}>
+        <IconBell width={16} height={16} className="toast-icon" />
+        <span>{item.message}</span>
+      </button>
+      <button className="toast-close" onClick={() => onDismiss(item.id)} aria-label="Dismiss">
+        <IconClose width={14} height={14} />
+      </button>
     </div>
   );
 }
