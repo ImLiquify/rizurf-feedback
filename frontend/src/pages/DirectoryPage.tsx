@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { searchEmployees } from '../api';
 import type { Employee } from '../types';
-import { initials } from '../utils';
+import { Avatar } from '../components/Avatar';
 import { IconSearch } from '../components/icons';
 
 function stars(n: number): string {
@@ -54,7 +54,7 @@ export function DirectoryPage() {
             <li key={e.id} className="employee-row">
               <Link to={`/employees/${e.id}`} className="employee-row-link">
                 <div className="employee-main">
-                  <div className="avatar">{initials(e.name)}</div>
+                  <Avatar name={e.name} photoUrl={e.photoUrl} />
                   <div>
                     <div>{e.name}</div>
                     <div className="muted">{e.role}</div>

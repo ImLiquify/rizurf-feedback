@@ -6,6 +6,7 @@ function mapRow(row) {
     email: row.email,
     name: row.name,
     role: row.role,
+    photoUrl: row.photo_url ?? null,
     avgRating: row.avg_rating !== null ? Number(row.avg_rating) : null,
     reviewCount: Number(row.review_count),
   };
@@ -17,26 +18,26 @@ function mapRow(row) {
 // them (unlike the review body/author, which the visibility rule still
 // gates on read).
 const SELECT_WITH_RATING = `
-  SELECT e.id, e.email, e.name, e.role,
+  SELECT e.id, e.email, e.name, e.role, e.photo_url,
          AVG(r.rating) AS avg_rating, COUNT(r.id) AS review_count
   FROM employees e
   LEFT JOIN reviews r ON r.receiver_id = e.id
 `;
 
 export async function findEmployeeById(id) {
-  const [rows] = await pool.query('SELECT id, email, name, role FROM employees WHERE id = ?', [id]);
-  return rows[0] ? { id: rows[0].id, email: rows[0].email, name: rows[0].name, role: rows[0].role } : null;
+  const [rows] = await pool.query('SELECT id, email, name, role, photo_url FROM employees WHERE id = ?', [id]);
+  return rows[0] ? { id: rows[0].id, email: rows[0].email, name: rows[0].name, role: rows[0].role, photoUrl: rows[0].photo_url ?? null } : null;
 }
 
 export async function searchEmployees(query) {
   const q = query.trim();
   if (!q) {
-    const [rows] = await pool.query(`${SELECT_WITH_RATING} GROUP BY e.id, e.email, e.name, e.role ORDER BY e.name`);
+    const [rows] = await pool.query(`${SELECT_WITH_RATING} GROUP BY e.id, e.email, e.name, e.role, e.photo_url ORDER BY e.name`);
     return rows.map(mapRow);
   }
   const like = `%${q}%`;
   const [rows] = await pool.query(
-    `${SELECT_WITH_RATING} WHERE e.name LIKE ? OR e.email LIKE ? GROUP BY e.id, e.email, e.name, e.role ORDER BY e.name`,
+    `${SELECT_WITH_RATING} WHERE e.name LIKE ? OR e.email LIKE ? GROUP BY e.id, e.email, e.name, e.role, e.photo_url ORDER BY e.name`,
     [like, like],
   );
   return rows.map(mapRow);
@@ -56,9 +57,9 @@ export async function upsertEmployeeFromGateway({ id, email, name, role }) {
   return rows[0]?.id ?? id;
 }
 
-// Roster rows from the Intern API: [id, email, name]. An existing email keeps
-// its row and role; only the name is refreshed.
+// Roster rows from the Intern API: [id, email, name, photo_url]. An existing
+// email keeps its row and role; only the name and photo are refreshed.
 export async function upsertRosterEmployees(rows) {
   if (!rows.length) return;
-  await pool.query('INSERT INTO employees (id, email, name) VALUES ? ON DUPLICATE KEY UPDATE name = VALUES(name)', [rows]);
+  await pool.query('INSERT INTO employees (id, email, name, photo_url) VALUES ? ON DUPLICATE KEY UPDATE name = VALUES(name), photo_url = VALUES(photo_url)', [rows]);
 }

@@ -1,69 +1,98 @@
-import { NavLink, Route, Routes } from 'react-router-dom';
+import { useState } from 'react';
+import { NavLink, Route, Routes, useLocation } from 'react-router-dom';
 import { useCurrentUser } from './context/CurrentUserContext';
 import { NotificationsList } from './components/NotificationsList';
+import { Avatar } from './components/Avatar';
+import { IconFlag, IconGrid, IconMenu, IconUsers } from './components/icons';
 import { DirectoryPage } from './pages/DirectoryPage';
 import { EmployeeProfilePage } from './pages/EmployeeProfilePage';
 import { AdminFlagsPage } from './pages/AdminFlagsPage';
 import { AdminWallPage } from './pages/AdminWallPage';
-import { initials } from './utils';
+
+const GATEWAY = 'https://web-omega-two-47.vercel.app';
 
 function isAdminRole(role: string): boolean {
   return role === 'admin' || role === 'hr';
 }
 
+function pageTitle(pathname: string): string {
+  if (pathname.startsWith('/employees/')) return 'Profile';
+  if (pathname.startsWith('/admin/flags')) return 'Flags';
+  if (pathname.startsWith('/admin/wall')) return 'Employee Wall';
+  return 'Directory';
+}
+
+// Shell per RIZURF_UI_STANDARD.md §2: 4px top line, 56px icon rail that
+// widens over the page on hover, 65px top bar, drawer below 1000px.
 export function App() {
   const { currentUser } = useCurrentUser();
+  const { pathname } = useLocation();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const navClass = ({ isActive }: { isActive: boolean }) => 'nav-item' + (isActive ? ' active' : '');
+  const close = () => setDrawerOpen(false);
 
   return (
-    <div className="app-shell">
-      <aside className="sidebar">
-        <div className="sidebar-brand">
-          <span className="sidebar-brand-mark">R</span>
-          Rizurf Feedback
-        </div>
+    <>
+      <div className="top-accent" aria-hidden="true" />
+      <div className="shell">
+        <div className={'backdrop' + (drawerOpen ? ' open' : '')} aria-hidden="true" onClick={close} />
 
-        <div className="sidebar-section-label">Main menu</div>
-        <nav className="sidebar-nav">
-          <NavLink to="/" end className={({ isActive }) => 'sidebar-nav-item' + (isActive ? ' active' : '')}>
-            Directory
-          </NavLink>
-          {isAdminRole(currentUser.role) && (
-            <NavLink to="/admin/flags" className={({ isActive }) => 'sidebar-nav-item' + (isActive ? ' active' : '')}>
-              Admin: Flags
+        <aside className={'sidebar' + (drawerOpen ? ' open' : '')}>
+          <div className="sidebar-brand">
+            <img className="brand-icon" src={`${GATEWAY}/logo-icon.png`} alt="Rizurf" />
+            <img className="brand-full" src={`${GATEWAY}/logo.png`} alt="Rizurf Realty" />
+          </div>
+          <nav className="nav">
+            <NavLink to="/" end className={navClass} onClick={close}>
+              <span className="nav-icon"><IconUsers width={22} height={22} strokeWidth={2.2} /></span>
+              <span className="nav-label">Directory</span>
             </NavLink>
-          )}
-          {isAdminRole(currentUser.role) && (
-            <NavLink to="/admin/wall" className={({ isActive }) => 'sidebar-nav-item' + (isActive ? ' active' : '')}>
-              Employee Wall
-            </NavLink>
-          )}
-        </nav>
-
-        <div className="sidebar-footer">
-          <div className="sidebar-identity">
-            <span className="sidebar-avatar">{initials(currentUser.name)}</span>
-            <div>
-              <div className="sidebar-identity-name">{currentUser.name}</div>
-              <div className="sidebar-identity-role">{currentUser.role}</div>
+            {isAdminRole(currentUser.role) && (
+              <>
+                <div className="nav-rule" role="separator" />
+                <NavLink to="/admin/flags" className={navClass} onClick={close}>
+                  <span className="nav-icon"><IconFlag width={22} height={22} strokeWidth={2.2} /></span>
+                  <span className="nav-label">Flags</span>
+                </NavLink>
+                <NavLink to="/admin/wall" className={navClass} onClick={close}>
+                  <span className="nav-icon"><IconGrid width={22} height={22} strokeWidth={2.2} /></span>
+                  <span className="nav-label">Employee Wall</span>
+                </NavLink>
+              </>
+            )}
+          </nav>
+          <div className="sidebar-user">
+            <Avatar name={currentUser.name} photoUrl={currentUser.photoUrl} size={38} />
+            <div className="sidebar-user-info">
+              <div className="sidebar-user-name">{currentUser.name}</div>
+              <div className="sidebar-user-role">{currentUser.role}</div>
             </div>
           </div>
-        </div>
-      </aside>
+        </aside>
 
-      <div className="content">
-        <div className="content-topbar">
-          <div className="content-topbar-spacer" />
-          <NotificationsList />
+        <div className="main">
+          <header className="topbar">
+            <button className="burger" type="button" aria-label="Toggle navigation" onClick={() => setDrawerOpen((o) => !o)}>
+              <IconMenu width={20} height={20} />
+            </button>
+            <span className="crumb">
+              <span className="crumb-root">Rizurf Feedback / </span>
+              <b>{pageTitle(pathname)}</b>
+            </span>
+            <div className="topbar-right">
+              <NotificationsList />
+            </div>
+          </header>
+          <main className="content">
+            <Routes>
+              <Route path="/" element={<DirectoryPage />} />
+              <Route path="/employees/:employeeId" element={<EmployeeProfilePage />} />
+              <Route path="/admin/flags" element={<AdminFlagsPage />} />
+              <Route path="/admin/wall" element={<AdminWallPage />} />
+            </Routes>
+          </main>
         </div>
-        <main>
-          <Routes>
-            <Route path="/" element={<DirectoryPage />} />
-            <Route path="/employees/:employeeId" element={<EmployeeProfilePage />} />
-            <Route path="/admin/flags" element={<AdminFlagsPage />} />
-            <Route path="/admin/wall" element={<AdminWallPage />} />
-          </Routes>
-        </main>
       </div>
-    </div>
+    </>
   );
 }

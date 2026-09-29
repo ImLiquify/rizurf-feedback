@@ -16,6 +16,7 @@ CREATE TABLE employees (
   id         VARCHAR(64) PRIMARY KEY,      -- the gateway's `sub` claim
   email      VARCHAR(255) NOT NULL UNIQUE,
   name       VARCHAR(255) NOT NULL,
+  photo_url  VARCHAR(1024) NULL,           -- from the Intern API roster (photo_url); NULL shows initials
   role       ENUM('user', 'admin', 'hr', 'supervisor') NOT NULL DEFAULT 'user',
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP

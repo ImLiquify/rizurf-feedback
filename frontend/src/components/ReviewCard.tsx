@@ -3,10 +3,12 @@ import type { ReviewView, Visibility } from '../types';
 import { ReviewForm } from './ReviewForm';
 import { ReplyForm } from './ReplyForm';
 import { IconDots, IconPencil, IconTrash, IconFlag } from './icons';
+import { Avatar } from './Avatar';
 
 interface ReviewCardProps {
   review: ReviewView;
   authorName: string | null;
+  authorPhotoUrl?: string | null;
   canManage: boolean;
   canReply: boolean;
   onEdit: (input: { rating: number; body: string; visibility: Visibility }) => void;
@@ -15,7 +17,7 @@ interface ReviewCardProps {
   onReply: (body: string) => void;
 }
 
-export function ReviewCard({ review, authorName, canManage, canReply, onEdit, onDelete, onFlag, onReply }: ReviewCardProps) {
+export function ReviewCard({ review, authorName, authorPhotoUrl, canManage, canReply, onEdit, onDelete, onFlag, onReply }: ReviewCardProps) {
   const [editing, setEditing] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [flagging, setFlagging] = useState(false);
@@ -112,6 +114,7 @@ export function ReviewCard({ review, authorName, canManage, canReply, onEdit, on
       </div>
 
       <p className="review-meta">
+        {authorName && <Avatar name={authorName} photoUrl={authorPhotoUrl} size={30} />}
         {authorLabel}
         {edited && <span className="edited-tag"> - Edited</span>}
       </p>

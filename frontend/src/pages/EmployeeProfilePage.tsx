@@ -14,7 +14,7 @@ import {
 import { ReviewForm } from '../components/ReviewForm';
 import { ReviewCard } from '../components/ReviewCard';
 import { IconChevronLeft } from '../components/icons';
-import { initials } from '../utils';
+import { Avatar } from '../components/Avatar';
 import type { Employee, ReviewView, Visibility } from '../types';
 
 export function EmployeeProfilePage() {
@@ -22,7 +22,7 @@ export function EmployeeProfilePage() {
   const { currentUser } = useCurrentUser();
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [reviews, setReviews] = useState<ReviewView[]>([]);
-  const [authorNames, setAuthorNames] = useState<Record<string, string>>({});
+  const [people, setPeople] = useState<Record<string, Employee>>({});
   const [error, setError] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [showReviewForm, setShowReviewForm] = useState(true);
@@ -31,11 +31,7 @@ export function EmployeeProfilePage() {
     setLoading(true);
     const [employees, employeeReviews] = await Promise.all([searchEmployees(''), getEmployeeReviews(employeeId)]);
     setEmployee(employees.find((e) => e.id === employeeId) ?? null);
-    const nameMap: Record<string, string> = {};
-    employees.forEach((e) => {
-      nameMap[e.id] = e.name;
-    });
-    setAuthorNames(nameMap);
+    setPeople(Object.fromEntries(employees.map((e) => [e.id, e])));
     setReviews(employeeReviews);
     setLoading(false);
   }, [employeeId]);
@@ -91,7 +87,7 @@ export function EmployeeProfilePage() {
       </Link>
 
       <div className="profile-header">
-        <span className="avatar profile-avatar">{initials(employee.name)}</span>
+        <Avatar name={employee.name} photoUrl={employee.photoUrl} size={56} />
         <div>
           <h1>{employee.name}</h1>
           <p className="muted">
@@ -116,7 +112,8 @@ export function EmployeeProfilePage() {
         <ReviewCard
           key={review.id}
           review={review}
-          authorName={review.authorId ? authorNames[review.authorId] ?? 'Unknown' : null}
+          authorName={review.authorId ? people[review.authorId]?.name ?? 'Unknown' : null}
+          authorPhotoUrl={review.authorId ? people[review.authorId]?.photoUrl : null}
           canManage={review.authorId === currentUser.id}
           canReply={review.receiverId === currentUser.id && !review.reply}
           onEdit={(input) => handleEditReview(review.id, input)}

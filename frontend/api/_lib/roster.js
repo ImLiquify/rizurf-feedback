@@ -12,7 +12,12 @@ let lastSync = 0;
 export function internsToEmployeeRows(interns) {
   return interns
     .filter((i) => i.email_address && i.status !== 'Former')
-    .map((i) => [i.id, i.email_address, `${i.first_name ?? ''} ${i.last_name ?? ''}`.trim() || i.email_address]);
+    .map((i) => [
+      i.id,
+      i.email_address,
+      `${i.first_name ?? ''} ${i.last_name ?? ''}`.trim() || i.email_address,
+      i.photo_url ?? null,
+    ]);
 }
 
 async function getAccessToken() {

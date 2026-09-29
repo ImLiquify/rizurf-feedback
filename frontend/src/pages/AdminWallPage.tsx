@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ApiError, getEmployeeWall } from '../api';
-import { initials } from '../utils';
+import { Avatar } from '../components/Avatar';
 import type { WallEmployee, WallReview } from '../types';
 
 function stars(n: number): string {
@@ -66,7 +66,7 @@ export function AdminWallPage() {
         {employees.map((employee) => (
           <div key={employee.id} className="wall-tile">
             <div className="wall-tile-header">
-              <span className="avatar">{initials(employee.name)}</span>
+              <Avatar name={employee.name} photoUrl={employee.photoUrl} />
               <div className="wall-tile-identity">
                 <div className="wall-tile-name">{employee.name}</div>
                 <div className="muted">{employee.role}</div>

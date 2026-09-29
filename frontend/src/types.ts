@@ -7,6 +7,7 @@ export interface Employee {
   email: string;
   name: string;
   role: Role;
+  photoUrl?: string | null; // from the Intern API roster; null → initials
   // Present on directory/search results; absent on the signed-in session
   // user (GET /api/auth/session doesn't compute an aggregate).
   avgRating?: number | null;
