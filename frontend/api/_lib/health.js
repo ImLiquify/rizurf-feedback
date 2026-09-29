@@ -251,11 +251,58 @@ export const openapi = {
     },
   },
   paths: {
-    '/health': { get: { summary: 'Liveness and dependency checks' } },
-    '/openapi.json': { get: { summary: 'This document' } },
-    '/api/auth/login': { get: { summary: 'Redirect to the Rizurf gateway to sign in' } },
-    '/api/auth/callback': { post: { summary: 'Exchange a gateway sign-in code for this app session (called by our own frontend, not the browser-to-gateway leg)' } },
-    '/api/auth/session': { get: { summary: 'Return the current signed-in user, or 401' } },
+    // /api/auth/login and /api/auth/callback are left out on purpose: they're
+    // the browser's sign-in plumbing (MICROAPP_AUTH.md §4), not an API anyone
+    // calls, and they can't carry a session because they create it.
+    '/health': {
+      get: {
+        summary: 'Liveness and dependency checks',
+        'x-rizurf': {
+          name: 'Service Health',
+          purpose: 'Check the service is up and its database reachable',
+          use_when: ['Monitoring whether Rizurf Feedback is available'],
+          do_not_use_when: [],
+          inputs: [],
+          outputs: ['status', 'service', 'version', 'checks'],
+          requires: [],
+          related_endpoints: [],
+          tags: ['health', 'status', 'uptime'],
+        },
+      },
+    },
+    '/openapi.json': {
+      get: {
+        summary: 'This document',
+        'x-rizurf': {
+          name: 'API Description',
+          purpose: 'Read what this service offers and how to call it',
+          use_when: ['Discovering the endpoints of Rizurf Feedback'],
+          do_not_use_when: [],
+          inputs: [],
+          outputs: ['paths', 'info'],
+          requires: [],
+          related_endpoints: [],
+          tags: ['openapi', 'docs', 'catalog'],
+        },
+      },
+    },
+    '/api/auth/session': {
+      get: {
+        summary: 'Return the current signed-in user, or 401',
+        security: [{ sessionCookie: [] }],
+        'x-rizurf': {
+          name: 'Current User',
+          purpose: 'Find out who is signed in',
+          use_when: ['Loading the app and needing the signed-in employee'],
+          do_not_use_when: ['Looking up some other employee — search employees instead'],
+          inputs: [],
+          outputs: ['id', 'email', 'name', 'role'],
+          requires: ['Signed-in session'],
+          related_endpoints: ['GET /api/employees'],
+          tags: ['session', 'me', 'whoami', 'current user'],
+        },
+      },
+    },
     '/api/employees': {
       get: {
         summary: 'Search employees by name or email',
