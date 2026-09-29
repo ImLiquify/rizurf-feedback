@@ -87,13 +87,11 @@ export function AdminWallPage() {
 
       <div className="wall-grid">
         {shown.map((employee) => (
-          <div key={employee.id} className="wall-tile">
+          <Link key={employee.id} to={`/admin/wall/${employee.id}`} className="wall-tile">
             <div className="wall-tile-header">
               <Avatar name={employee.name} photoUrl={employee.photoUrl} />
               <div className="wall-tile-identity">
-                <Link to={`/admin/wall/${employee.id}`} className="wall-tile-name">
-                  {employee.name}
-                </Link>
+                <div className="wall-tile-name">{employee.name}</div>
                 <div className="muted">{roleLabel(employee)}</div>
               </div>
               {employee.avgRating != null && (
@@ -128,11 +126,7 @@ export function AdminWallPage() {
                 </ul>
               )}
             </div>
-
-            <Link to={`/admin/wall/${employee.id}`} className="wall-tile-more">
-              View details
-            </Link>
-          </div>
+          </Link>
         ))}
       </div>
     </div>
