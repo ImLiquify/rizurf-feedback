@@ -19,7 +19,7 @@ CREATE TABLE employees (
   role       ENUM('user', 'admin', 'hr', 'supervisor') NOT NULL DEFAULT 'user',
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE reviews (
   id           VARCHAR(36) PRIMARY KEY,
@@ -38,7 +38,7 @@ CREATE TABLE reviews (
   CONSTRAINT chk_reviews_not_self CHECK (author_id <> receiver_id),
   INDEX idx_reviews_receiver (receiver_id),
   INDEX idx_reviews_author (author_id)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE review_replies (
   id         VARCHAR(36) PRIMARY KEY,
@@ -49,7 +49,7 @@ CREATE TABLE review_replies (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_replies_review FOREIGN KEY (review_id) REFERENCES reviews(id) ON DELETE CASCADE,
   CONSTRAINT fk_replies_author FOREIGN KEY (author_id) REFERENCES employees(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE review_flags (
   id          VARCHAR(36) PRIMARY KEY,
@@ -61,7 +61,7 @@ CREATE TABLE review_flags (
   CONSTRAINT fk_flags_review FOREIGN KEY (review_id)  REFERENCES reviews(id) ON DELETE CASCADE,
   CONSTRAINT fk_flags_author FOREIGN KEY (flagged_by) REFERENCES employees(id) ON DELETE CASCADE,
   INDEX idx_flags_status (status)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE notifications (
   id         VARCHAR(36) PRIMARY KEY,
@@ -72,4 +72,4 @@ CREATE TABLE notifications (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_notifications_user FOREIGN KEY (user_id) REFERENCES employees(id) ON DELETE CASCADE,
   INDEX idx_notifications_user (user_id, created_at)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
