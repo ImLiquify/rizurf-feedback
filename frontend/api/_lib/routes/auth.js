@@ -53,7 +53,10 @@ authRouter.post(
     });
 
     setSessionCookie(res, { ...claims, uid });
-    res.json({ user: { id: uid, email: claims.email, name: claims.name, role: claims.role } });
+    // The full row (photo, title, department), same as /auth/session, so a
+    // re-sign-in after the gateway session ends doesn't drop them.
+    const employee = await findEmployeeById(uid);
+    res.json({ user: employee ?? { id: uid, email: claims.email, name: claims.name, role: claims.role } });
   }),
 );
 
