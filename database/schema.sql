@@ -17,6 +17,7 @@ CREATE TABLE employees (
   email      VARCHAR(255) NOT NULL UNIQUE,
   name       VARCHAR(255) NOT NULL,
   photo_url  VARCHAR(1024) NULL,           -- from the Intern API roster (photo_url); NULL shows initials
+  title      VARCHAR(255) NULL,            -- Intern API role name, display only; access comes from `role`
   role       ENUM('user', 'admin', 'hr', 'supervisor') NOT NULL DEFAULT 'user',
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { searchEmployees } from '../api';
 import type { Employee } from '../types';
 import { Avatar } from '../components/Avatar';
+import { roleLabel } from '../utils';
 import { IconSearch } from '../components/icons';
 
 function stars(n: number): string {
@@ -61,7 +62,7 @@ export function DirectoryPage() {
                   <Avatar name={e.name} photoUrl={e.photoUrl} />
                   <div>
                     <div>{e.name}</div>
-                    <div className="muted">{e.role}</div>
+                    <div className="muted">{roleLabel(e)}</div>
                   </div>
                 </div>
                 <div className="stars">

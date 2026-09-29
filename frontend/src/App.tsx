@@ -3,13 +3,13 @@ import { NavLink, Route, Routes, useLocation } from 'react-router-dom';
 import { useCurrentUser } from './context/CurrentUserContext';
 import { NotificationsList } from './components/NotificationsList';
 import { Avatar } from './components/Avatar';
+import { roleLabel } from './utils';
 import { IconFlag, IconGrid, IconMenu, IconUsers } from './components/icons';
 import { DirectoryPage } from './pages/DirectoryPage';
 import { EmployeeProfilePage } from './pages/EmployeeProfilePage';
 import { AdminFlagsPage } from './pages/AdminFlagsPage';
 import { AdminWallPage } from './pages/AdminWallPage';
 import { MePage } from './pages/MePage';
-import { QuickSearch } from './components/QuickSearch';
 
 const GATEWAY = 'https://web-omega-two-47.vercel.app';
 
@@ -72,7 +72,7 @@ export function App() {
             <Avatar name={currentUser.name} photoUrl={currentUser.photoUrl} size={38} />
             <div className="sidebar-user-info">
               <div className="sidebar-user-name">{currentUser.name}</div>
-              <div className="sidebar-user-role">{currentUser.role}</div>
+              <div className="sidebar-user-role">{roleLabel(currentUser)}</div>
             </div>
           </div>
         </aside>
@@ -87,7 +87,6 @@ export function App() {
               <b>{pageTitle(pathname)}</b>
             </span>
             <div className="topbar-right">
-              <QuickSearch />
               <NotificationsList />
             </div>
           </header>

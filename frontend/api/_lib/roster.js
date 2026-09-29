@@ -11,8 +11,10 @@ const PAGE = 200; // the Intern API's max page size
 let lastCheck = 0;
 let inFlight = null;
 
-// Former interns are left out; everyone else with an email is listed.
-export function internsToEmployeeRows(interns) {
+// Former interns are left out; everyone else with an email is listed. Their
+// Intern API role name becomes a display title only: access (admin/hr) is
+// never taken from here, only from the gateway at sign-in.
+export function internsToEmployeeRows(interns, roleNames = new Map()) {
   return interns
     .filter((i) => i.email_address && i.status !== 'Former')
     .map((i) => [
@@ -20,7 +22,17 @@ export function internsToEmployeeRows(interns) {
       i.email_address,
       `${i.first_name ?? ''} ${i.last_name ?? ''}`.trim() || i.email_address,
       i.photo_url ?? null,
+      roleNames.get(i.role_id) ?? null,
     ]);
+}
+
+async function getJson(path, token) {
+  const res = await fetch(`${config.internApiUrl}${path}`, {
+    headers: { authorization: `Bearer ${token}` },
+    signal: AbortSignal.timeout(5000),
+  });
+  if (!res.ok) throw new Error(`Intern API ${path} failed (HTTP ${res.status}): ${await res.text()}`);
+  return res.json();
 }
 
 async function getAccessToken() {
@@ -67,17 +79,15 @@ async function runSync() {
 
 async function fetchAndStoreRoster() {
   const token = await getAccessToken();
+  // Role names are a nice-to-have; failing to get them must not block the roster.
+  const rolesPromise = getJson('/api/roles', token).catch(() => ({ data: [] }));
   const interns = [];
   for (let offset = 0; ; offset += PAGE) {
-    const res = await fetch(`${config.internApiUrl}/api/interns?limit=${PAGE}&offset=${offset}`, {
-      headers: { authorization: `Bearer ${token}` },
-      signal: AbortSignal.timeout(5000),
-    });
-    if (!res.ok) throw new Error(`Intern API list failed (HTTP ${res.status}): ${await res.text()}`);
-    const { data, pagination } = await res.json();
+    const { data, pagination } = await getJson(`/api/interns?limit=${PAGE}&offset=${offset}`, token);
     interns.push(...data);
     if (!data.length || offset + PAGE >= pagination.total) break;
   }
 
-  await upsertRosterEmployees(internsToEmployeeRows(interns));
+  const roleNames = new Map(((await rolesPromise).data ?? []).map((role) => [role.id, role.name]));
+  await upsertRosterEmployees(internsToEmployeeRows(interns, roleNames));
 }

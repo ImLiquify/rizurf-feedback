@@ -9,7 +9,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test:api": "node --test api/_lib/**/*.test.js"
+    "test:api": "node --test api/_lib/**/*.test.js src/**/*.test.ts"
   },
   "dependencies": {
     "dotenv": "^16.4.5",

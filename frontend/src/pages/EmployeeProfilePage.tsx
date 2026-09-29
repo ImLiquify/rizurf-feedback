@@ -15,7 +15,10 @@ import { ReviewForm } from '../components/ReviewForm';
 import { ReviewCard } from '../components/ReviewCard';
 import { IconChevronLeft } from '../components/icons';
 import { Avatar } from '../components/Avatar';
+import { roleLabel } from '../utils';
 import { RatingSummaryCard } from '../components/RatingSummaryCard';
+import { ReviewToolbar } from '../components/ReviewToolbar';
+import { filterReviews, NO_FILTER } from '../reviewFilters';
 import type { Employee, RatingSummary, ReviewView, Visibility } from '../types';
 
 export function EmployeeProfilePage() {
@@ -24,6 +27,7 @@ export function EmployeeProfilePage() {
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [reviews, setReviews] = useState<ReviewView[]>([]);
   const [summary, setSummary] = useState<RatingSummary | null>(null);
+  const [filter, setFilter] = useState(NO_FILTER);
   const [people, setPeople] = useState<Record<string, Employee>>({});
   const [error, setError] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(true);
@@ -95,6 +99,8 @@ export function EmployeeProfilePage() {
   if (!employee) return <p>No employee with id {employeeId}.</p>;
 
   const isSelf = employee.id === currentUser.id;
+  const authorOf = (r: ReviewView) => (r.authorId ? people[r.authorId]?.name ?? '' : '');
+  const shown = filterReviews(reviews, filter, authorOf);
 
   return (
     <div>
@@ -108,7 +114,7 @@ export function EmployeeProfilePage() {
         <div>
           <h1>{employee.name}</h1>
           <p className="muted">
-            {employee.email} · {employee.role}
+            {employee.email} · {roleLabel(employee)}
           </p>
         </div>
       </div>
@@ -126,8 +132,10 @@ export function EmployeeProfilePage() {
       )}
 
       <h2 style={{ marginTop: 28 }}>Reviews</h2>
+      <ReviewToolbar reviews={reviews} filter={filter} onChange={setFilter} shown={shown.length} />
       {reviews.length === 0 && <div className="empty-state">No reviews yet.</div>}
-      {reviews.map((review) => (
+      {reviews.length > 0 && shown.length === 0 && <div className="empty-state">No reviews match these filters.</div>}
+      {shown.map((review) => (
         <ReviewCard
           key={review.id}
           review={review}

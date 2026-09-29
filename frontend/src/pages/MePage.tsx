@@ -11,8 +11,11 @@ import {
   searchEmployees,
 } from '../api';
 import { Avatar } from '../components/Avatar';
+import { roleLabel } from '../utils';
 import { ReviewCard } from '../components/ReviewCard';
 import { RatingSummaryCard } from '../components/RatingSummaryCard';
+import { ReviewToolbar } from '../components/ReviewToolbar';
+import { filterReviews, NO_FILTER } from '../reviewFilters';
 import type { Employee, GivenReview, RatingSummary, ReviewView, Visibility } from '../types';
 
 type Tab = 'received' | 'given';
@@ -27,6 +30,7 @@ export function MePage() {
   const [given, setGiven] = useState<GivenReview[]>([]);
   const [people, setPeople] = useState<Record<string, Employee>>({});
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState(NO_FILTER);
 
   const loadReceived = useCallback(async () => {
     const data = await getEmployeeReviews(currentUser.id);
@@ -46,6 +50,12 @@ export function MePage() {
   if (loading) return <p className="muted">Loading…</p>;
 
   const awaitingReply = received.filter((r) => !r.reply).length;
+  const shownReceived = filterReviews(received, filter, (r) => (r.authorId ? people[r.authorId]?.name ?? '' : ''));
+  const shownGiven = filterReviews(given, filter, (r) => r.receiverName);
+  const switchTab = (t: Tab) => {
+    setTab(t);
+    setFilter(NO_FILTER);
+  };
 
   return (
     <div>
@@ -54,7 +64,7 @@ export function MePage() {
         <div>
           <h1>{currentUser.name}</h1>
           <p className="muted">
-            {currentUser.email} · {currentUser.role}
+            {currentUser.email} · {roleLabel(currentUser)}
           </p>
         </div>
       </div>
@@ -62,21 +72,23 @@ export function MePage() {
       {summary && <RatingSummaryCard summary={summary} title="Your rating" />}
 
       <div className="tabs" role="tablist" aria-label="Your reviews">
-        <button role="tab" aria-selected={tab === 'received'} className="tab" onClick={() => setTab('received')}>
+        <button role="tab" aria-selected={tab === 'received'} className="tab" onClick={() => switchTab('received')}>
           About me <span className="tab-count">{received.length}</span>
           {awaitingReply > 0 && <span className="badge" title="Waiting for your reply">{awaitingReply}</span>}
         </button>
-        <button role="tab" aria-selected={tab === 'given'} className="tab" onClick={() => setTab('given')}>
+        <button role="tab" aria-selected={tab === 'given'} className="tab" onClick={() => switchTab('given')}>
           I've given <span className="tab-count">{given.length}</span>
         </button>
       </div>
 
       {tab === 'received' ? (
         <div role="tabpanel">
+          <ReviewToolbar reviews={received} filter={filter} onChange={setFilter} shown={shownReceived.length} />
+          {received.length > 0 && shownReceived.length === 0 && <div className="empty-state">No reviews match these filters.</div>}
           {received.length === 0 && (
             <div className="empty-state">No one has reviewed you yet. Reviews written about you will show up here.</div>
           )}
-          {received.map((review) => (
+          {shownReceived.map((review) => (
             <ReviewCard
               key={review.id}
               review={review}
@@ -93,12 +105,14 @@ export function MePage() {
         </div>
       ) : (
         <div role="tabpanel">
+          <ReviewToolbar reviews={given} filter={filter} onChange={setFilter} shown={shownGiven.length} />
+          {given.length > 0 && shownGiven.length === 0 && <div className="empty-state">No reviews match these filters.</div>}
           {given.length === 0 && (
             <div className="empty-state">
               You haven't reviewed anyone yet. <Link to="/">Find a coworker</Link> to leave feedback.
             </div>
           )}
-          {given.map((review) => (
+          {shownGiven.map((review) => (
             <div key={review.id} className="given-item">
               <Link to={`/employees/${review.receiverId}`} className="given-to">
                 <Avatar name={review.receiverName} photoUrl={review.receiverPhotoUrl} size={26} />

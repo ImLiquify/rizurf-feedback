@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { ApiError, getEmployeeWall } from '../api';
 import { Avatar } from '../components/Avatar';
+import { roleLabel } from '../utils';
+import { IconSearch } from '../components/icons';
 import type { WallEmployee, WallReview } from '../types';
 
 function stars(n: number): string {
@@ -36,6 +38,7 @@ export function AdminWallPage() {
   const [employees, setEmployees] = useState<WallEmployee[]>([]);
   const [blocked, setBlocked] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -57,19 +60,35 @@ export function AdminWallPage() {
   if (loading) return <p className="muted">Loading…</p>;
   if (blocked) return <p>{blocked}</p>;
 
+  const q = query.trim().toLowerCase();
+  const shown = q ? employees.filter((e) => `${e.name} ${e.email}`.toLowerCase().includes(q)) : employees;
+
   return (
     <div>
       <h1>Employee Wall</h1>
       <p className="muted">Every employee, with the feedback they've given and received.</p>
 
+      <div className="search-field">
+        <IconSearch />
+        <input
+          id="search-input"
+          type="search"
+          aria-label="Quick find a coworker"
+          placeholder="Quick find a coworker"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+      </div>
+      {shown.length === 0 && <div className="empty-state">No one matches “{query}”.</div>}
+
       <div className="wall-grid">
-        {employees.map((employee) => (
+        {shown.map((employee) => (
           <div key={employee.id} className="wall-tile">
             <div className="wall-tile-header">
               <Avatar name={employee.name} photoUrl={employee.photoUrl} />
               <div className="wall-tile-identity">
                 <div className="wall-tile-name">{employee.name}</div>
-                <div className="muted">{employee.role}</div>
+                <div className="muted">{roleLabel(employee)}</div>
               </div>
               {employee.avgRating != null && (
                 <span className="stars wall-tile-rating">

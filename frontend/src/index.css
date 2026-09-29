@@ -334,6 +334,27 @@ label { display: block; font-size: 12px; margin: 10px 0 4px; font-weight: 650; c
 
 .star-hint { margin-left: 10px; font-size: 13px; color: var(--muted); }
 
+/* ---------- Review toolbar: search, stars, sort, topic chips ---------- */
+.review-toolbar { margin: 12px 0 4px; display: grid; gap: 10px; }
+.review-toolbar-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.review-toolbar-row select { width: auto; height: 38px; padding: 0 10px; cursor: pointer; }
+.review-search { position: relative; flex: 1 1 220px; display: flex; align-items: center; }
+.review-search svg { position: absolute; left: 11px; color: var(--muted); pointer-events: none; }
+.review-search input { height: 38px; padding-left: 32px; }
+.topic-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.topic-chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px;
+  border: 1.5px solid var(--line); border-radius: var(--radius-pill); background: var(--surface);
+  font: inherit; font-size: 12.5px; font-weight: 600; color: var(--navy-700); cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
+}
+.topic-chip:hover { border-color: var(--primary); color: var(--primary); }
+.topic-chip[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: #fff; }
+.topic-chip:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.topic-chip-count { font-size: 11px; opacity: 0.75; font-variant-numeric: tabular-nums; }
+.review-toolbar-status { margin: 0; display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); }
+.review-toolbar-status .link-btn { margin: 0; }
+
 /* ---------- Me page ---------- */
 .tabs { display: flex; gap: 4px; margin: 28px 0 4px; border-bottom: 1px solid var(--line); }
 .tab {
@@ -352,26 +373,6 @@ label { display: block; font-size: 12px; margin: 10px 0 4px; font-weight: 650; c
 .given-to:hover b { color: var(--primary); }
 .given-item .review-card { margin-top: 8px; }
 .empty-state a { color: var(--primary); font-weight: 600; }
-
-/* ---------- Quick search (top bar) ---------- */
-.quick-search { position: relative; display: flex; align-items: center; width: 260px; }
-.quick-search > svg { position: absolute; left: 11px; color: var(--muted); pointer-events: none; }
-.quick-search input { height: 36px; padding: 0 12px 0 34px; font-size: 13.5px; background: var(--soft); }
-.quick-search input:focus-visible { background: var(--surface); }
-.quick-search-panel {
-  position: absolute; top: 44px; right: 0; width: 340px; margin: 0; padding: 6px; list-style: none;
-  background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg); z-index: 60;
-}
-.quick-search-row {
-  display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px; border: 0; border-radius: var(--radius-sm);
-  background: none; font: inherit; text-align: left; cursor: pointer; color: var(--ink);
-}
-.quick-search-row.active { background: var(--primary-tint); }
-.quick-search-name { flex: 1; min-width: 0; display: flex; flex-direction: column; font-size: 13.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
-.quick-search-name .muted { text-transform: capitalize; font-weight: 400; }
-.quick-search-rating { font-size: 13px; font-weight: 600; color: var(--navy-700); font-variant-numeric: tabular-nums; }
-.quick-search-empty { padding: 10px; font-size: 13px; color: var(--muted); }
 
 ::selection { background: var(--primary-tint); color: var(--navy); }
 
@@ -395,8 +396,6 @@ label { display: block; font-size: 12px; margin: 10px 0 4px; font-weight: 650; c
   .backdrop.open { display: block; position: fixed; inset: 0; background: rgba(2, 23, 50, 0.45); z-index: 45; }
 }
 @media (max-width: 700px) {
-  .quick-search { width: auto; flex: 1; min-width: 0; }
-  .quick-search-panel { width: min(340px, calc(100vw - 28px)); }
   .bell-btn .bell-label { display: none; }
   .rating-summary-average { font-size: 36px; }
   .topbar { padding: 0 14px; gap: 10px; }
@@ -407,5 +406,5 @@ label { display: block; font-size: 12px; margin: 10px 0 4px; font-weight: 650; c
   .employee-row-link { flex-wrap: wrap; }
 }
 @media (max-width: 480px) {
-  .crumb { display: none; } /* the page heading already says where you are; the search needs the room */
+  .crumb-root { display: none; }
 }
