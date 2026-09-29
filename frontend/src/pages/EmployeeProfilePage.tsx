@@ -20,6 +20,7 @@ import { RatingSummaryCard } from '../components/RatingSummaryCard';
 import { ReviewToolbar } from '../components/ReviewToolbar';
 import { filterReviews, NO_FILTER } from '../reviewFilters';
 import type { Employee, RatingSummary, ReviewView, Visibility } from '../types';
+import { Skeleton } from '../components/Skeleton';
 
 export function EmployeeProfilePage() {
   const { employeeId = '' } = useParams();
@@ -90,7 +91,7 @@ export function EmployeeProfilePage() {
     await load();
   }
 
-  if (loading) return <p className="muted">Loading…</p>;
+  if (loading) return <Skeleton variant="profile" />;
   if (!employee) return <p>No employee with id {employeeId}.</p>;
 
   const isSelf = employee.id === currentUser.id;

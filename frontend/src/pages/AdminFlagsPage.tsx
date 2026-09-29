@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ApiError, listOpenFlags, resolveFlag, searchEmployees } from '../api';
 import type { OpenFlagEntry } from '../types';
 import { IconFlag, IconTrash } from '../components/icons';
+import { Skeleton } from '../components/Skeleton';
 
 export function AdminFlagsPage() {
   const [flags, setFlags] = useState<OpenFlagEntry[]>([]);
@@ -41,7 +42,7 @@ export function AdminFlagsPage() {
     }
   }
 
-  if (loading) return <p className="muted">Loading…</p>;
+  if (loading) return <Skeleton variant="rows" />;
   if (blocked) return <p>{blocked}</p>;
 
   return (

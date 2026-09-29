@@ -17,6 +17,7 @@ import { RatingSummaryCard } from '../components/RatingSummaryCard';
 import { ReviewToolbar } from '../components/ReviewToolbar';
 import { filterReviews, NO_FILTER } from '../reviewFilters';
 import type { Employee, GivenReview, RatingSummary, ReviewView, Visibility } from '../types';
+import { Skeleton } from '../components/Skeleton';
 
 type Tab = 'received' | 'given';
 
@@ -47,7 +48,7 @@ export function MePage() {
       .finally(() => setLoading(false));
   }, [loadReceived, loadGiven]);
 
-  if (loading) return <p className="muted">Loading…</p>;
+  if (loading) return <Skeleton variant="profile" />;
 
   const awaitingReply = received.filter((r) => !r.reply).length;
   const shownReceived = filterReviews(received, filter, (r) => (r.authorId ? people[r.authorId]?.name ?? '' : ''));

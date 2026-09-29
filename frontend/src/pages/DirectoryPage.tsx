@@ -5,6 +5,7 @@ import type { Employee } from '../types';
 import { Avatar } from '../components/Avatar';
 import { roleLabel } from '../utils';
 import { IconSearch } from '../components/icons';
+import { Skeleton } from '../components/Skeleton';
 
 function stars(n: number): string {
   const rounded = Math.round(n);
@@ -51,7 +52,7 @@ export function DirectoryPage() {
         />
       </div>
       {loading ? (
-        <p className="muted">Loading…</p>
+        <Skeleton variant="rows" />
       ) : (
         <ul className="employee-list">
           {results.length === 0 && <li className="empty-state">No matches.</li>}

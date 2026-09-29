@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { exchangeCode, getSession } from '../api';
 import type { Employee } from '../types';
+import { ShellSkeleton } from '../components/Skeleton';
 
 interface CurrentUserContextValue {
   currentUser: Employee;
@@ -56,9 +57,10 @@ export function CurrentUserProvider({ children }: { children: ReactNode }) {
   }, []);
 
   if (!currentUser) {
+    if (!error) return <ShellSkeleton />;
     return (
       <div className="auth-loading">
-        <p className="muted">{error ? `Couldn't sign you in: ${error}` : 'Loading…'}</p>
+        <p className="muted">Couldn't sign you in: {error}</p>
       </div>
     );
   }

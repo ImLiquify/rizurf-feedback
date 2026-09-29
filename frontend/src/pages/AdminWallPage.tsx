@@ -5,6 +5,7 @@ import { Avatar } from '../components/Avatar';
 import { fullDate, roleLabel, timeAgo } from '../utils';
 import { IconSearch } from '../components/icons';
 import type { WallEmployee, WallReview } from '../types';
+import { Skeleton } from '../components/Skeleton';
 
 function stars(n: number): string {
   return '★'.repeat(n) + '☆'.repeat(5 - n);
@@ -65,7 +66,7 @@ export function AdminWallPage() {
     };
   }, []);
 
-  if (loading) return <p className="muted">Loading…</p>;
+  if (loading) return <Skeleton variant="tiles" />;
   if (blocked) return <p>{blocked}</p>;
 
   const q = query.trim().toLowerCase();

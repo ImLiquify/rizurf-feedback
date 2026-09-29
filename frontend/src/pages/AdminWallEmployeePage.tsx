@@ -7,6 +7,7 @@ import { IconChevronLeft } from '../components/icons';
 import { filterReviews, NO_FILTER } from '../reviewFilters';
 import { fullDate, roleLabel, timeAgo } from '../utils';
 import type { WallEmployee, WallReview } from '../types';
+import { Skeleton } from '../components/Skeleton';
 
 type Tab = 'received' | 'given';
 
@@ -28,7 +29,7 @@ export function AdminWallEmployeePage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p className="muted">Loading…</p>;
+  if (loading) return <Skeleton variant="profile" />;
   if (blocked) return <p>{blocked}</p>;
 
   const employee = everyone.find((e) => e.id === employeeId);
