@@ -147,3 +147,7 @@ export async function getNotifications(): Promise<NotificationItem[]> {
   const data = await request<{ notifications: NotificationItem[] }>('/notifications');
   return data.notifications;
 }
+
+export function markNotificationsRead(): Promise<null> {
+  return request<null>('/notifications/read', { method: 'POST' });
+}

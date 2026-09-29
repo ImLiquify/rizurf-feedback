@@ -27,3 +27,9 @@ export function viewReviewFor(review, requester) {
 export function viewReviewsFor(reviews, requester) {
   return reviews.map((review) => viewReviewFor(review, requester)).filter((review) => review !== null);
 }
+
+// The notification the receiver gets. An anonymous review must never name
+// its author here either: the message text is stored and shown as-is.
+export function newReviewNotice(authorName, visibility) {
+  return visibility === 'anonymous' ? 'New anonymous review.' : `${authorName} left you a review.`;
+}

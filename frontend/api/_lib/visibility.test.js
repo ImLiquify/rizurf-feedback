@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { isAdminRole, viewReviewFor, viewReviewsFor } from './visibility.js';
+import { isAdminRole, newReviewNotice, viewReviewFor, viewReviewsFor } from './visibility.js';
 
 const receiver = { id: 'emp-1', role: 'employee' };
 const author = { id: 'emp-3', role: 'employee' };
@@ -45,4 +45,9 @@ test('an anonymous review is hidden entirely from an unrelated employee', () => 
 test('viewReviewsFor filters out reviews the requester may not see', () => {
   const result = viewReviewsFor([publicReview, anonReview], unrelated);
   assert.deepEqual(result, [{ ...publicReview }]);
+});
+
+test('the new-review notification never names an anonymous author', () => {
+  assert.equal(newReviewNotice('Bob Santos', 'public'), 'Bob Santos left you a review.');
+  assert.equal(newReviewNotice('Bob Santos', 'anonymous'), 'New anonymous review.');
 });

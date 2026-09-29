@@ -8,6 +8,8 @@ import { reviewsRouter } from './routes/reviews.js';
 import { adminRouter } from './routes/admin.js';
 import { notificationsRouter } from './routes/notifications.js';
 import { ApiError } from './errors.js';
+import { asyncHandler } from './asyncHandler.js';
+import { gatewayBadges } from './gatewayBadges.js';
 
 const CORRELATION_HEADER = 'x-correlation-id';
 
@@ -35,8 +37,12 @@ app.get('/openapi.json', (req, res) => {
   res.send(OPENAPI_JSON);
 });
 
+// App-icon badge counts for the gateway: its own token, not a session, so
+// it goes before requireSession and the 404 handler (MICROAPP_BADGES.md §3).
+app.get('/gateway/badges', asyncHandler(gatewayBadges));
+
 // SS-5 — a wrong method on a real path is 405, not 404.
-app.all(['/health', '/openapi.json'], (req, res) => {
+app.all(['/health', '/openapi.json', '/gateway/badges'], (req, res) => {
   res.status(405).set('allow', 'GET').json({
     error: {
       code: 'METHOD_NOT_ALLOWED',

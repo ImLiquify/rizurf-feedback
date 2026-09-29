@@ -1,7 +1,7 @@
 import { pool } from './db/pool.js';
 import { config } from './config.js';
 
-const VERSION = '1.1.0';
+const VERSION = '1.2.0';
 const started = Date.now();
 
 // MICROAPP_PERFORMANCE.md §3 — time-box every check so one hanging
@@ -221,7 +221,7 @@ export const openapi = {
           description: 'See your own in-app notifications.',
           does: ['List your notifications'],
           best_for: 'Employees checking for new reviews, replies, or flag resolutions.',
-          endpoints: ['GET /api/notifications'],
+          endpoints: ['GET /api/notifications', 'POST /api/notifications/read', 'GET /gateway/badges'],
         },
       ],
       workflows: [
@@ -248,6 +248,8 @@ export const openapi = {
       // not by other services via client_credentials. Documented honestly
       // rather than declaring a Bearer scheme these routes don't accept.
       sessionCookie: { type: 'apiKey', in: 'cookie', name: 'rizurf_feedback_session' },
+      // Only the gateway calls /gateway/badges, with its own signed access token.
+      bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
     },
   },
   paths: {
@@ -385,6 +387,40 @@ export const openapi = {
           requires: ['Signed-in session'],
           related_endpoints: ['PATCH /api/reviews/{id}', 'DELETE /api/reviews/{id}'],
           tags: ['my reviews', 'given', 'sent', 'written', 'feedback history'],
+        },
+      },
+    },
+    '/gateway/badges': {
+      get: {
+        summary: 'Unread notification counts per person, for the badge on this app in the gateway',
+        security: [{ bearerAuth: ['gateway:badges:read'] }],
+        'x-rizurf': {
+          name: 'App Badge Counts',
+          purpose: "Show how many unread feedback notifications each person has on this app's icon",
+          use_when: ['The gateway refreshes app icon badges'],
+          do_not_use_when: ['Showing a person their own notifications, use GET /api/notifications'],
+          inputs: [],
+          outputs: ['badges[].email', 'badges[].count'],
+          requires: ['Gateway access token with gateway:badges:read'],
+          related_endpoints: ['GET /api/notifications', 'POST /api/notifications/read'],
+          tags: ['badge', 'unread', 'count', 'notifications', 'gateway'],
+        },
+      },
+    },
+    '/api/notifications/read': {
+      post: {
+        summary: 'Mark all of your notifications as read',
+        security: [{ sessionCookie: [] }],
+        'x-rizurf': {
+          name: 'Mark Notifications Read',
+          purpose: 'Clear your unread notifications and the badge on the app icon',
+          use_when: ['You have opened and seen your notifications'],
+          do_not_use_when: ['Just listing notifications, use GET /api/notifications'],
+          inputs: [],
+          outputs: [],
+          requires: ['Signed-in session'],
+          related_endpoints: ['GET /api/notifications'],
+          tags: ['notifications', 'read', 'clear', 'badge'],
         },
       },
     },
