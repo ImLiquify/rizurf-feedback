@@ -60,7 +60,9 @@ export async function verifyToken(token, expectedUse) {
   if (claims.iss !== config.gatewayUrl) {
     throw new Error(`Token issuer "${claims.iss}" is not this app's configured gateway.`);
   }
-  if (claims.aud !== config.serviceId) {
+  // The gateway addresses identity tokens to the app's own origin (PUBLIC_URL);
+  // the service id is still accepted. Both name this app and nothing else.
+  if (claims.aud !== config.serviceId && claims.aud !== config.publicUrl) {
     throw new Error(`Token audience "${claims.aud}" was not minted for this service.`);
   }
 
