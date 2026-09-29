@@ -112,7 +112,7 @@ export function MePage() {
           {given.length > 0 && shownGiven.length === 0 && <div className="empty-state">No reviews match these filters.</div>}
           {given.length === 0 && (
             <div className="empty-state">
-              You haven't reviewed anyone yet. <Link to="/">Find a coworker</Link> to leave feedback.
+              You haven't reviewed anyone yet. <Link to="/directory">Find a coworker</Link> to leave feedback.
             </div>
           )}
           {shownGiven.map((review) => (

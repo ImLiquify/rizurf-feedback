@@ -100,7 +100,7 @@ export function EmployeeProfilePage() {
 
   return (
     <div>
-      <Link to="/" className="back-link">
+      <Link to="/directory" className="back-link">
         <IconChevronLeft width={16} height={16} />
         Directory
       </Link>

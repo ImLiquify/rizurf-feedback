@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NavLink, Route, Routes, useLocation } from 'react-router-dom';
+import { Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom';
 import { useCurrentUser } from './context/CurrentUserContext';
 import { NotificationsList } from './components/NotificationsList';
 import { Avatar } from './components/Avatar';
@@ -51,7 +51,7 @@ export function App() {
               <span className="nav-icon"><Avatar name={currentUser.name} photoUrl={currentUser.photoUrl} size={24} /></span>
               <span className="nav-label">Me</span>
             </NavLink>
-            <NavLink to="/" end className={navClass} onClick={close}>
+            <NavLink to="/directory" className={navClass} onClick={close}>
               <span className="nav-icon"><IconUsers width={22} height={22} strokeWidth={2.2} /></span>
               <span className="nav-label">Directory</span>
             </NavLink>
@@ -87,7 +87,8 @@ export function App() {
           </header>
           <main className="content">
             <Routes>
-              <Route path="/" element={<DirectoryPage />} />
+              <Route path="/" element={<Navigate to="/me" replace />} />
+              <Route path="/directory" element={<DirectoryPage />} />
               <Route path="/me" element={<MePage />} />
               <Route path="/employees/:employeeId" element={<EmployeeProfilePage />} />
               <Route path="/admin/flags" element={<AdminFlagsPage />} />
