@@ -308,11 +308,23 @@ label { display: block; font-size: 12px; margin: 10px 0 4px; font-weight: 650; c
 .wall-tile { background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--radius-md); padding: 18px; }
 .wall-tile-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
 .wall-tile-identity { flex: 1; min-width: 0; }
-.wall-tile-name { font-weight: 650; font-size: 15px; color: var(--navy); }
+.wall-tile-name { font-weight: 650; font-size: 15px; color: var(--navy); text-decoration: none; }
+.wall-tile-name:hover { color: var(--primary); text-decoration: underline; }
+.wall-tile { display: flex; flex-direction: column; }
+.wall-tile-more {
+  margin-top: auto; padding-top: 14px; align-self: flex-start;
+  font-size: 13px; font-weight: 650; color: var(--primary); text-decoration: none;
+}
+.wall-tile-more:hover { color: var(--primary-600); text-decoration: underline; }
+.wall-detail-list { list-style: none; margin: 0; padding: 0; }
+.wall-detail-who { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+.wall-detail-who a { color: var(--navy-700); font-weight: 650; text-decoration: none; }
+.wall-detail-who a:hover { color: var(--primary); text-decoration: underline; }
+.wall-detail-date { margin-left: auto; font-size: 12px; font-variant-numeric: tabular-nums; }
 .wall-tile-rating { font-size: 13px; white-space: nowrap; }
 .wall-section + .wall-section { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
 .wall-section h2 { font-size: 12px; font-weight: 650; color: var(--muted); margin: 0 0 8px; }
-.wall-review-list { list-style: none; margin: 0; padding: 0; max-height: 220px; overflow-y: auto; display: grid; gap: 8px; }
+.wall-review-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .wall-review-line { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; background: var(--soft); border-radius: var(--radius-sm); }
 .wall-review-line .stars.small { font-size: 12px; }
 .wall-review-body { font-size: 13px; color: var(--ink); }

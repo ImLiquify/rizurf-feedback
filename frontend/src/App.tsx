@@ -9,6 +9,7 @@ import { DirectoryPage } from './pages/DirectoryPage';
 import { EmployeeProfilePage } from './pages/EmployeeProfilePage';
 import { AdminFlagsPage } from './pages/AdminFlagsPage';
 import { AdminWallPage } from './pages/AdminWallPage';
+import { AdminWallEmployeePage } from './pages/AdminWallEmployeePage';
 import { MePage } from './pages/MePage';
 
 const GATEWAY = 'https://web-omega-two-47.vercel.app';
@@ -97,6 +98,7 @@ export function App() {
               <Route path="/employees/:employeeId" element={<EmployeeProfilePage />} />
               <Route path="/admin/flags" element={<AdminFlagsPage />} />
               <Route path="/admin/wall" element={<AdminWallPage />} />
+              <Route path="/admin/wall/:employeeId" element={<AdminWallEmployeePage />} />
             </Routes>
           </main>
         </div>

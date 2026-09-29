@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ApiError, getEmployeeWall } from '../api';
 import { Avatar } from '../components/Avatar';
 import { roleLabel } from '../utils';
@@ -8,6 +9,9 @@ import type { WallEmployee, WallReview } from '../types';
 function stars(n: number): string {
   return '★'.repeat(n) + '☆'.repeat(5 - n);
 }
+
+// The tile is a preview: the newest few each way; the detail page has them all.
+const PREVIEW = 2;
 
 function truncate(text: string, max = 90): string {
   return text.length > max ? `${text.slice(0, max).trimEnd()}…` : text;
@@ -87,7 +91,9 @@ export function AdminWallPage() {
             <div className="wall-tile-header">
               <Avatar name={employee.name} photoUrl={employee.photoUrl} />
               <div className="wall-tile-identity">
-                <div className="wall-tile-name">{employee.name}</div>
+                <Link to={`/admin/wall/${employee.id}`} className="wall-tile-name">
+                  {employee.name}
+                </Link>
                 <div className="muted">{roleLabel(employee)}</div>
               </div>
               {employee.avgRating != null && (
@@ -103,7 +109,7 @@ export function AdminWallPage() {
                 <p className="muted small">No reviews given yet.</p>
               ) : (
                 <ul className="wall-review-list">
-                  {employee.reviewsGiven.map((r) => (
+                  {employee.reviewsGiven.slice(0, PREVIEW).map((r) => (
                     <ReviewLine key={r.id} review={r} counterpartLabel="to" counterpartName={r.receiverName} />
                   ))}
                 </ul>
@@ -116,12 +122,16 @@ export function AdminWallPage() {
                 <p className="muted small">No reviews received yet.</p>
               ) : (
                 <ul className="wall-review-list">
-                  {employee.reviewsReceived.map((r) => (
+                  {employee.reviewsReceived.slice(0, PREVIEW).map((r) => (
                     <ReviewLine key={r.id} review={r} counterpartLabel="from" counterpartName={r.authorName} />
                   ))}
                 </ul>
               )}
             </div>
+
+            <Link to={`/admin/wall/${employee.id}`} className="wall-tile-more">
+              View details
+            </Link>
           </div>
         ))}
       </div>
