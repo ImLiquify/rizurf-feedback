@@ -32,8 +32,12 @@ export function CurrentUserProvider({ children }: { children: ReactNode }) {
           window.history.replaceState({}, '', window.location.pathname);
           if (!cancelled) setCurrentUser(user);
           return;
-        } catch {
-          // Fall through to a plain session check below.
+        } catch (err) {
+          // Stop here: falling through to the session check would 401,
+          // bounce to the gateway, get a fresh code and fail again forever.
+          window.history.replaceState({}, '', window.location.pathname);
+          if (!cancelled) setError(err instanceof Error ? err.message : 'Sign-in failed.');
+          return;
         }
       }
 

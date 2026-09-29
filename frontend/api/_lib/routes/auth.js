@@ -33,10 +33,17 @@ authRouter.post(
       body: JSON.stringify({ code, redirect_uri: redirectUri }),
       signal: AbortSignal.timeout(5000),
     });
-    if (!tokenRes.ok) throw validationError('Could not exchange the sign-in code with the gateway.');
+    if (!tokenRes.ok) {
+      throw validationError(`The gateway refused the sign-in code (HTTP ${tokenRes.status}): ${await tokenRes.text()}`);
+    }
     const { token } = await tokenRes.json();
 
-    const claims = await verifyToken(token, 'identity');
+    let claims;
+    try {
+      claims = await verifyToken(token, 'identity');
+    } catch (err) {
+      throw validationError(`Sign-in token rejected: ${err.message}`);
+    }
 
     await upsertEmployeeFromGateway({
       id: claims.sub,
