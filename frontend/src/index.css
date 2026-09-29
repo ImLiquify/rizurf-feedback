@@ -355,8 +355,16 @@ label { display: block; font-size: 12px; margin: 10px 0 4px; font-weight: 650; c
 /* ---------- Admin flags ---------- */
 .flag-list { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 10px; }
 .flag-row { background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--radius-md); padding: 14px 16px; }
-.flag-reason { display: inline-flex; align-items: center; gap: 6px; color: var(--danger); font-weight: 650; font-size: 13px; }
-.flag-review-body { margin: 8px 0; font-size: 14px; color: var(--ink); }
+.flag-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.flag-person { display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; color: var(--navy); }
+.flag-person b { font-weight: 650; }
+.flag-reason { display: flex; align-items: center; gap: 6px; margin: 10px 0 0; color: var(--danger); font-weight: 650; font-size: 14px; }
+.flag-review { margin: 12px 0 0; padding: 12px 14px; background: var(--soft); border: 1px solid var(--line); border-radius: var(--radius-sm); }
+.flag-route { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.flag-route .stars { margin-left: auto; font-size: 13px; }
+.flag-arrow { color: var(--muted); }
+.anon-tag { font-size: 11px; font-weight: 700; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-pill); padding: 1px 8px; }
+.flag-review-body { margin: 8px 0 0; font-size: 14px; color: var(--ink); line-height: 1.5; }
 .flag-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 
 .empty-state { color: var(--muted); font-size: 14px; padding: 24px 0; text-align: center; }
