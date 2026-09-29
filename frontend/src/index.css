@@ -290,19 +290,36 @@ label { display: block; font-size: 12px; margin: 10px 0 4px; font-weight: 650; c
 .search-field svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); }
 #search-input { padding-left: 40px; height: 40px; }
 
-.employee-list { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); }
-.employee-row {
-  background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--radius-md);
-  overflow: hidden; transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+/* ---------- Directory: header + person cards ---------- */
+.dir-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px 24px; flex-wrap: wrap; }
+.dir-head h1 { margin-bottom: 2px; }
+.dir-head .muted { margin: 0; }
+.dir-head .search-field { flex: 0 1 380px; margin-top: 0; }
+.person-grid {
+  list-style: none; padding: 0; margin: 22px 0 0; display: grid; gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
 }
-.employee-row:hover { border-color: var(--primary); box-shadow: var(--shadow-sm); }
-.employee-row-link {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  padding: 12px 16px; text-decoration: none; color: inherit;
+.person-card {
+  display: flex; align-items: center; gap: 14px; height: 100%; padding: 14px 16px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg);
+  color: inherit; text-decoration: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 }
-.employee-row-link:focus-visible { outline: none; box-shadow: inset var(--focus-ring); }
-.employee-main { display: flex; align-items: center; gap: 12px; font-weight: 600; color: var(--navy-700); }
-.employee-main .muted { font-weight: 400; font-size: 13px; text-transform: capitalize; }
+.person-card:hover { border-color: color-mix(in srgb, var(--primary) 45%, var(--line)); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.person-card:focus-visible { outline: none; box-shadow: var(--focus-ring); border-color: var(--primary); }
+.person-info { flex: 1; min-width: 0; }
+.person-name { font-size: 14.5px; font-weight: 650; color: var(--navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.person-meta { margin-top: 1px; font-size: 12.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.person-rating {
+  flex: none; display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px;
+  border-radius: var(--radius-pill); background: var(--soft); border: 1px solid var(--line);
+  font-size: 12.5px; font-weight: 700; color: var(--navy-700); font-variant-numeric: tabular-nums;
+}
+.person-rating-star { color: var(--star); font-size: 13px; }
+.person-rating-count { font-weight: 500; color: var(--muted); }
+.person-rating-count::before { content: '·'; margin-right: 4px; }
+.person-rating.none { background: none; border-color: transparent; font-weight: 500; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .person-card { transition: none; } .person-card:hover { transform: none; } }
 .stars { color: var(--star); letter-spacing: 1px; white-space: nowrap; }
 
 /* ---------- Panels / forms ---------- */
@@ -563,7 +580,7 @@ label { display: block; font-size: 12px; margin: 10px 0 4px; font-weight: 650; c
 .skeleton-summary { padding: 20px 22px; }
 .skeleton .wall-grid { margin-top: 0; }
 .skeleton-rail { display: grid; gap: 18px; padding: 16px; }
-.search-field + .skeleton { margin-top: 18px; }
+.search-field + .skeleton, .dir-head + .skeleton { margin-top: 22px; }
 
 /* ---------- Scrollbars ---------- */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -591,7 +608,6 @@ label { display: block; font-size: 12px; margin: 10px 0 4px; font-weight: 650; c
   h1 { font-size: 24px; }
   .profile-header, .wall-tile-header { flex-wrap: wrap; }
   .wall-tile-rating { flex-basis: 100%; }
-  .employee-row-link { flex-wrap: wrap; }
 }
 @media (max-width: 480px) {
   .crumb-root { display: none; }
