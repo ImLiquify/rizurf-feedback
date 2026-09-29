@@ -22,7 +22,8 @@ function sign(payload) {
 export function createSessionCookieValue(claims) {
   const session = {
     sid: claims.sid,
-    sub: claims.sub,
+    sub: claims.sub, // the gateway's id — what introspect is asked about
+    uid: claims.uid ?? claims.sub, // this app's employee id (differs for roster-first people)
     email: claims.email,
     name: claims.name,
     role: claims.role,

@@ -17,6 +17,6 @@ export async function requireSession(req, res, next) {
     return next(unauthorized('Session ended at the gateway.'));
   }
 
-  req.user = { id: session.sub, email: session.email, name: session.name, role: session.role };
+  req.user = { id: session.uid ?? session.sub, email: session.email, name: session.name, role: session.role };
   next();
 }

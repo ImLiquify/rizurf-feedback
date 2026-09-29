@@ -43,13 +43,22 @@ export async function searchEmployees(query) {
 }
 
 // Synced from the gateway identity token on every successful sign-in
-// (MICROAPP_AUTH.md §4 step 6 / schema.sql's comment on `employees`) —
-// keeps name/role current without needing the roster-sync service for
-// anyone who has ever logged in.
+// (MICROAPP_AUTH.md §4 step 6). Matched on id OR email: someone added from
+// the intern roster keeps their existing row (and any reviews on it) when
+// they first sign in. Returns the employee id this app uses for them.
 export async function upsertEmployeeFromGateway({ id, email, name, role }) {
   await pool.query(
     `INSERT INTO employees (id, email, name, role) VALUES (?, ?, ?, ?)
      ON DUPLICATE KEY UPDATE email = VALUES(email), name = VALUES(name), role = VALUES(role)`,
     [id, email, name, role],
   );
+  const [rows] = await pool.query('SELECT id FROM employees WHERE email = ?', [email]);
+  return rows[0]?.id ?? id;
+}
+
+// Roster rows from the Intern API: [id, email, name]. An existing email keeps
+// its row and role; only the name is refreshed.
+export async function upsertRosterEmployees(rows) {
+  if (!rows.length) return;
+  await pool.query('INSERT INTO employees (id, email, name) VALUES ? ON DUPLICATE KEY UPDATE name = VALUES(name)', [rows]);
 }

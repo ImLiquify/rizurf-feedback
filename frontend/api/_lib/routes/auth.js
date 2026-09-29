@@ -45,15 +45,15 @@ authRouter.post(
       throw validationError(`Sign-in token rejected: ${err.message}`);
     }
 
-    await upsertEmployeeFromGateway({
+    const uid = await upsertEmployeeFromGateway({
       id: claims.sub,
       email: claims.email,
       name: claims.name,
       role: claims.role,
     });
 
-    setSessionCookie(res, claims);
-    res.json({ user: { id: claims.sub, email: claims.email, name: claims.name, role: claims.role } });
+    setSessionCookie(res, { ...claims, uid });
+    res.json({ user: { id: uid, email: claims.email, name: claims.name, role: claims.role } });
   }),
 );
 
@@ -73,9 +73,10 @@ authRouter.get(
       throw unauthorized('Session ended at the gateway.');
     }
 
-    const employee = await findEmployeeById(session.sub);
+    const uid = session.uid ?? session.sub;
+    const employee = await findEmployeeById(uid);
     res.json({
-      user: employee ?? { id: session.sub, email: session.email, name: session.name, role: session.role },
+      user: employee ?? { id: uid, email: session.email, name: session.name, role: session.role },
     });
   }),
 );

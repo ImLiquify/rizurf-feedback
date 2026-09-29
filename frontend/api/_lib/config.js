@@ -37,4 +37,8 @@ export const config = {
   publicUrl: publicUrl.replace(/\/+$/, ''),
   serviceId: process.env.SERVICE_ID,
   sessionSecret: process.env.SESSION_SECRET,
+  // Intern roster sync (roster.js) — skipped entirely if no CLIENT_SECRET.
+  clientId: process.env.CLIENT_ID || process.env.SERVICE_ID,
+  clientSecret: process.env.CLIENT_SECRET,
+  internApiUrl: (process.env.INTERN_API_URL || 'https://intern-database.vercel.app').replace(/\/+$/, ''),
 };

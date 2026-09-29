@@ -4,12 +4,15 @@ import { searchEmployees } from '../db/employees.js';
 import { findReviewsByReceiver } from '../db/reviews.js';
 import { findRepliesForReviews } from '../db/replies.js';
 import { viewReviewsFor } from '../visibility.js';
+import { syncInternRoster } from '../roster.js';
 
 export const employeesRouter = Router();
 
 employeesRouter.get(
   '/employees',
   asyncHandler(async (req, res) => {
+    // A roster outage must never break search — log it and serve what we have.
+    await syncInternRoster().catch((err) => console.error('Intern roster sync failed:', err.message));
     const employees = await searchEmployees(String(req.query.q ?? ''));
     res.json({ employees });
   }),
