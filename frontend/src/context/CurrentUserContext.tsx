@@ -17,6 +17,7 @@ const CurrentUserContext = createContext<CurrentUserContextValue | undefined>(un
 // (a bad/expired code, or this app's own API being unreachable).
 export function CurrentUserProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<Employee | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -39,8 +40,8 @@ export function CurrentUserProvider({ children }: { children: ReactNode }) {
       try {
         const user = await getSession();
         if (!cancelled) setCurrentUser(user);
-      } catch {
-        // Nothing more to try; stay on the loading state.
+      } catch (err) {
+        if (!cancelled) setError(err instanceof Error ? err.message : 'Could not reach the server.');
       }
     }
 
@@ -53,7 +54,7 @@ export function CurrentUserProvider({ children }: { children: ReactNode }) {
   if (!currentUser) {
     return (
       <div className="auth-loading">
-        <p className="muted">Loading…</p>
+        <p className="muted">{error ? `Couldn't sign you in: ${error}` : 'Loading…'}</p>
       </div>
     );
   }

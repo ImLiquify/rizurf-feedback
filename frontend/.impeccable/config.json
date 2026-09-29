@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "createdAt": "2026-09-25T06:21:25.831Z",
+        "reason": "Sanctioned Operate-mode UI face recorded in DESIGN.md and .impeccable/config.json during the redesign"
+      }
+    ]
+  }
+}
