@@ -4,7 +4,7 @@ import { config } from '../config.js';
 import { verifyToken } from '../auth/verifyToken.js';
 import { setSessionCookie, readSessionCookie, gatewaySessionIsLive, clearSessionCookie, NO_STORE_HEADERS } from '../auth/session.js';
 import { upsertEmployeeFromGateway, findEmployeeById } from '../db/employees.js';
-import { validationError } from '../errors.js';
+import { unauthorized, validationError } from '../errors.js';
 
 export const authRouter = Router();
 
@@ -58,12 +58,12 @@ authRouter.get(
   asyncHandler(async (req, res) => {
     res.set(NO_STORE_HEADERS);
     const session = readSessionCookie(req);
-    if (!session) return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'No session.' } });
+    if (!session) throw unauthorized('No session. Sign in through the gateway.');
 
     const live = await gatewaySessionIsLive(session);
     if (!live) {
       clearSessionCookie(res);
-      return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Session ended at the gateway.' } });
+      throw unauthorized('Session ended at the gateway.');
     }
 
     const employee = await findEmployeeById(session.sub);
