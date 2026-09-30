@@ -6,6 +6,8 @@ import { IconBell, IconClose } from './icons';
 import { timeAgo } from '../utils';
 
 const TOAST_MS = 5000;
+const POLL_MS = 10000;
+export const NOTIFICATIONS_ARRIVED = 'rizurf:notifications-arrived';
 
 export function NotificationsList() {
   const navigate = useNavigate();
@@ -20,8 +22,8 @@ export function NotificationsList() {
 
   useEffect(() => {
     let cancelled = false;
-    // Every request pays the gateway session check, so poll gently and only
-    // while the tab is visible (RIZURF_PERFORMANCE_CHANGES.md §7).
+    // Every request pays the gateway session check, so poll one small list and
+    // only while the tab is visible (RIZURF_PERFORMANCE_CHANGES.md §7).
     function load() {
       if (document.visibilityState !== 'visible') return;
       getNotifications()
@@ -30,7 +32,11 @@ export function NotificationsList() {
           const fresh = all.filter((n) => !n.read);
           if (seen.current) {
             const arrived = fresh.filter((n) => !seen.current!.has(n.id));
-            if (arrived.length) setToasts((t) => [...arrived, ...t].slice(0, 3));
+            if (arrived.length) {
+              setToasts((t) => [...arrived, ...t].slice(0, 3));
+              // Pages showing reviews reload themselves, so new feedback appears without a refresh.
+              window.dispatchEvent(new Event(NOTIFICATIONS_ARRIVED));
+            }
             // Browsers may block sound until the page has been clicked once; then it's silent, not an error.
             if (arrived.some((n) => n.type === 'review_received')) new Audio('/notification.wav').play().catch(() => {});
           }
@@ -40,7 +46,7 @@ export function NotificationsList() {
         .catch(() => {});
     }
     load();
-    const interval = setInterval(load, 45000);
+    const interval = setInterval(load, POLL_MS);
     document.addEventListener('visibilitychange', load);
     return () => {
       cancelled = true;

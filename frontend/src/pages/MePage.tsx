@@ -18,6 +18,7 @@ import { ReviewToolbar } from '../components/ReviewToolbar';
 import { filterReviews, NO_FILTER } from '../reviewFilters';
 import type { Employee, GivenReview, RatingSummary, ReviewView, Visibility } from '../types';
 import { Skeleton } from '../components/Skeleton';
+import { NOTIFICATIONS_ARRIVED } from '../components/NotificationsList';
 
 type Tab = 'received' | 'given';
 
@@ -46,6 +47,13 @@ export function MePage() {
       .then(([employees]) => setPeople(Object.fromEntries(employees.map((e) => [e.id, e]))))
       .catch(() => {})
       .finally(() => setLoading(false));
+  }, [loadReceived, loadGiven]);
+
+  // New feedback about me, or a reply to mine, lands here without a refresh.
+  useEffect(() => {
+    const reload = () => Promise.all([loadReceived(), loadGiven()]).catch(() => {});
+    window.addEventListener(NOTIFICATIONS_ARRIVED, reload);
+    return () => window.removeEventListener(NOTIFICATIONS_ARRIVED, reload);
   }, [loadReceived, loadGiven]);
 
   if (loading) return <Skeleton variant="profile" />;
