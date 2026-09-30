@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react';
 import { Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom';
 import { useCurrentUser } from './context/CurrentUserContext';
 import { NOTIFICATIONS_ARRIVED, NotificationsList } from './components/NotificationsList';
-import { getEmployeeReviews } from './api';
+import { getEmployeeReviews, listOpenFlags } from './api';
 import { Avatar } from './components/Avatar';
 import { ProfileMenu } from './components/ProfileMenu';
 import { IconFlag, IconGrid, IconMenu, IconUsers } from './components/icons';
 import { DirectoryPage } from './pages/DirectoryPage';
 import { EmployeeProfilePage } from './pages/EmployeeProfilePage';
-import { AdminFlagsPage } from './pages/AdminFlagsPage';
+import { AdminFlagsPage, OPEN_FLAGS } from './pages/AdminFlagsPage';
 import { AdminWallPage } from './pages/AdminWallPage';
 import { AdminWallEmployeePage } from './pages/AdminWallEmployeePage';
 import { AWAITING_REPLY, MePage } from './pages/MePage';
@@ -54,6 +54,29 @@ export function App() {
     };
   }, [currentUser.id]);
 
+  // Admin/HR: open flags waiting for a decision. A badge only, no banner or
+  // sound. Nothing notifies us of a new flag, so check twice a minute while
+  // the tab is visible; the Flags page reports its own count as it changes.
+  const isAdmin = isAdminRole(currentUser.role);
+  const [openFlags, setOpenFlags] = useState(0);
+  useEffect(() => {
+    if (!isAdmin) return;
+    const load = () => {
+      if (document.visibilityState !== 'visible') return;
+      listOpenFlags().then((f) => setOpenFlags(f.length)).catch(() => {});
+    };
+    const onCount = (e: Event) => setOpenFlags((e as CustomEvent<number>).detail);
+    load();
+    const interval = setInterval(load, 30000);
+    document.addEventListener('visibilitychange', load);
+    window.addEventListener(OPEN_FLAGS, onCount);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', load);
+      window.removeEventListener(OPEN_FLAGS, onCount);
+    };
+  }, [isAdmin]);
+
   return (
     <>
       <div className="top-accent" aria-hidden="true" />
@@ -82,12 +105,20 @@ export function App() {
               <span className="nav-icon"><IconUsers width={22} height={22} strokeWidth={2.2} /></span>
               <span className="nav-label">Directory</span>
             </NavLink>
-            {isAdminRole(currentUser.role) && (
+            {isAdmin && (
               <>
                 <div className="nav-rule" role="separator" />
                 <NavLink to="/admin/flags" className={navClass} onClick={close}>
-                  <span className="nav-icon"><IconFlag width={22} height={22} strokeWidth={2.2} /></span>
+                  <span className="nav-icon">
+                    <IconFlag width={22} height={22} strokeWidth={2.2} />
+                    {openFlags > 0 && <span className="nav-dot" aria-hidden="true" />}
+                  </span>
                   <span className="nav-label">Flags</span>
+                  {openFlags > 0 && (
+                    <span className="badge nav-count" title="Open flags" aria-label={`${openFlags} open flags`}>
+                      {openFlags > 99 ? '99+' : openFlags}
+                    </span>
+                  )}
                 </NavLink>
                 <NavLink to="/admin/wall" className={navClass} onClick={close}>
                   <span className="nav-icon"><IconGrid width={22} height={22} strokeWidth={2.2} /></span>

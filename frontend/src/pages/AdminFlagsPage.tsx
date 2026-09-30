@@ -17,6 +17,8 @@ function Person({ person, fallback = 'Unknown' }: { person?: Employee; fallback?
   );
 }
 
+export const OPEN_FLAGS = 'rizurf:open-flags';
+
 export function AdminFlagsPage() {
   const [flags, setFlags] = useState<OpenFlagEntry[]>([]);
   const [people, setPeople] = useState<Record<string, Employee>>({});
@@ -40,6 +42,11 @@ export function AdminFlagsPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  // Keeps the sidebar's Flags badge in step, e.g. right after resolving one.
+  useEffect(() => {
+    if (!loading && !blocked) window.dispatchEvent(new CustomEvent(OPEN_FLAGS, { detail: flags.length }));
+  }, [loading, blocked, flags.length]);
 
   async function handleResolve(flagId: string, deleteReviewToo: boolean) {
     setError(undefined);
