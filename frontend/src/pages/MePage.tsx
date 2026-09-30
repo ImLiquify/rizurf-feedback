@@ -21,6 +21,7 @@ import { Skeleton } from '../components/Skeleton';
 import { NOTIFICATIONS_ARRIVED } from '../components/NotificationsList';
 
 type Tab = 'received' | 'given';
+export const AWAITING_REPLY = 'rizurf:awaiting-reply';
 
 // Everything about the signed-in person in one place: the reviews written
 // about them (reply right here) and the ones they've written.
@@ -56,9 +57,14 @@ export function MePage() {
     return () => window.removeEventListener(NOTIFICATIONS_ARRIVED, reload);
   }, [loadReceived, loadGiven]);
 
+  // Keeps the sidebar's Me badge in step, e.g. right after I reply here.
+  const awaitingReply = received.filter((r) => !r.reply).length;
+  useEffect(() => {
+    if (!loading) window.dispatchEvent(new CustomEvent(AWAITING_REPLY, { detail: awaitingReply }));
+  }, [loading, awaitingReply]);
+
   if (loading) return <Skeleton variant="profile" />;
 
-  const awaitingReply = received.filter((r) => !r.reply).length;
   const shownReceived = filterReviews(received, filter, (r) => (r.authorId ? (people[r.authorId]?.name ?? '') : ''));
   const shownGiven = filterReviews(given, filter, (r) => r.receiverName);
   const switchTab = (t: Tab) => {

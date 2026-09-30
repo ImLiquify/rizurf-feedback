@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom';
 import { useCurrentUser } from './context/CurrentUserContext';
-import { NotificationsList } from './components/NotificationsList';
+import { NOTIFICATIONS_ARRIVED, NotificationsList } from './components/NotificationsList';
+import { getEmployeeReviews } from './api';
 import { Avatar } from './components/Avatar';
 import { ProfileMenu } from './components/ProfileMenu';
 import { IconFlag, IconGrid, IconMenu, IconUsers } from './components/icons';
@@ -10,7 +11,7 @@ import { EmployeeProfilePage } from './pages/EmployeeProfilePage';
 import { AdminFlagsPage } from './pages/AdminFlagsPage';
 import { AdminWallPage } from './pages/AdminWallPage';
 import { AdminWallEmployeePage } from './pages/AdminWallEmployeePage';
-import { MePage } from './pages/MePage';
+import { AWAITING_REPLY, MePage } from './pages/MePage';
 
 const GATEWAY = 'https://web-omega-two-47.vercel.app';
 
@@ -35,6 +36,24 @@ export function App() {
   const navClass = ({ isActive }: { isActive: boolean }) => 'nav-item' + (isActive ? ' active' : '');
   const close = () => setDrawerOpen(false);
 
+  // Reviews about me still waiting for my reply: the same number as the Me
+  // page's "About me" badge, which reports its own count as it changes.
+  const [awaitingReply, setAwaitingReply] = useState(0);
+  useEffect(() => {
+    const load = () =>
+      getEmployeeReviews(currentUser.id)
+        .then((d) => setAwaitingReply(d.reviews.filter((r) => !r.reply).length))
+        .catch(() => {});
+    const onCount = (e: Event) => setAwaitingReply((e as CustomEvent<number>).detail);
+    load();
+    window.addEventListener(NOTIFICATIONS_ARRIVED, load);
+    window.addEventListener(AWAITING_REPLY, onCount);
+    return () => {
+      window.removeEventListener(NOTIFICATIONS_ARRIVED, load);
+      window.removeEventListener(AWAITING_REPLY, onCount);
+    };
+  }, [currentUser.id]);
+
   return (
     <>
       <div className="top-accent" aria-hidden="true" />
@@ -48,8 +67,16 @@ export function App() {
           </div>
           <nav className="nav">
             <NavLink to="/me" className={navClass} onClick={close}>
-              <span className="nav-icon"><Avatar name={currentUser.name} photoUrl={currentUser.photoUrl} size={24} /></span>
+              <span className="nav-icon">
+                <Avatar name={currentUser.name} photoUrl={currentUser.photoUrl} size={24} />
+                {awaitingReply > 0 && <span className="nav-dot" aria-hidden="true" />}
+              </span>
               <span className="nav-label">Me</span>
+              {awaitingReply > 0 && (
+                <span className="badge nav-count" title="Waiting for your reply" aria-label={`${awaitingReply} waiting for your reply`}>
+                  {awaitingReply > 99 ? '99+' : awaitingReply}
+                </span>
+              )}
             </NavLink>
             <NavLink to="/directory" className={navClass} onClick={close}>
               <span className="nav-icon"><IconUsers width={22} height={22} strokeWidth={2.2} /></span>
