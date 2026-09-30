@@ -1,5 +1,4 @@
 import type {
-  DirectoryEmployee,
   Employee,
   GivenReview,
   NotificationItem,
@@ -74,12 +73,6 @@ export async function exchangeCode(code: string): Promise<Employee> {
 
 export async function searchEmployees(query: string): Promise<Employee[]> {
   const data = await request<{ employees: Employee[] }>(`/employees?q=${encodeURIComponent(query)}`);
-  return data.employees;
-}
-
-// The directory's tiles: everyone, each with the reviews you may see of them.
-export async function getDirectory(query: string): Promise<DirectoryEmployee[]> {
-  const data = await request<{ employees: DirectoryEmployee[] }>(`/employees?preview=1&q=${encodeURIComponent(query)}`);
   return data.employees;
 }
 
