@@ -31,6 +31,8 @@ export function NotificationsList() {
           if (seen.current) {
             const arrived = fresh.filter((n) => !seen.current!.has(n.id));
             if (arrived.length) setToasts((t) => [...arrived, ...t].slice(0, 3));
+            // Browsers may block sound until the page has been clicked once; then it's silent, not an error.
+            if (arrived.some((n) => n.type === 'review_received')) new Audio('/notification.wav').play().catch(() => {});
           }
           seen.current = new Set(all.map((n) => n.id));
           setUnread(fresh);
