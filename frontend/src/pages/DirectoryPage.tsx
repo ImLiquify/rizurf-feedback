@@ -73,7 +73,7 @@ export function DirectoryPage() {
           {results.map((e) => (
             <li key={e.id}>
               <Link to={`/employees/${e.id}`} className="person-card">
-                <Avatar name={e.name} photoUrl={e.photoUrl} size={48} />
+                <Avatar name={e.name} photoUrl={e.photoUrl} size={76} />
                 <div className="person-info">
                   <div className="person-name">{e.name}</div>
                   <div className="person-meta">{[roleLabel(e), e.department].filter(Boolean).join(' · ')}</div>
