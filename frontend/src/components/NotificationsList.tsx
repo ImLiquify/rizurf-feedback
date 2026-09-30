@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getNotifications, markNotificationRead } from '../api';
+import { getNotifications, markAllNotificationsRead, markNotificationRead } from '../api';
 import type { NotificationItem } from '../types';
 import { IconBell, IconClose } from './icons';
 import { timeAgo } from '../utils';
@@ -112,6 +112,13 @@ export function NotificationsList() {
     if (n.link) navigate(n.link);
   }
 
+  // Marks everything read; on failure the next poll brings them back.
+  function clearAll() {
+    setUnread([]);
+    setToasts([]);
+    markAllNotificationsRead().catch(() => {});
+  }
+
   const count = unread.length;
 
   return (
@@ -129,7 +136,14 @@ export function NotificationsList() {
       </button>
       {open && (
         <div className="notif-panel" role="dialog" aria-label="Unread notifications">
-          <div className="notif-head">Notifications</div>
+          <div className="notif-head">
+            Notifications
+            {count > 0 && (
+              <button type="button" className="link-btn" onClick={clearAll}>
+                Clear all
+              </button>
+            )}
+          </div>
           {count === 0 ? (
             <div className="notif-empty">You're all caught up.</div>
           ) : (

@@ -151,3 +151,7 @@ export async function getNotifications(): Promise<NotificationItem[]> {
 export function markNotificationRead(id: string): Promise<null> {
   return request<null>(`/notifications/${encodeURIComponent(id)}/read`, { method: 'POST' });
 }
+
+export function markAllNotificationsRead(): Promise<null> {
+  return request<null>('/notifications/read', { method: 'POST' });
+}

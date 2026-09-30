@@ -229,7 +229,8 @@ h1 .dept-tag { font-size: 12.5px; padding: 3px 11px; }
   padding: 6px; max-height: 380px; overflow-y: auto; z-index: 50;
   animation: notif-drop 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
-.notif-head { padding: 8px 10px 6px; font-size: 12px; font-weight: 700; color: var(--muted); }
+.notif-head { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px 6px; font-size: 12px; font-weight: 700; color: var(--muted); }
+.notif-head .link-btn { margin: 0; font-size: 12px; }
 .notif-empty { padding: 18px 10px 20px; font-size: 13.5px; color: var(--muted); text-align: center; }
 .notif-item {
   display: flex; justify-content: space-between; align-items: baseline; gap: 12px; width: 100%;
