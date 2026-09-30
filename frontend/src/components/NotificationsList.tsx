@@ -6,6 +6,21 @@ import { IconBell, IconClose } from './icons';
 import { timeAgo } from '../utils';
 
 const TOAST_MS = 5000;
+
+// One ding per notification, however many tabs of the app are open: every tab
+// polls, so the first to see a notification claims it here and the rest stay
+// quiet. Browsers may block sound until the page has been clicked once; then
+// it's silent, not an error.
+function chimeOnce(arrived: NotificationItem[]) {
+  try {
+    const heard = new Set<string>(JSON.parse(localStorage.getItem('chimed') ?? '[]'));
+    if (arrived.every((n) => heard.has(n.id))) return;
+    localStorage.setItem('chimed', JSON.stringify([...arrived.map((n) => n.id), ...heard].slice(0, 50)));
+  } catch {
+    // no storage (private window): just ding
+  }
+  new Audio('/notification.wav').play().catch(() => {});
+}
 const POLL_MS = 10000;
 export const NOTIFICATIONS_ARRIVED = 'rizurf:notifications-arrived';
 
@@ -37,8 +52,7 @@ export function NotificationsList() {
               // Pages showing reviews reload themselves, so new feedback appears without a refresh.
               window.dispatchEvent(new Event(NOTIFICATIONS_ARRIVED));
             }
-            // Browsers may block sound until the page has been clicked once; then it's silent, not an error.
-            if (arrived.some((n) => n.type === 'review_received')) new Audio('/notification.wav').play().catch(() => {});
+            if (arrived.length) chimeOnce(arrived);
           }
           seen.current = new Set(all.map((n) => n.id));
           setUnread(fresh);
