@@ -6,6 +6,7 @@ import { IconBell, IconClose } from './icons';
 import { timeAgo } from '../utils';
 
 const TOAST_MS = 5000;
+const LOUDNESS = 2.5; // 1 = the file as recorded; much higher starts to distort
 
 // One ding per notification, however many tabs of the app are open: every tab
 // polls, so the first to see a notification claims it here and the rest stay
@@ -19,7 +20,18 @@ function chimeOnce(arrived: NotificationItem[]) {
   } catch {
     // no storage (private window): just ding
   }
-  new Audio('/notification.wav').play().catch(() => {});
+  const audio = new Audio('/notification.mp3');
+  try {
+    // An <audio> element tops out at the file's own level; a gain node goes past it.
+    const ctx = new AudioContext();
+    const gain = ctx.createGain();
+    gain.gain.value = LOUDNESS;
+    ctx.createMediaElementSource(audio).connect(gain).connect(ctx.destination);
+    audio.onended = () => ctx.close();
+  } catch {
+    // no Web Audio: plays at normal volume
+  }
+  audio.play().catch(() => {});
 }
 const POLL_MS = 10000;
 export const NOTIFICATIONS_ARRIVED = 'rizurf:notifications-arrived';
