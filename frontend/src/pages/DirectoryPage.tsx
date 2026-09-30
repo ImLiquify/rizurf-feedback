@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { searchEmployees } from '../api';
-import type { Employee } from '../types';
+import { getDirectory } from '../api';
+import type { DirectoryEmployee } from '../types';
 import { Avatar } from '../components/Avatar';
-import { roleLabel } from '../utils';
+import { fullDate, roleLabel, timeAgo } from '../utils';
+import { topicCounts } from '../reviewFilters';
 import { IconSearch } from '../components/icons';
 import { Skeleton } from '../components/Skeleton';
 
 export function DirectoryPage() {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<Employee[]>([]);
+  const [results, setResults] = useState<DirectoryEmployee[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,7 +19,7 @@ export function DirectoryPage() {
     let cancelled = false;
     const timer = setTimeout(
       () => {
-        searchEmployees(query)
+        getDirectory(query)
           .then((r) => {
             if (!cancelled) setResults(r);
           })
@@ -63,40 +64,84 @@ export function DirectoryPage() {
         </div>
       </div>
       {loading ? (
-        <Skeleton variant="rows" />
+        <Skeleton variant="tiles" />
       ) : results.length === 0 ? (
         <div className="empty-state">
           {q ? `No one matches “${q}”. Try a first name or a department.` : 'No one here yet.'}
         </div>
       ) : (
-        <ul className="person-grid">
+        <ul className="wall-grid directory-grid">
           {results.map((e) => (
             <li key={e.id}>
-              <Link to={`/employees/${e.id}`} className="person-card">
-                <Avatar name={e.name} photoUrl={e.photoUrl} size={48} />
-                <div className="person-info">
-                  <div className="person-name">{e.name}</div>
-                  <div className="person-meta">{[roleLabel(e), e.department].filter(Boolean).join(' · ')}</div>
-                </div>
-                {e.avgRating != null ? (
-                  <span
-                    className="person-rating"
-                    aria-label={`${e.avgRating.toFixed(1)} stars from ${e.reviewCount} reviews`}
-                  >
-                    <span className="person-rating-star" aria-hidden="true">
-                      ★
-                    </span>
-                    {e.avgRating.toFixed(1)}
-                    <span className="person-rating-count">{e.reviewCount}</span>
-                  </span>
-                ) : (
-                  <span className="person-rating none">No reviews</span>
-                )}
-              </Link>
+              <PersonTile person={e} />
             </li>
           ))}
         </ul>
       )}
     </div>
+  );
+}
+
+function truncate(text: string, max = 120): string {
+  return text.length > max ? `${text.slice(0, max).trimEnd()}…` : text;
+}
+
+// A preview of how people see this person: rating, what reviews keep
+// mentioning, and the newest review you're allowed to read.
+function PersonTile({ person }: { person: DirectoryEmployee }) {
+  const tags = topicCounts(person.reviews).slice(0, 3);
+  const latest = person.reviews[0];
+
+  return (
+    <Link to={`/employees/${person.id}`} className="wall-tile person-tile">
+      <div className="wall-tile-header">
+        <Avatar name={person.name} photoUrl={person.photoUrl} size={44} />
+        <div className="wall-tile-identity">
+          <div className="wall-tile-name">{person.name}</div>
+          <div className="person-meta">{[roleLabel(person), person.department].filter(Boolean).join(' · ')}</div>
+        </div>
+        {person.avgRating != null ? (
+          <span
+            className="person-rating"
+            aria-label={`${person.avgRating.toFixed(1)} stars from ${person.reviewCount} reviews`}
+          >
+            <span className="person-rating-star" aria-hidden="true">
+              ★
+            </span>
+            {person.avgRating.toFixed(1)}
+            <span className="person-rating-count">{person.reviewCount}</span>
+          </span>
+        ) : (
+          <span className="person-rating none">No reviews</span>
+        )}
+      </div>
+
+      {tags.length > 0 && (
+        <div className="person-tags" aria-label="People often mention">
+          {tags.map(({ topic, count, average }) => (
+            <span key={topic} className={'topic-chip' + (average >= 4 ? ' good' : average <= 2 ? ' bad' : '')}>
+              {topic} <span className="topic-chip-count">{count}</span>
+            </span>
+          ))}
+        </div>
+      )}
+
+      {latest ? (
+        <figure className="person-quote">
+          <blockquote>{truncate(latest.body)}</blockquote>
+          <figcaption>
+            <span className="stars small" aria-label={`${latest.rating} of 5 stars`}>
+              {'★'.repeat(latest.rating)}
+              {'☆'.repeat(5 - latest.rating)}
+            </span>
+            <time dateTime={latest.createdAt} title={fullDate(latest.createdAt)}>
+              {timeAgo(latest.createdAt)}
+            </time>
+          </figcaption>
+        </figure>
+      ) : (
+        <p className="person-empty">No reviews yet. Be the first to leave one.</p>
+      )}
+    </Link>
   );
 }

@@ -111,3 +111,9 @@ export interface GivenReview extends ReviewView {
   receiverName: string;
   receiverPhotoUrl: string | null;
 }
+
+// A directory tile: the reviews of this person the viewer may see, newest
+// first, as rating/text/date only (no author).
+export interface DirectoryEmployee extends Employee {
+  reviews: { rating: number; body: string; createdAt: string }[];
+}

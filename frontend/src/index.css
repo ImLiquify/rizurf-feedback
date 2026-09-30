@@ -295,19 +295,6 @@ label { display: block; font-size: 12px; margin: 10px 0 4px; font-weight: 650; c
 .dir-head h1 { margin-bottom: 2px; }
 .dir-head .muted { margin: 0; }
 .dir-head .search-field { flex: 0 1 380px; margin-top: 0; }
-.person-grid {
-  list-style: none; padding: 0; margin: 22px 0 0; display: grid; gap: 12px;
-}
-.person-card {
-  display: flex; align-items: center; gap: 14px; height: 100%; padding: 14px 16px;
-  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg);
-  color: inherit; text-decoration: none;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
-}
-.person-card:hover { border-color: color-mix(in srgb, var(--primary) 45%, var(--line)); box-shadow: var(--shadow-md); transform: translateY(-1px); }
-.person-card:focus-visible { outline: none; box-shadow: var(--focus-ring); border-color: var(--primary); }
-.person-info { flex: 1; min-width: 0; }
-.person-name { font-size: 14.5px; font-weight: 650; color: var(--navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .person-meta { margin-top: 1px; font-size: 12.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .person-rating {
   flex: none; display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px;
@@ -317,8 +304,19 @@ label { display: block; font-size: 12px; margin: 10px 0 4px; font-weight: 650; c
 .person-rating-star { color: var(--star); font-size: 13px; }
 .person-rating-count { font-weight: 500; color: var(--muted); }
 .person-rating-count::before { content: '·'; margin-right: 4px; }
+/* Directory tiles share the Wall's tile; these are the preview parts. */
+.directory-grid { list-style: none; padding: 0; margin-top: 22px; }
+.directory-grid > li { display: flex; }
+.wall-tile.person-tile { flex: 1; display: flex; flex-direction: column; }
+.wall-tile.person-tile .wall-tile-header { margin-bottom: 12px; align-items: center; }
+.person-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.person-tags .topic-chip { padding: 2px 10px; font-size: 12px; cursor: inherit; }
+.person-quote { margin: auto 0 0; padding: 10px 12px; background: var(--soft); border-radius: var(--radius-sm); }
+.person-quote blockquote { margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--ink); }
+.person-quote figcaption { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.person-quote .stars.small { font-size: 12px; }
+.person-empty { margin: auto 0 0; font-size: 13px; color: var(--muted); }
 .person-rating.none { background: none; border-color: transparent; font-weight: 500; color: var(--muted); }
-@media (prefers-reduced-motion: reduce) { .person-card { transition: none; } .person-card:hover { transform: none; } }
 .stars { color: var(--star); letter-spacing: 1px; white-space: nowrap; }
 
 /* ---------- Panels / forms ---------- */
