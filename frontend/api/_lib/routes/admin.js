@@ -55,6 +55,6 @@ adminRouter.get(
     await syncInternRoster().catch((err) => console.error('Intern roster sync failed:', err.message));
 
     const [employees, reviews] = await Promise.all([searchEmployees(''), findAllReviewsWithNames()]);
-    res.json({ employees: buildWall(employees, reviews) });
+    res.json({ employees: buildWall(employees.filter((e) => !e.left), reviews) });
   }),
 );

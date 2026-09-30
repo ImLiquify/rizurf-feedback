@@ -20,6 +20,7 @@ CREATE TABLE employees (
   title      VARCHAR(255) NULL,            -- Intern API role name, display only; access comes from `role`
   department VARCHAR(255) NULL,            -- department name via department-api (Intern API department_id)
   role       ENUM('user', 'admin', 'hr', 'supervisor') NOT NULL DEFAULT 'user',
+  left_at    TIMESTAMP NULL,               -- set when they drop off the intern roster; hides them from the directory
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

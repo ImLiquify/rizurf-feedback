@@ -20,7 +20,7 @@ export function DirectoryPage() {
       () => {
         searchEmployees(query)
           .then((r) => {
-            if (!cancelled) setResults(r);
+            if (!cancelled) setResults(r.filter((e) => !e.left));
           })
           .catch(() => {})
           .finally(() => {

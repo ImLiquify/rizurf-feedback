@@ -10,6 +10,7 @@ export interface Employee {
   photoUrl?: string | null; // from the Intern API roster; null → initials
   title?: string | null; // Intern API role name; display only, access comes from `role`
   department?: string | null; // from department-api via the roster sync
+  left?: boolean; // dropped off the intern roster: hidden from the directory, name kept on old reviews
   // Present on directory/search results; absent on the signed-in session
   // user (GET /api/auth/session doesn't compute an aggregate).
   avgRating?: number | null;
