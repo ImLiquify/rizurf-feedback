@@ -6,7 +6,7 @@ import { IconBell, IconClose } from './icons';
 import { timeAgo } from '../utils';
 
 const TOAST_MS = 5000;
-const LOUDNESS = 2; // 1 = the file as recorded; much higher starts to distort
+const LOUDNESS = 1.5; // 1 = the file as recorded; much higher starts to distort
 
 // One ding per notification, however many tabs of the app are open: every tab
 // polls, so the first to see a notification claims it here and the rest stay
